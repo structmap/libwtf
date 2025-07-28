@@ -326,6 +326,15 @@ void stream_callback(const wtf_stream_event_t* event)
     stream_context_t* stream_ctx = (stream_context_t*)event->user_context;
 
     switch (event->type) {
+
+    case WTF_STREAM_EVENT_SEND_COMPLETE: {
+        for (uint32_t i = 0; i < event->send_complete.buffer_count; i++) {
+            if (event->send_complete.buffers[i].data) {
+                free(event->send_complete.buffers[i].data);
+            }
+        }
+        break;
+    }
     case WTF_STREAM_EVENT_DATA_RECEIVED: {
         printf("[STREAM] Data received on stream %u\n",
             stream_ctx ? stream_ctx->stream_id : 0);
@@ -494,21 +503,20 @@ void session_callback(const wtf_session_event_t* event)
     case WTF_SESSION_EVENT_DATAGRAM_RECEIVED: {
         printf("[DATAGRAM] Received on session %u (%u bytes)\n",
             session_ctx ? session_ctx->session_id : 0,
-            (unsigned int)event->datagram_received.data.length);
+            (unsigned int)event->datagram_received.length);
 
         g_stats.datagrams_received++;
-        g_stats.bytes_received += event->datagram_received.data.length;
+        g_stats.bytes_received += event->datagram_received.length;
 
-        char* text = malloc(event->datagram_received.data.length + 1);
+        char* text = malloc(event->datagram_received.length + 1);
         if (text) {
-            memcpy(text, event->datagram_received.data.data,
-                event->datagram_received.data.length);
-            text[event->datagram_received.data.length] = '\0';
+            memcpy(text, event->datagram_received.data, event->datagram_received.length);
+            text[event->datagram_received.length] = '\0';
 
             printf("[DATAGRAM] Content: %s\n", text);
 
-            command_t cmd = parse_command((const char*)event->datagram_received.data.data,
-                event->datagram_received.data.length);
+            command_t cmd = parse_command((const char*)event->datagram_received.data,
+                event->datagram_received.length);
 
             switch (cmd.type) {
             case CMD_REQUEST_STREAM:
@@ -545,10 +553,10 @@ void session_callback(const wtf_session_event_t* event)
 
             case CMD_ECHO:
             default: {
-                char* reversed = malloc(event->datagram_received.data.length + 1);
+                char* reversed = malloc(event->datagram_received.length + 1);
                 if (reversed) {
-                    size_t len = event->datagram_received.data.length;
-                    memcpy(reversed, event->datagram_received.data.data, len);
+                    size_t len = event->datagram_received.length;
+                    memcpy(reversed, event->datagram_received.data, len);
 
                     for (size_t i = 0; i < len / 2; i++) {
                         char temp = reversed[i];
@@ -579,6 +587,16 @@ void session_callback(const wtf_session_event_t* event)
         break;
     }
 
+    case WTF_SESSION_EVENT_DATAGRAM_SEND_STATE_CHANGE: {
+        if (WTF_DATAGRAM_SEND_STATE_IS_FINAL(event->datagram_send_state_changed.state)) {
+            for (uint32_t i = 0; i < event->datagram_send_state_changed.buffer_count; i++) {
+                if (event->datagram_send_state_changed.buffers[i].data) {
+                    free(event->datagram_send_state_changed.buffers[i].data);
+                }
+            }
+        }
+        break;
+    }
     case WTF_SESSION_EVENT_DRAINING:
         printf("[SESSION] Session %u is draining\n",
             session_ctx ? session_ctx->session_id : 0);

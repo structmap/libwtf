@@ -234,7 +234,7 @@ wtf_result_t handle_ping(wtf_session_t* session, const char* ping_data)
         wtf_buffer_t buffer = { .data = (uint8_t*)pong_response,
             .length = (size_t)msg_len };
 
-        wtf_result_t result = wtf_session_send_datagram(session, &buffer);
+        wtf_result_t result = wtf_session_send_datagram(session, &buffer, 1);
         if (result == WTF_SUCCESS) {
             g_stats.datagrams_sent++;
             g_stats.bytes_sent += buffer.length;
@@ -263,7 +263,7 @@ wtf_result_t handle_stats_request(wtf_session_t* session)
         wtf_buffer_t buffer = { .data = (uint8_t*)stats_response,
             .length = (size_t)msg_len };
 
-        wtf_result_t result = wtf_session_send_datagram(session, &buffer);
+        wtf_result_t result = wtf_session_send_datagram(session, &buffer, 1);
         if (result == WTF_SUCCESS) {
             g_stats.datagrams_sent++;
             g_stats.bytes_sent += buffer.length;
@@ -286,7 +286,7 @@ wtf_result_t handle_bulk_data(wtf_session_t* session, const char* bulk_info)
         wtf_buffer_t buffer = { .data = (uint8_t*)bulk_response,
             .length = (size_t)msg_len };
 
-        wtf_result_t result = wtf_session_send_datagram(session, &buffer);
+        wtf_result_t result = wtf_session_send_datagram(session, &buffer, 1);
         if (result == WTF_SUCCESS) {
             g_stats.datagrams_sent++;
             g_stats.bytes_sent += buffer.length;
@@ -330,11 +330,11 @@ void stream_callback(const wtf_stream_event_t* event)
         printf("[STREAM] Data received on stream %u\n",
             stream_ctx ? stream_ctx->stream_id : 0);
 
-        const size_t buffer_count = event->data_received.buffer_count;
+        const uint32_t buffer_count = event->data_received.buffer_count;
         const wtf_buffer_t* data = event->data_received.buffers;
 
         size_t total_length = 0;
-        for (int i = 0; i < buffer_count; i++) {
+        for (uint32_t i = 0; i < buffer_count; i++) {
             total_length += data[i].length;
         }
 
@@ -343,7 +343,7 @@ void stream_callback(const wtf_stream_event_t* event)
             break;
 
         size_t offset = 0;
-        for (int i = 0; i < buffer_count; i++) {
+        for (uint32_t i = 0; i < buffer_count; i++) {
             memcpy(text + offset, data[i].data, data[i].length);
             offset += data[i].length;
         }
@@ -377,19 +377,27 @@ void stream_callback(const wtf_stream_event_t* event)
             break;
         case CMD_ECHO:
         default: {
-            wtf_buffer_t response_buffers[1];
-            response_buffers[0].data = (uint8_t*)text;
-            response_buffers[0].length = total_length;
 
-            wtf_result_t result = wtf_stream_send(event->stream, response_buffers, 1, false);
-            if (result == WTF_SUCCESS) {
-                g_stats.bytes_sent += total_length;
-                printf("[STREAM] Echoed %zu bytes back\n", total_length);
-            } else {
-                printf("[STREAM] Failed to echo data: %s\n",
-                    wtf_result_to_string(result));
+            char* echo_data = malloc(total_length);
+            wtf_buffer_t* response_buffers = malloc(sizeof(wtf_buffer_t));
+
+            if (echo_data && response_buffers) {
+                memcpy(echo_data, text, total_length);
+
+                response_buffers[0].length = (uint32_t)total_length;
+                response_buffers[0].data = (uint8_t*)echo_data;
+
+                wtf_result_t result = wtf_stream_send(event->stream, response_buffers, 1, false);
+                if (result == WTF_SUCCESS) {
+                    g_stats.bytes_sent += total_length;
+                    printf("[STREAM] Echoed %zu bytes back\n", total_length);
+                } else {
+                    printf("[STREAM] Failed to echo data: %s\n",
+                        wtf_result_to_string(result));
+                    free(echo_data);
+                    free(response_buffers);
+                }
             }
-            break;
         }
         }
 
@@ -484,9 +492,9 @@ void session_callback(const wtf_session_event_t* event)
     }
 
     case WTF_SESSION_EVENT_DATAGRAM_RECEIVED: {
-        printf("[DATAGRAM] Received on session %u (%zu bytes)\n",
+        printf("[DATAGRAM] Received on session %u (%u bytes)\n",
             session_ctx ? session_ctx->session_id : 0,
-            event->datagram_received.data.length);
+            (unsigned int)event->datagram_received.data.length);
 
         g_stats.datagrams_received++;
         g_stats.bytes_received += event->datagram_received.data.length;
@@ -550,7 +558,7 @@ void session_callback(const wtf_session_event_t* event)
 
                     wtf_buffer_t buffer = { .data = (uint8_t*)reversed, .length = len };
 
-                    wtf_result_t result = wtf_session_send_datagram(event->session, &buffer);
+                    wtf_result_t result = wtf_session_send_datagram(event->session, &buffer, 1);
                     if (result == WTF_SUCCESS) {
                         g_stats.datagrams_sent++;
                         g_stats.bytes_sent += len;
@@ -558,9 +566,8 @@ void session_callback(const wtf_session_event_t* event)
                     } else {
                         printf("[DATAGRAM] Failed to echo: %s\n",
                             wtf_result_to_string(result));
+                        free(reversed);
                     }
-
-                    free(reversed);
                 }
                 break;
             }

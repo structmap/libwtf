@@ -4423,6 +4423,7 @@ wtf_result_t wtf_server_create(wtf_context_t* context,
             goto cleanup_cred_config;
         }
 
+        memset(srv->cred_config->CertificateFile, 0, sizeof(QUIC_CERTIFICATE_FILE));
         if (!config->cert_config->cert_data.file.cert_path || !config->cert_config->cert_data.file.key_path || !wtf_path_valid(config->cert_config->cert_data.file.cert_path) || !wtf_path_valid(config->cert_config->cert_data.file.key_path)) {
             WTF_LOG_ERROR(ctx, "server", "Invalid certificate or key file path");
             result = WTF_ERROR_INVALID_PARAMETER;

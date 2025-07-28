@@ -133,6 +133,26 @@ typedef enum {
     WTF_H3_VERSION_FALLBACK = 0x0110
 } wtf_h3_error_t;
 
+//! Datagram send states for tracking datagram lifecycle
+typedef enum {
+    WTF_DATAGRAM_SEND_UNKNOWN = 0, //! Not yet sent.
+    //! Indicates the datagram has now been sent out on the network. This is the earliest the app may free the wtf_buffer_t.
+    WTF_DATAGRAM_SEND_SENT = 1,
+    //! The sent datagram is suspected to be lost. If desired, the app could retransmit the data now.
+    WTF_DATAGRAM_SEND_LOST_SUSPECTED = 2,
+    //! The datagram is confirmed lost and no longer tracked. The app should not retransmit.
+    WTF_DATAGRAM_SEND_LOST_DISCARDED = 3,
+    //! The sent datagram has been acknowledged.
+    WTF_DATAGRAM_SEND_ACKNOWLEDGED = 4,
+    //! The sent datagram has been acknowledged after previously being suspected as lost.
+    WTF_DATAGRAM_SEND_ACKNOWLEDGED_SPURIOUS = 5,
+    //! The queued datagram was canceled; either because the connection was shutdown or the peer did not negotiate the feature.
+    WTF_DATAGRAM_SEND_CANCELED = 6
+} wtf_datagram_send_state_t;
+
+#define WTF_DATAGRAM_SEND_STATE_IS_FINAL(State) \
+    ((State) >= WTF_DATAGRAM_SEND_LOST_DISCARDED)
+
 //! QPACK error codes as defined in RFC 9204
 typedef enum {
     WTF_QPACK_DECOMPRESSION_FAILED = 0x0200,
@@ -162,7 +182,8 @@ typedef enum {
     WTF_SESSION_EVENT_DISCONNECTED, //! Session has been disconnected
     WTF_SESSION_EVENT_DRAINING, //! Session is being drained
     WTF_SESSION_EVENT_STREAM_OPENED, //! New stream created on session
-    WTF_SESSION_EVENT_DATAGRAM_RECEIVED //! Datagram received on session
+    WTF_SESSION_EVENT_DATAGRAM_SEND_STATE_CHANGE, //! This event indicates a state change for a previous unreliable datagram send
+    WTF_SESSION_EVENT_DATAGRAM_RECEIVED, //! Datagram received on session
 } wtf_session_event_type_t;
 
 //! Stream event types for callback notifications
@@ -216,7 +237,13 @@ typedef struct {
             wtf_stream_type_t stream_type; //! Type of the new stream
         } stream_opened;
         struct {
-            wtf_buffer_t data; //! Received datagram data
+            wtf_buffer_t* buffers; //! Array of sent datagram buffers
+            uint32_t buffer_count; //! Number of buffers sent
+            wtf_datagram_send_state_t state; //! New state of the datagram send
+        } datagram_send_state_changed;
+        struct {
+            const uint32_t length;        //! Size of data in bytes
+            const uint8_t* data;          //! Pointer to buffer data
         } datagram_received;
     };
 } wtf_session_event_t;
@@ -233,6 +260,8 @@ typedef struct {
             bool fin; //! True if this is the final data
         } data_received;
         struct {
+            wtf_buffer_t* buffers; //! Array of sent data buffers
+            uint32_t buffer_count; //! Number of buffers sent
             bool cancelled; //! True if send was cancelled
         } send_complete;
         struct {
@@ -469,18 +498,26 @@ WTF_API wtf_result_t wtf_session_drain(wtf_session_t* session);
 //! @param buffers array of buffers containing datagram data
 //! @param buffer_count number of buffers in array
 //! @return WTF_SUCCESS on success, error code on failure
-//! 
+//!
 //! @note Memory ownership:
 //! - The buffers array is always owned by the caller.
-//! - On SUCCESS: The library takes ownership of all buffer data (buffers[i].data) and
-//!   will free it on send completion. The caller must not access or free the data.
+//! - On SUCCESS: The caller retains ownership of buffer data (buffers[i].data).
+//!   The library will emit a WTF_SESSION_EVENT_DATAGRAM_SEND_STATE_CHANGE event
+//!   when the send state changes. The application must free the buffer data when
+//!   the state reaches a final state (use WTF_DATAGRAM_SEND_STATE_IS_FINAL macro).
 //! - On FAILURE: The caller retains ownership of all buffer data and must free it.
-//! 
+//!
+//! @note Send state change handling:
+//! - Applications MUST implement WTF_SESSION_EVENT_DATAGRAM_SEND_STATE_CHANGE handling
+//!   in their session callback to free the sent buffer data on final states.
+//! - If no session callback is set, the library will automatically free the
+//!   buffer data as a fallback, but this is not recommended.
+//!
 //! @note The function creates an internal buffer array containing a protocol header
-//!       followed by references to the original data buffers. No data copying occurs.
+//! followed by references to the original data buffers. No data copying occurs.
 WTF_API wtf_result_t wtf_session_send_datagram(wtf_session_t* session,
-                                               const wtf_buffer_t* buffers, 
-                                               uint32_t buffer_count);
+    const wtf_buffer_t* buffers,
+    uint32_t buffer_count);
 
 //! Open a new stream on a session
 //! @param session parent session for the stream
@@ -521,18 +558,27 @@ WTF_API void wtf_session_set_context(wtf_session_t* session,
 //! @param buffer_count number of buffers in array
 //! @param fin true if this is the final data
 //! @return WTF_SUCCESS on success, error code on failure
-//! 
+//!
 //! @note Memory ownership:
-//! - On SUCCESS: The ownership of the buffers array is transferred to the library.
-//!   All buffer data (buffers[i].data) must remain valid until send completion callback - the data is freed by the library.
-//! - On FAILURE: The caller retains full ownership of both the buffers array and all data.
-//! 
+//! - On SUCCESS: The caller retains ownership of buffer data (buffers[i].data).
+//!   The library will emit a WTF_STREAM_EVENT_SEND_COMPLETE event when the send
+//!   operation completes. The application must free the buffer data in the
+//!   send completion callback.
+//! - On FAILURE: The caller retains full ownership of both the buffers array
+//!   and all data, and should free them immediately.
+//!
+//! @note Send completion handling:
+//! - Applications MUST implement WTF_STREAM_EVENT_SEND_COMPLETE handling in their
+//!   stream callback to free the sent buffer data.
+//! - If no stream callback is set, the library will automatically free the
+//!   buffer data as a fallback, but this is not recommended.
+//!
 //! @note The function passes the original buffers directly to the QUIC layer without
-//!       modification or copying. No protocol headers are added for stream data.
+//! modification or copying. No protocol headers are added for stream data.
 WTF_API wtf_result_t wtf_stream_send(wtf_stream_t* stream,
-                                     const wtf_buffer_t* buffers,
-                                     uint32_t buffer_count, 
-                                     bool fin);
+    const wtf_buffer_t* buffers,
+    uint32_t buffer_count,
+    bool fin);
 
 //! Close a stream gracefully (send FIN)
 //! @param stream stream to close

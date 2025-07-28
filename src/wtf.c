@@ -369,6 +369,7 @@ typedef struct wtf_context {
 typedef struct {
     wtf_buffer_t* buffers;
     uint32_t count;
+    wtf_session* session;
 } wtf_internal_send_context;
 
 static bool wtf_process_settings_frame(wtf_http3_stream* stream,
@@ -695,12 +696,10 @@ static size_t wtf_strncpy(char* dest, const char* src, size_t dest_size)
 #endif
         return 0;
     }
-
     if (!src) {
         dest[0] = '\0';
         return 0;
     }
-
 #ifdef _WIN32
     errno_t err = strcpy_s(dest, dest_size, src);
     if (err != 0) {
@@ -709,11 +708,9 @@ static size_t wtf_strncpy(char* dest, const char* src, size_t dest_size)
     }
     return strlen(dest);
 #else
-    size_t result = strncpy(dest, src, dest_size);
-    if (result >= dest_size) {
-        return dest_size - 1;
-    }
-    return result;
+    strncpy(dest, src, dest_size - 1);
+    dest[dest_size - 1] = '\0';
+    return strlen(dest);
 #endif
 }
 
@@ -1877,6 +1874,7 @@ static wtf_result_t wtf_session_send_datagram_internal(
         result = WTF_ERROR_OUT_OF_MEMORY;
         goto cleanup;
     }
+    send_ctx->session = session;
 
     size_t bytes_written;
     if (!wtf_varint_encode(quarter_stream_id, header_buffer, header_size,
@@ -1927,16 +1925,14 @@ static bool wtf_session_process_datagram(wtf_session* session,
         return false;
 
     if (session->callback) {
-        wtf_buffer_t buffer = { (uint32_t)length, (uint8_t*)data };
         wtf_session_event_t event = {
             .type = WTF_SESSION_EVENT_DATAGRAM_RECEIVED,
             .session = (wtf_session_t*)session,
             .user_context = session->user_context,
-            .datagram_received = { buffer }
+            .datagram_received = { .length = (const uint32_t)length, .data = (const uint8_t*)data }
         };
         session->callback(&event);
     }
-
     return true;
 }
 
@@ -3586,27 +3582,36 @@ static QUIC_STATUS QUIC_API wtf_upgraded_stream_callback(
         WTF_LOG_DEBUG(conn->server->context, "webtransport",
             "WebTransport stream send complete on stream %llu",
             (unsigned long long)wt_stream->stream_id);
+
+        wtf_internal_send_context* send_ctx = NULL;
         if (Event->SEND_COMPLETE.ClientContext) {
-            wtf_internal_send_context* send_ctx = (wtf_internal_send_context*)Event->SEND_COMPLETE.ClientContext;
-            for (uint32_t i = 0; i < send_ctx->count; i++) {
-                if (send_ctx->buffers[i].data) {
-                    free(send_ctx->buffers[i].data);
+            send_ctx = (wtf_internal_send_context*)Event->SEND_COMPLETE.ClientContext;
+        }
+
+        if (send_ctx) {
+            if (wt_stream->callback) {
+                wtf_stream_event_t event = {
+                    .type = WTF_STREAM_EVENT_SEND_COMPLETE,
+                    .stream = (wtf_stream_t*)wt_stream,
+                    .user_context = wt_stream->user_context,
+                    .send_complete = {
+                        .buffers = send_ctx->buffers,
+                        .buffer_count = send_ctx->count,
+                        .cancelled = Event->SEND_COMPLETE.Canceled }
+                };
+                wt_stream->callback(&event);
+            } else {
+                for (uint32_t i = 0; i < send_ctx->count; i++) {
+                    if (send_ctx->buffers[i].data) {
+                        free(send_ctx->buffers[i].data);
+                    }
                 }
             }
+
             free(send_ctx->buffers);
             free(send_ctx);
         }
 
-        if (wt_stream->callback) {
-            wtf_stream_event_t event = {
-                .type = WTF_STREAM_EVENT_SEND_COMPLETE,
-                .stream = (wtf_stream_t*)wt_stream,
-                .user_context = wt_stream->user_context,
-                .send_complete = {
-                    .cancelled = Event->SEND_COMPLETE.Canceled }
-            };
-            wt_stream->callback(&event);
-        }
         return QUIC_STATUS_SUCCESS;
     }
 
@@ -4034,15 +4039,39 @@ static QUIC_STATUS QUIC_API wtf_connection_callback(
     }
 
     case QUIC_CONNECTION_EVENT_DATAGRAM_SEND_STATE_CHANGED: {
-        if (Event->DATAGRAM_SEND_STATE_CHANGED.ClientContext && Event->DATAGRAM_SEND_STATE_CHANGED.State == QUIC_DATAGRAM_SEND_SENT) {
-
+        if (Event->DATAGRAM_SEND_STATE_CHANGED.ClientContext) {
             wtf_internal_send_context* send_ctx = (wtf_internal_send_context*)Event->DATAGRAM_SEND_STATE_CHANGED.ClientContext;
-            if (send_ctx->buffers && send_ctx->count > 0 && send_ctx->buffers[0].data) {
-                free(send_ctx->buffers[0].data);
-            }
+            if (send_ctx) {
 
-            free(send_ctx->buffers);
-            free(send_ctx);
+                wtf_session* session = send_ctx->session;
+
+                if (session && session->callback) {
+                    wtf_session_event_t event = {
+                        .type = WTF_SESSION_EVENT_DATAGRAM_SEND_STATE_CHANGE,
+                        .session = session,
+                        .user_context = session->user_context,
+                        .datagram_send_state_changed = {
+                            .buffers = send_ctx->count > 1 ? &send_ctx->buffers[1] : NULL,
+                            .buffer_count = send_ctx->count > 0 ? send_ctx->count - 1 : 0,
+                            .state = (wtf_datagram_send_state_t)Event->DATAGRAM_SEND_STATE_CHANGED.State }
+                    };
+                    session->callback(&event);
+                } else {
+                    for (uint32_t i = 1; i < send_ctx->count; i++) {
+                        if (send_ctx->buffers[i].data) {
+                            free(send_ctx->buffers[i].data);
+                        }
+                    }
+                }
+
+                if (QUIC_DATAGRAM_SEND_STATE_IS_FINAL(Event->DATAGRAM_SEND_STATE_CHANGED.State)) {
+                    if (send_ctx->buffers && send_ctx->count > 0 && send_ctx->buffers[0].data) {
+                        free(send_ctx->buffers[0].data);
+                    }
+                    free(send_ctx->buffers);
+                    free(send_ctx);
+                }
+            }
         }
         return QUIC_STATUS_SUCCESS;
     }

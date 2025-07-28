@@ -180,8 +180,8 @@ typedef enum {
 
 //! Data buffer for network operations
 typedef struct {
-    const uint8_t* data; //! Pointer to buffer data
-    size_t length; //! Size of data in bytes
+    uint32_t length;        //! Size of data in bytes
+    uint8_t* data;          //! Pointer to buffer data
 } wtf_buffer_t;
 
 //! HTTP header for connection validation
@@ -229,11 +229,10 @@ typedef struct {
     union {
         struct {
             wtf_buffer_t* buffers; //! Array of received data buffers
-            size_t buffer_count; //! Number of buffers
+            uint32_t buffer_count; //! Number of buffers
             bool fin; //! True if this is the final data
         } data_received;
         struct {
-            void* send_context; //! Context from send operation
             bool cancelled; //! True if send was cancelled
         } send_complete;
         struct {
@@ -444,13 +443,6 @@ WTF_API wtf_result_t wtf_server_stop(wtf_server_t* server);
 //! @return current operational state
 WTF_API wtf_server_state_t wtf_server_get_state(wtf_server_t* server);
 
-//! Get server statistics
-//! @param server target server instance
-//! @param stats pointer to statistics structure to fill
-//! @return WTF_SUCCESS on success, error code on failure
-WTF_API wtf_result_t wtf_server_get_statistics(wtf_server_t* server,
-    wtf_server_statistics_t* stats);
-
 //! Destroy the server and free resources
 //! @param server server instance to destroy
 WTF_API void wtf_server_destroy(wtf_server_t* server);
@@ -474,11 +466,21 @@ WTF_API wtf_result_t wtf_session_drain(wtf_session_t* session);
 
 //! Send a datagram on a session
 //! @param session target session
-//! @param data buffer containing datagram data
+//! @param buffers array of buffers containing datagram data
+//! @param buffer_count number of buffers in array
 //! @return WTF_SUCCESS on success, error code on failure
-//! @note The data buffer must remain valid until send completion
+//! 
+//! @note Memory ownership:
+//! - The buffers array is always owned by the caller.
+//! - On SUCCESS: The library takes ownership of all buffer data (buffers[i].data) and
+//!   will free it on send completion. The caller must not access or free the data.
+//! - On FAILURE: The caller retains ownership of all buffer data and must free it.
+//! 
+//! @note The function creates an internal buffer array containing a protocol header
+//!       followed by references to the original data buffers. No data copying occurs.
 WTF_API wtf_result_t wtf_session_send_datagram(wtf_session_t* session,
-    const wtf_buffer_t* data);
+                                               const wtf_buffer_t* buffers, 
+                                               uint32_t buffer_count);
 
 //! Open a new stream on a session
 //! @param session parent session for the stream
@@ -519,9 +521,18 @@ WTF_API void wtf_session_set_context(wtf_session_t* session,
 //! @param buffer_count number of buffers in array
 //! @param fin true if this is the final data
 //! @return WTF_SUCCESS on success, error code on failure
+//! 
+//! @note Memory ownership:
+//! - On SUCCESS: The ownership of the buffers array is transferred to the library.
+//!   All buffer data (buffers[i].data) must remain valid until send completion callback - the data is freed by the library.
+//! - On FAILURE: The caller retains full ownership of both the buffers array and all data.
+//! 
+//! @note The function passes the original buffers directly to the QUIC layer without
+//!       modification or copying. No protocol headers are added for stream data.
 WTF_API wtf_result_t wtf_stream_send(wtf_stream_t* stream,
-    const wtf_buffer_t* buffers,
-    size_t buffer_count, bool fin);
+                                     const wtf_buffer_t* buffers,
+                                     uint32_t buffer_count, 
+                                     bool fin);
 
 //! Close a stream gracefully (send FIN)
 //! @param stream stream to close

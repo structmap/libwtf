@@ -27,12 +27,9 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 set(WTF_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/output CACHE STRING "Output directory for build artifacts")
-message(STATUS "WTF: Output set to ${WTF_OUTPUT_DIR}")
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
-
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${WTF_OUTPUT_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${WTF_OUTPUT_DIR})
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${WTF_OUTPUT_DIR})
@@ -52,15 +49,6 @@ option(WTF_BUILD_SAMPLES "Build sample applications" OFF)
 option(WTF_ENABLE_LOGGING "Enable logging support" ON)
 option(WTF_USE_EXTERNAL_MSQUIC "Use an external msquic installation" OFF)
 
-include_directories(
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
-    ${CMAKE_CURRENT_SOURCE_DIR}/deps/tinycthreads
-    ${CMAKE_CURRENT_SOURCE_DIR}/deps/ls-qpack
-    ${CMAKE_CURRENT_SOURCE_DIR}/deps/xxhash
-    ${CMAKE_CURRENT_SOURCE_DIR}/deps/verstable
-)
-
 set(WTF_VERSION ${GIT_VERSION})
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.in
@@ -68,7 +56,10 @@ configure_file(
     @ONLY
 )
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
+set(WTF_LIBRARY_NAME "wtf")
+set(WTF_VERSION_MAJOR ${GIT_VERSION_MAJOR})
+set(WTF_VERSION_MINOR ${GIT_VERSION_MINOR})
+set(WTF_VERSION_PATCH ${GIT_VERSION_PATCH})
 
 if(WIN32)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -110,8 +101,6 @@ if(WTF_USE_EXTERNAL_MSQUIC)
     find_package(msquic CONFIG REQUIRED)
     set(MSQUIC_LIBRARIES msquic)
 else()
-    message(STATUS "Building MsQuic from submodule...")
-    
     set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
     
     if(WIN32)
@@ -134,21 +123,18 @@ else()
     if(WTF_ENABLE_LOGGING OR CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(QUIC_ENABLE_LOGGING ON CACHE BOOL "Enable MsQuic logging")
         set(QUIC_LOGGING_TYPE "stdout" CACHE STRING "Set MsQuic logging output to stdout")
-        message(STATUS "MsQuic logging enabled with stdout output")
     else()
         set(QUIC_ENABLE_LOGGING OFF CACHE BOOL "Disable MsQuic logging")
     endif()
     
     add_compile_definitions(QUIC_API_ENABLE_PREVIEW_FEATURES=1)
 
-    # Workaround for Apple Clang invalid-unevaluated-string warning in MsQuic (Clang 17)
     if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         add_compile_options(-Wno-invalid-unevaluated-string)
     endif()
     
     add_subdirectory(msquic)
     
-    # Force MsQuic targets to use our output directories
     if(TARGET msquic)
         set_target_properties(msquic PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR}
@@ -180,7 +166,10 @@ else()
     if(NOT APPLE)
         list(APPEND PLATFORM_LIBS rt)
         list(APPEND PLATFORM_LIBS m)
+    else()
+        list(APPEND PLATFORM_LIBS "-framework Security")
     endif()
+
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
             list(APPEND PLATFORM_LIBS dl)
@@ -191,22 +180,43 @@ else()
     endif()
 endif()
 
+if(WIN32)
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/export/windows/wtf.def.in
+        ${CMAKE_CURRENT_BINARY_DIR}/wtf.def
+        @ONLY
+    )
+    configure_file(
+        ${CMAKE_CURRENT_SOURCE_DIR}/export/windows/wtf.rc.in
+        ${CMAKE_CURRENT_BINARY_DIR}/wtf.rc
+        @ONLY
+    )
+    set(WTF_EXPORT_SOURCES ${CMAKE_CURRENT_BINARY_DIR}/wtf.rc)
+else()
+    set(WTF_EXPORT_SOURCES "")
+endif()
+
 set(WTF_SOURCES
     deps/tinycthreads/tinycthread.c
     deps/ls-qpack/lsqpack.c
     deps/xxhash/xxhash.c
-    src/wtf.c
+    src/log.c
+    src/qpack.c
+    src/varint.c
+    src/utils.c
+    src/datagram.c
+    src/stream.c
+    src/session.c   
+    src/settings.c
+    src/conn.c
+    src/http3.c
+    src/server.c
+    src/context.c
+    ${WTF_EXPORT_SOURCES}
 )
 
-set(WTF_HEADERS
-    deps/verstable/verstable.h
+set(WTF_PUBLIC_HEADERS
     include/wtf.h
-    deps/tinycthreads/tinycthread.h
-    deps/ls-qpack/lsqpack.h
-    deps/xxhash/xxhash.h
-    deps/ls-qpack/lsxpack_header.h
-    deps/ls-qpack/huff-tables.h
-    ${CMAKE_CURRENT_BINARY_DIR}/include/wtf_version.h
 )
 
 add_library(wtf SHARED ${WTF_SOURCES})
@@ -214,11 +224,8 @@ add_library(wtf SHARED ${WTF_SOURCES})
 set_target_properties(wtf PROPERTIES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
+    PUBLIC_HEADER "${WTF_PUBLIC_HEADERS}"
 )
-
-if(NOT WIN32)
-    target_compile_options(wtf PRIVATE -fvisibility=hidden)
-endif()
 
 if(WIN32)
     set_target_properties(wtf PROPERTIES
@@ -233,11 +240,12 @@ target_include_directories(wtf
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include>
         $<INSTALL_INTERFACE:include>
     PRIVATE
-        ${MSQUIC_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/deps/tinycthreads
         ${CMAKE_CURRENT_SOURCE_DIR}/deps/ls-qpack
         ${CMAKE_CURRENT_SOURCE_DIR}/deps/xxhash
         ${CMAKE_CURRENT_SOURCE_DIR}/deps/verstable
+        ${MSQUIC_INCLUDE_DIRS}
 )
 
 if(WIN32 OR EMSCRIPTEN)
@@ -258,6 +266,33 @@ endif()
 
 target_compile_definitions(wtf PRIVATE WTF_EXPORTS)
 
+if(NOT WIN32)
+    target_compile_options(wtf PRIVATE -fvisibility=hidden)
+    target_compile_options(wtf PRIVATE -fvisibility-inlines-hidden)
+endif()
+
+if(WIN32)
+    set_target_properties(wtf PROPERTIES
+        LINK_FLAGS "/DEF:${CMAKE_CURRENT_BINARY_DIR}/wtf.def"
+    )
+elseif(APPLE)
+    set_target_properties(wtf PROPERTIES
+        LINK_FLAGS "-Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/export/darwin/exports.txt -Wl,-dead_strip -Wl,-x"
+    )
+elseif(UNIX)
+    set_target_properties(wtf PROPERTIES
+        LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export/linux/exports.txt -Wl,--gc-sections -Wl,--strip-all"
+    )
+endif()
+
+if(NOT WIN32)
+    set_target_properties(wtf PROPERTIES
+        C_VISIBILITY_PRESET hidden
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN YES
+    )
+endif()
+
 add_library(WebTransport::wtf ALIAS wtf)
 
 if(WTF_BUILD_SAMPLES AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/samples")
@@ -271,7 +306,7 @@ endif()
 
 include(GNUInstallDirs)
 
-install(FILES include/wtf.h
+install(FILES ${WTF_PUBLIC_HEADERS}
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
 
@@ -280,38 +315,3 @@ install(TARGETS wtf
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
-
-message(STATUS "")
-message(STATUS "WebTransport Library Configuration:")
-message(STATUS "  Git Version:       ${GIT_VERSION}")
-message(STATUS "  Project Version:   ${PROJECT_VERSION}")
-message(STATUS "  Build type:        ${CMAKE_BUILD_TYPE}")
-message(STATUS "  Library type:      SHARED")
-message(STATUS "  Output directory:  ${WTF_OUTPUT_DIR}")
-message(STATUS "  Tests:             ${WTF_BUILD_TESTS}")
-message(STATUS "  Samples:           ${WTF_BUILD_SAMPLES}")
-message(STATUS "  Logging:           ${WTF_ENABLE_LOGGING}")
-message(STATUS "  External MsQuic:   ${WTF_USE_EXTERNAL_MSQUIC}")
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-message(STATUS "  Debug symbols:     ON")
-message(STATUS "  Stack traces:      ON")
-message(STATUS "  Optimizations:     OFF")
-message(STATUS "  LTO:               OFF")
-if(APPLE)
-message(STATUS "  macOS debug mode:  ENHANCED")
-endif()
-else()
-message(STATUS "  Optimizations:     ON")
-message(STATUS "  LTO:               ON")
-endif()
-if(WTF_ENABLE_LOGGING OR CMAKE_BUILD_TYPE STREQUAL "Debug")
-message(STATUS "  MsQuic Logging:    ON (stdout)")
-else()
-message(STATUS "  MsQuic Logging:    OFF")
-endif()
-if(WIN32)
-message(STATUS "  Symbol Export:     AUTO (Windows DLL)")
-else()
-message(STATUS "  Symbol Export:     CONTROLLED (visibility)")
-endif()
-message(STATUS "")

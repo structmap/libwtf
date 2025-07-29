@@ -1,0 +1,34 @@
+# Auto-generated Darwin export list from wtf.h
+# Do not edit manually - regenerate using export script
+_wtf_get_version
+_wtf_context_create
+_wtf_context_destroy
+_wtf_context_set_log_level
+_wtf_server_create
+_wtf_server_start
+_wtf_server_stop
+_wtf_server_get_state
+_wtf_server_destroy
+_wtf_session_close
+_wtf_session_drain
+_wtf_session_send_datagram
+_wtf_session_create_stream
+_wtf_session_get_state
+_wtf_session_get_peer_address
+_wtf_session_set_context
+_wtf_stream_send
+_wtf_stream_close
+_wtf_stream_abort
+_wtf_stream_get_id
+_wtf_stream_set_callback
+_wtf_stream_set_context
+_wtf_stream_get_type
+_wtf_stream_get_state
+_wtf_stream_set_priority
+_wtf_stream_set_receive_enabled
+_wtf_session_find_stream_by_id
+_wtf_result_to_string
+_wtf_webtransport_error_to_string
+_wtf_get_error_details
+_wtf_is_valid_application_error
+_wtf_http3_error_to_string

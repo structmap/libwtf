@@ -34,7 +34,6 @@ typedef struct wtf_context wtf_context_t;
 typedef struct wtf_server wtf_server_t;
 typedef struct wtf_session wtf_session_t;
 typedef struct wtf_stream wtf_stream_t;
-typedef struct wtf_http3_connection wtf_http3_connection_t;
 
 // #endregion
 
@@ -404,16 +403,6 @@ typedef struct {
     wtf_execution_profile_t execution_profile; //! Performance profile
 } wtf_context_config_t;
 
-//! Server performance statistics
-typedef struct {
-    uint32_t active_sessions; //! Currently active sessions
-    uint64_t total_sessions_accepted; //! Total sessions accepted
-    uint64_t total_sessions_rejected; //! Total sessions rejected
-    uint64_t total_connections_attempted; //! Total connection attempts
-    uint64_t total_bytes_sent; //! Total bytes transmitted
-    uint64_t total_bytes_received; //! Total bytes received
-} wtf_server_statistics_t;
-
 //! Library version information
 typedef struct {
     uint32_t major; //! Major version number
@@ -627,15 +616,6 @@ WTF_API wtf_stream_state_t wtf_stream_get_state(wtf_stream_t* stream);
 WTF_API wtf_result_t wtf_stream_set_priority(wtf_stream_t* stream,
     uint16_t priority);
 
-//! Get stream statistics
-//! @param stream target stream
-//! @param bytes_sent pointer to receive bytes sent count
-//! @param bytes_received pointer to receive bytes received count
-//! @return WTF_SUCCESS on success, error code on failure
-WTF_API wtf_result_t wtf_stream_get_statistics(wtf_stream_t* stream,
-    uint64_t* bytes_sent,
-    uint64_t* bytes_received);
-
 //! Enable or disable stream receive operations
 //! @param stream target stream
 //! @param enabled true to enable, false to disable
@@ -647,37 +627,6 @@ WTF_API wtf_result_t wtf_stream_set_receive_enabled(wtf_stream_t* stream,
 
 // #region Advanced Connection Features
 
-//! Get connection session limits
-//! @param conn target connection
-//! @param max_sessions pointer to receive maximum sessions limit
-//! @param current_sessions pointer to receive current session count
-//! @return WTF_SUCCESS on success, error code on failure
-WTF_API wtf_result_t wtf_connection_get_session_limit(
-    wtf_http3_connection_t* conn, uint32_t* max_sessions,
-    uint32_t* current_sessions);
-
-//! Check if connection can accept new sessions
-//! @param conn target connection
-//! @return true if connection can accept new sessions
-WTF_API bool wtf_connection_can_accept_session(wtf_http3_connection_t* conn);
-
-//! Get all active sessions on a connection
-//! @param conn target connection
-//! @param sessions array to receive session pointers
-//! @param session_count pointer to receive actual session count
-//! @param max_sessions maximum sessions that can fit in array
-//! @return WTF_SUCCESS on success, error code on failure
-WTF_API wtf_result_t wtf_connection_get_sessions(wtf_http3_connection_t* conn,
-    wtf_session_t** sessions,
-    size_t* session_count,
-    size_t max_sessions);
-
-//! Find session by ID in connection
-//! @param conn target connection
-//! @param session_id ID of session to find
-//! @return session pointer or NULL if not found
-WTF_API wtf_session_t* wtf_connection_find_session_by_id(
-    wtf_http3_connection_t* conn, uint64_t session_id);
 
 //! Find stream by ID within session
 //! @param session target session

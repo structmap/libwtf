@@ -22,7 +22,7 @@ function parseWTFApiMethods(content: string): string[] {
 }
 
 function createDirectories() {
-    const dirs = ['export/darwin', 'export/linux', 'export/windows'];
+    const dirs = ['cmake/export/darwin', 'cmake/export/linux', 'cmake/export/windows'];
     for (const dir of dirs) {
         try {
             Bun.spawnSync(['mkdir', '-p', dir]);
@@ -156,10 +156,10 @@ const windowsDef = generateWindowsDef(wtfApiMethods);
 const windowsRC = generateWindowsRC();
 // Write all files
 await Promise.all([
-    writeFile('export/darwin/exports.txt', darwinExports),
-    writeFile('export/linux/exports.txt', linuxExports),
-    writeFile('export/windows/wtf.def.in', windowsDef),
-    writeFile('export/windows/wtf.rc.in', windowsRC),
+    writeFile('cmake/export/darwin/exports.txt', darwinExports),
+    writeFile('cmake/export/linux/exports.txt', linuxExports),
+    writeFile('cmake/export/windows/wtf.def.in', windowsDef),
+    writeFile('cmake/export/windows/wtf.rc.in', windowsRC),
 ]);
 
 console.log("\n🎉 Export file generation complete!");

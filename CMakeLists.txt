@@ -9,7 +9,7 @@ get_git_version(GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 project(wtf 
     VERSION ${GIT_VERSION_MAJOR}.${GIT_VERSION_MINOR}.${GIT_VERSION_PATCH}
-    DESCRIPTION "High-Performance WebTransport Library"
+    DESCRIPTION "A WebTransport Library"
     LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 11)
@@ -182,12 +182,12 @@ endif()
 
 if(WIN32)
     configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/export/windows/wtf.def.in
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/export/windows/wtf.def.in
         ${CMAKE_CURRENT_BINARY_DIR}/wtf.def
         @ONLY
     )
     configure_file(
-        ${CMAKE_CURRENT_SOURCE_DIR}/export/windows/wtf.rc.in
+        ${CMAKE_CURRENT_SOURCE_DIR}/cmake/export/windows/wtf.rc.in
         ${CMAKE_CURRENT_BINARY_DIR}/wtf.rc
         @ONLY
     )
@@ -277,11 +277,11 @@ if(WIN32)
     )
 elseif(APPLE)
     set_target_properties(wtf PROPERTIES
-        LINK_FLAGS "-Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/export/darwin/exports.txt -Wl,-dead_strip -Wl,-x"
+        LINK_FLAGS "-Wl,-exported_symbols_list,${CMAKE_CURRENT_SOURCE_DIR}/cmake/export/darwin/exports.txt -Wl,-dead_strip -Wl,-x"
     )
 elseif(UNIX)
     set_target_properties(wtf PROPERTIES
-        LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/export/linux/exports.txt -Wl,--gc-sections -Wl,--strip-all"
+        LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/cmake/export/linux/exports.txt -Wl,--gc-sections -Wl,--strip-all"
     )
 endif()
 

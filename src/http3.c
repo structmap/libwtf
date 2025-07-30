@@ -446,7 +446,7 @@ static wtf_frame_result_t wtf_http3_process_webtransport_stream_frame(wtf_http3_
 
     if (length > 0) {
         uint16_t session_offset = 0;
-        if (wtf_varint_decode((size_t)length, data, &session_offset, &session_id)) {
+        if (wtf_varint_decode((uint16_t)length, data, &session_offset, &session_id)) {
             found_session = true;
         }
     } else {
@@ -839,7 +839,7 @@ static bool wtf_http3_parse_uni_stream_type(wtf_http3_stream* stream, const uint
     if (!wtf_varint_decode((uint16_t)length, data, &type_offset, &stream_type)) {
         if (stream->buffered_headers_length + length <= sizeof(stream->buffered_headers)) {
             memcpy(stream->buffered_headers + stream->buffered_headers_length, data, length);
-            stream->buffered_headers_length += length;
+            stream->buffered_headers_length += (uint32_t)length;
         }
         return false;
     }

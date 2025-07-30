@@ -9,6 +9,7 @@
     #include <bcrypt.h>
     #include <windows.h>
     #pragma comment(lib, "bcrypt.lib")
+    #include <io.h>
 #elif defined(__linux__) || defined(__ANDROID__)
     #include <fcntl.h>
     #include <sys/random.h>
@@ -171,7 +172,8 @@ bool wtf_path_valid(const char* path)
     }
 
 #ifdef _WIN32
-    return _access(path, 0) == 0;
+    errno_t err = _access_s(path, 0);
+    return err == 0;
 #else
     return access(path, F_OK) == 0;
 #endif

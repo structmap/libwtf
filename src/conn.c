@@ -179,7 +179,7 @@ void wtf_connection_process_buffered_data(wtf_connection* conn, wtf_session* ses
             }
             mtx_unlock(&conn->streams_mutex);
 
-            size_t offset = 0;
+            uint16_t offset = 0;
             uint64_t frame_or_type;
             uint64_t parsed_session_id;
 

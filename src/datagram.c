@@ -50,10 +50,10 @@ void wtf_datagram_process(wtf_connection* conn, const uint8_t* data, size_t data
     if (!conn || !data || data_len == 0)
         return;
 
-    size_t offset = 0;
+    uint16_t offset = 0;
     uint64_t quarter_stream_id;
 
-    if (!wtf_varint_decode(data_len, data, &offset, &quarter_stream_id)) {
+    if (!wtf_varint_decode((uint16_t)data_len, data, &offset, &quarter_stream_id)) {
         WTF_LOG_TRACE(conn->server->context, "datagram", "Failed to decode Quarter Stream ID");
         return;
     }

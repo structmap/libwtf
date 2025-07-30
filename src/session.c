@@ -386,7 +386,7 @@ wtf_result_t wtf_session_send_datagram(wtf_session* session, const wtf_buffer_t*
     }
 
     new_buffers[0].data = header_buffer;
-    new_buffers[0].length = header_size;
+    new_buffers[0].length = (uint32_t)header_size;
 
     for (uint32_t i = 0; i < buffer_count; i++) {
         new_buffers[i + 1].data = data[i].data;

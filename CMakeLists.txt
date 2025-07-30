@@ -1,4 +1,4 @@
-if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
+if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
     cmake_minimum_required(VERSION 3.20)
 else()
     cmake_minimum_required(VERSION 3.16)
@@ -9,7 +9,7 @@ get_git_version(GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 project(wtf 
     VERSION ${GIT_VERSION_MAJOR}.${GIT_VERSION_MINOR}.${GIT_VERSION_PATCH}
-    DESCRIPTION "A WebTransport Library"
+    DESCRIPTION "A fast WebTransport library"
     LANGUAGES C CXX)
 
 set(CMAKE_C_STANDARD 11)
@@ -17,8 +17,12 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(NOT CMAKE_BUILD_TYPE)
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     set(CMAKE_BUILD_TYPE Release)
+endif()
+
+if(CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_CONFIGURATION_TYPES "Debug;Release;RelWithDebInfo" CACHE STRING "Available build configurations" FORCE)
 endif()
 
 set(CMAKE_SKIP_BUILD_RPATH FALSE)
@@ -27,22 +31,22 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 set(WTF_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/output CACHE STRING "Output directory for build artifacts")
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${WTF_OUTPUT_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${WTF_OUTPUT_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${WTF_OUTPUT_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${WTF_OUTPUT_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${WTF_OUTPUT_DIR})
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${WTF_OUTPUT_DIR})
 
-foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
-    string(TOUPPER ${CONFIG} CONFIG_UPPER)
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG})
-    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG})
-    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG})
-endforeach()
+if(CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
+    foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+        string(TOUPPER ${CONFIG} CONFIG_UPPER)
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG})
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG})
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG})
+    endforeach()
+else()
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
+    set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
+    set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR})
+endif()
 
 option(WTF_BUILD_TESTS "Build tests" OFF)
 option(WTF_BUILD_SAMPLES "Build sample applications" OFF)
@@ -69,33 +73,75 @@ if(WIN32)
         add_compile_options(/Qspectre)
     endif()
     add_compile_options(/W3)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_compile_options(/Od /Zi /RTC1)
-        add_link_options(/DEBUG:FULL)
-    else()
-        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /GL /Zi")
-        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
-        set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG /IGNORE:4075 /DEBUG /OPT:REF /OPT:ICF")
-        set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /IGNORE:4075 /DEBUG /OPT:REF /OPT:ICF")
-        add_compile_options(/O2 /DNDEBUG)
-    endif()
+    
+    add_compile_options(
+        $<$<CONFIG:Debug>:/Od>
+        $<$<CONFIG:Debug>:/Zi>
+        $<$<CONFIG:Debug>:/RTC1>
+        $<$<CONFIG:Release>:/O2>
+        $<$<CONFIG:Release>:/DNDEBUG>
+        $<$<CONFIG:RelWithDebInfo>:/O2>
+        $<$<CONFIG:RelWithDebInfo>:/Zi>
+        $<$<CONFIG:RelWithDebInfo>:/DNDEBUG>
+    )
+    
+    add_link_options($<$<CONFIG:Debug>:/DEBUG:FULL>)
+    
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /GL /Zi")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
+    set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} /GL /Zi")
+    set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /GL /Zi")
+    
+    set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG /IGNORE:4075 /DEBUG /OPT:REF /OPT:ICF")
+    set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /IGNORE:4075 /DEBUG /OPT:REF /OPT:ICF")
+    set(CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_SHARED_LINKER_FLAGS_RELWITHDEBINFO} /LTCG /IGNORE:4075 /DEBUG /OPT:REF /OPT:ICF")
+    set(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO} /LTCG /IGNORE:4075 /DEBUG /OPT:REF /OPT:ICF")
 else()
     add_compile_options(-Wall -Wextra)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_compile_options(-g -O0 -DDEBUG -fno-omit-frame-pointer)
-        if(APPLE)
-            add_compile_options(-fno-limit-debug-info -gdwarf-4)
-            add_link_options(-Wl,-no_compact_unwind)
-        endif()
-    else()
-        add_compile_options(-O2 -DNDEBUG)
-        add_link_options(-flto)
-        if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
-            add_compile_options(-fuse-linker-plugin -ffat-lto-objects)
-            add_link_options(-fuse-linker-plugin)
-        endif()
+    add_compile_options(
+        $<$<CONFIG:Debug>:-g>
+        $<$<CONFIG:Debug>:-O0>
+        $<$<CONFIG:Debug>:-DDEBUG>
+        $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
+        $<$<CONFIG:Release>:-O2>
+        $<$<CONFIG:Release>:-DNDEBUG>
+        $<$<CONFIG:RelWithDebInfo>:-O2>
+        $<$<CONFIG:RelWithDebInfo>:-g>
+        $<$<CONFIG:RelWithDebInfo>:-DNDEBUG>
+    )
+    
+    if(APPLE)
+        add_compile_options(
+            $<$<CONFIG:Debug>:-fno-limit-debug-info>
+            $<$<CONFIG:Debug>:-gdwarf-4>
+            $<$<CONFIG:RelWithDebInfo>:-fno-limit-debug-info>
+            $<$<CONFIG:RelWithDebInfo>:-gdwarf-4>
+        )
+        add_link_options(
+            $<$<CONFIG:Debug>:-Wl,-no_compact_unwind>
+            $<$<CONFIG:RelWithDebInfo>:-Wl,-no_compact_unwind>
+        )
+    endif()
+    
+    add_link_options(
+        $<$<CONFIG:Release>:-flto>
+        $<$<CONFIG:RelWithDebInfo>:-flto>
+    )
+    
+    if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
+        add_compile_options(
+            $<$<CONFIG:Release>:-fuse-linker-plugin>
+            $<$<CONFIG:Release>:-ffat-lto-objects>
+            $<$<CONFIG:RelWithDebInfo>:-fuse-linker-plugin>
+            $<$<CONFIG:RelWithDebInfo>:-ffat-lto-objects>
+        )
+        add_link_options(
+            $<$<CONFIG:Release>:-fuse-linker-plugin>
+            $<$<CONFIG:RelWithDebInfo>:-fuse-linker-plugin>
+        )
     endif()
 endif()
+
 
 if(WTF_USE_EXTERNAL_MSQUIC)
     find_package(msquic CONFIG REQUIRED)
@@ -104,9 +150,9 @@ else()
     set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
     
     if(WIN32)
-        set(QUIC_TLS_LIB "schannel" CACHE STRING "Use Schannel on Windows")
+        set(QUIC_TLS "schannel" CACHE STRING "Use Schannel on Windows")
     else()
-        set(QUIC_TLS_LIB "openssl" CACHE STRING "Use OpenSSL on non-Windows")
+        set(QUIC_TLS "openssl3" CACHE STRING "Use OpenSSL on non-Windows")
     endif()
     
     set(QUIC_BUILD_SHARED ON CACHE BOOL "Builds MsQuic as a dynamic library")
@@ -120,11 +166,9 @@ else()
         set(QUIC_OUTPUT_DIR ${WTF_OUTPUT_DIR} CACHE STRING "Output directory for MsQuic artifacts")
     endif()
     
-    if(WTF_ENABLE_LOGGING OR CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if(WTF_ENABLE_LOGGING)
         set(QUIC_ENABLE_LOGGING ON CACHE BOOL "Enable MsQuic logging")
         set(QUIC_LOGGING_TYPE "stdout" CACHE STRING "Set MsQuic logging output to stdout")
-    else()
-        set(QUIC_ENABLE_LOGGING OFF CACHE BOOL "Disable MsQuic logging")
     endif()
     
     add_compile_definitions(QUIC_API_ENABLE_PREVIEW_FEATURES=1)
@@ -136,19 +180,22 @@ else()
     add_subdirectory(msquic)
     
     if(TARGET msquic)
-        set_target_properties(msquic PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR}
-            LIBRARY_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR}
-            ARCHIVE_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR}
-        )
-        foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
-            string(TOUPPER ${CONFIG} CONFIG_UPPER)
+        if(CMAKE_CONFIGURATION_TYPES)
+            foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+                string(TOUPPER ${CONFIG} CONFIG_UPPER)
+                set_target_properties(msquic PROPERTIES
+                    RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG}
+                    LIBRARY_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG}
+                    ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG}
+                )
+            endforeach()
+        else()
             set_target_properties(msquic PROPERTIES
-                RUNTIME_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG}
-                LIBRARY_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG}
-                ARCHIVE_OUTPUT_DIRECTORY_${CONFIG_UPPER} ${WTF_OUTPUT_DIR}/${CONFIG}
+                RUNTIME_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR}
+                LIBRARY_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR}
+                ARCHIVE_OUTPUT_DIRECTORY ${WTF_OUTPUT_DIR}
             )
-        endforeach()
+        endif()
     endif()
     
     set(MSQUIC_LIBRARIES msquic)
@@ -157,26 +204,21 @@ endif()
 
 if(WIN32)
     set(PLATFORM_LIBS ws2_32 iphlpapi bcrypt)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        list(APPEND PLATFORM_LIBS dbghelp)
-    endif()
+    set(PLATFORM_LIBS ${PLATFORM_LIBS} $<$<CONFIG:Debug>:dbghelp>)
 else()
     find_package(Threads REQUIRED)
     set(PLATFORM_LIBS Threads::Threads)
     if(NOT APPLE)
-        list(APPEND PLATFORM_LIBS rt)
-        list(APPEND PLATFORM_LIBS m)
+        list(APPEND PLATFORM_LIBS rt m)
     else()
         list(APPEND PLATFORM_LIBS "-framework Security")
     endif()
 
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
-            list(APPEND PLATFORM_LIBS dl)
-        endif()
-        if(APPLE)
-            list(APPEND PLATFORM_LIBS "-framework CoreFoundation")
-        endif()
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+        set(PLATFORM_LIBS ${PLATFORM_LIBS} $<$<CONFIG:Debug>:dl>)
+    endif()
+    if(APPLE)
+        set(PLATFORM_LIBS ${PLATFORM_LIBS} $<$<CONFIG:Debug>:-framework\ CoreFoundation>)
     endif()
 endif()
 
@@ -269,6 +311,11 @@ target_compile_definitions(wtf PRIVATE WTF_EXPORTS)
 if(NOT WIN32)
     target_compile_options(wtf PRIVATE -fvisibility=hidden)
     target_compile_options(wtf PRIVATE -fvisibility-inlines-hidden)
+    set_target_properties(wtf PROPERTIES
+        C_VISIBILITY_PRESET hidden
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN YES
+    )
 endif()
 
 if(WIN32)
@@ -282,14 +329,6 @@ elseif(APPLE)
 elseif(UNIX)
     set_target_properties(wtf PROPERTIES
         LINK_FLAGS "-Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/cmake/export/linux/exports.txt -Wl,--gc-sections -Wl,--strip-all"
-    )
-endif()
-
-if(NOT WIN32)
-    set_target_properties(wtf PROPERTIES
-        C_VISIBILITY_PRESET hidden
-        CXX_VISIBILITY_PRESET hidden
-        VISIBILITY_INLINES_HIDDEN YES
     )
 endif()
 
@@ -314,4 +353,5 @@ install(TARGETS wtf
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )

@@ -72,20 +72,20 @@ bool wtf_settings_decode_frame(wtf_connection* conn, const uint8_t* data, size_t
     if (!conn || !data)
         return false;
 
-    size_t offset = 0;
+    uint16_t offset = 0;
 
     WTF_LOG_DEBUG(conn->server->context, "http3", "Parsing settings frame: %zu bytes", data_len);
 
     while (offset < data_len) {
         uint64_t setting_id, setting_value;
 
-        if (!wtf_varint_decode(data_len, data, &offset, &setting_id)) {
+        if (!wtf_varint_decode((uint16_t) data_len, data, &offset, &setting_id)) {
             WTF_LOG_ERROR(conn->server->context, "http3",
                           "Failed to decode setting ID at offset %zu", offset);
             return false;
         }
 
-        if (!wtf_varint_decode(data_len, data, &offset, &setting_value)) {
+        if (!wtf_varint_decode((uint16_t)data_len, data, &offset, &setting_value)) {
             WTF_LOG_ERROR(conn->server->context, "http3",
                           "Failed to decode setting value for ID %llu at offset %zu",
                           (unsigned long long)setting_id, offset);

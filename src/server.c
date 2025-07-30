@@ -4,6 +4,9 @@
 #include "log.h"
 #include "utils.h"
 
+extern void QuicAddrSetPort(_In_ QUIC_ADDR* Addr, _In_ uint16_t Port);
+extern void QuicAddrSetFamily(_In_ QUIC_ADDR* Addr, _In_ QUIC_ADDRESS_FAMILY Family);
+
 static QUIC_STATUS QUIC_API wtf_listener_callback(HQUIC Listener, void* Context,
                                                   QUIC_LISTENER_EVENT* Event)
 {
@@ -177,7 +180,7 @@ wtf_result_t wtf_server_start(wtf_server_t* server)
 
     QUIC_ADDR address = {0};
     QuicAddrSetFamily(&address, QUIC_ADDRESS_FAMILY_UNSPEC);
-    QuicAddrSetPort(&address, srv->config.port);
+
 
     if (srv->config.host) {
         if (inet_pton(AF_INET, srv->config.host, &((struct sockaddr_in*)&address)->sin_addr) == 1) {
@@ -188,6 +191,8 @@ wtf_result_t wtf_server_start(wtf_server_t* server)
             QuicAddrSetFamily(&address, QUIC_ADDRESS_FAMILY_INET6);
         }
     }
+
+    QuicAddrSetPort(&address, srv->config.port);
 
     const char* alpn = WTF_ALPN;
     QUIC_BUFFER alpn_buffer = {(uint32_t)strlen(alpn), (uint8_t*)alpn};

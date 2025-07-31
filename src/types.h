@@ -18,7 +18,7 @@ extern "C" {
 #define WTF_DEFAULT_MAX_SESSIONS 16
 #define WTF_MAX_DATAGRAM_SIZE 65536
 #define WTF_MAX_STREAM_BUFFER_SIZE (1024 * 1024)
-#define WTF_MAX_BUFFERED_STREAMS 100
+#define WTF_MAX_BUFFERED_STREAMS 16
 #define WTF_MAX_BUFFERED_DATAGRAMS 1000
 #define WTF_MAX_STACK_BUFFERS 64
 
@@ -30,7 +30,7 @@ typedef enum {
     WTF_FRAME_PUSH_PROMISE = 0x05,
     WTF_FRAME_GOAWAY = 0x07,
     WTF_FRAME_MAX_PUSH_ID = 0x0D,
-    WTF_FRAME_WEBTRANSPORT_STREAM = 0x41
+    WTF_FRAME_BIDIR_WEBTRANSPORT_STREAM = 0x41
 } wtf_h3_frame_type_t;
 
 typedef enum {
@@ -38,7 +38,7 @@ typedef enum {
     WTF_STREAM_TYPE_PUSH = 0x01,
     WTF_STREAM_TYPE_QPACK_ENCODER = 0x02,
     WTF_STREAM_TYPE_QPACK_DECODER = 0x03,
-    WTF_STREAM_TYPE_WEBTRANSPORT_STREAM = 0x54
+    WTF_STREAM_TYPE_UNI_WEBTRANSPORT_STREAM = 0x54
 } wtf_h3_stream_type_t;
 
 typedef enum {
@@ -219,8 +219,8 @@ typedef struct wtf_http3_stream {
     uint64_t type;
     wtf_internal_stream_state_t state;
 
-    uint32_t buffered_headers_length;
-    uint8_t buffered_headers[1024];
+    uint32_t buffered_frames_length;
+    uint8_t buffered_frames[1024];
     bool frame_header_complete;
 
     uint8_t* header_buffer;

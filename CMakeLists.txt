@@ -167,11 +167,9 @@ else()
     endif()
     
     if(WTF_ENABLE_LOGGING)
-        set(QUIC_ENABLE_LOGGING ON CACHE BOOL "Enable MsQuic logging")
-        set(QUIC_LOGGING_TYPE "stdout" CACHE STRING "Set MsQuic logging output to stdout")
+          set(QUIC_ENABLE_LOGGING OFF CACHE BOOL "Explicitly disable MsQuic logging")
     else()
         set(QUIC_ENABLE_LOGGING OFF CACHE BOOL "Explicitly disable MsQuic logging")
-        set(QUIC_LOGGING_TYPE "stub" CACHE STRING "Disable MsQuic logging output")
     endif()
     
     add_compile_definitions(QUIC_API_ENABLE_PREVIEW_FEATURES=1)

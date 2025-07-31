@@ -148,9 +148,9 @@ void wtf_connection_process_buffered_data(wtf_connection* conn, wtf_session* ses
         wtf_http3_stream* stream = itr.data->val;
         bool stream_belongs = false;
 
-        if (stream->buffered_headers_length > 0) {
+        if (stream->buffered_frames_length > 0) {
             stream_belongs = wtf_stream_belongs_to_session(
-                stream->id, session->id, stream->buffered_headers, stream->buffered_headers_length);
+                stream->id, session->id, stream->buffered_frames, stream->buffered_frames_length);
         }
 
         if (stream_belongs) {
@@ -183,9 +183,9 @@ void wtf_connection_process_buffered_data(wtf_connection* conn, wtf_session* ses
             uint64_t frame_or_type;
             uint64_t parsed_session_id;
 
-            if (wtf_varint_decode(stream->buffered_headers_length, stream->buffered_headers,
-                                  &offset, &frame_or_type)
-                && wtf_varint_decode(stream->buffered_headers_length, stream->buffered_headers,
+            if (wtf_varint_decode(stream->buffered_frames_length, stream->buffered_frames, &offset,
+                                  &frame_or_type)
+                && wtf_varint_decode(stream->buffered_frames_length, stream->buffered_frames,
                                      &offset, &parsed_session_id)) {
                 wtf_connection_associate_stream_with_session(conn, stream, session);
             }

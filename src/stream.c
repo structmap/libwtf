@@ -18,7 +18,7 @@ static bool wtf_stream_parse_unidirectional_header(const uint8_t* data, size_t d
         return false;
     }
 
-    if (stream_type != WTF_STREAM_TYPE_WEBTRANSPORT_STREAM) {
+    if (stream_type != WTF_STREAM_TYPE_UNI_WEBTRANSPORT_STREAM) {
         return false;
     }
 
@@ -43,7 +43,7 @@ static bool wtf_stream_parse_bidirectional_header(const uint8_t* data, size_t da
         return false;
     }
 
-    if (frame_type != WTF_FRAME_WEBTRANSPORT_STREAM) {
+    if (frame_type != WTF_FRAME_BIDIR_WEBTRANSPORT_STREAM) {
         return false;
     }
 
@@ -115,20 +115,23 @@ static wtf_result_t wtf_stream_encode_header(wtf_stream* stream, uint8_t* header
     uint8_t* header_end = header + header_size;
 
     if (stream->type == WTF_STREAM_UNIDIRECTIONAL) {
-        current_pos = wtf_varint_encode(WTF_STREAM_TYPE_WEBTRANSPORT_STREAM, current_pos);
+        current_pos = wtf_varint_encode(WTF_STREAM_TYPE_UNI_WEBTRANSPORT_STREAM, current_pos);
+        if (current_pos > header_end) {
+            return WTF_ERROR_BUFFER_TOO_SMALL;
+        }
+        current_pos = wtf_varint_encode(stream->session->id, current_pos);
         if (current_pos > header_end) {
             return WTF_ERROR_BUFFER_TOO_SMALL;
         }
     } else {
-        current_pos = wtf_varint_encode(WTF_FRAME_WEBTRANSPORT_STREAM, current_pos);
+        current_pos = wtf_varint_encode(WTF_FRAME_BIDIR_WEBTRANSPORT_STREAM, current_pos);
         if (current_pos > header_end) {
             return WTF_ERROR_BUFFER_TOO_SMALL;
         }
-    }
-
-    current_pos = wtf_varint_encode(stream->session->id, current_pos);
-    if (current_pos > header_end) {
-        return WTF_ERROR_BUFFER_TOO_SMALL;
+        current_pos = wtf_varint_encode(stream->session->id, current_pos);
+        if (current_pos > header_end) {
+            return WTF_ERROR_BUFFER_TOO_SMALL;
+        }
     }
 
     *header_length = current_pos - header;
@@ -189,7 +192,7 @@ static wtf_result_t wtf_stream_send_header(wtf_stream* stream, HQUIC Stream)
 
     WTF_LOG_ERROR(conn->server->context, "webtransport",
                   "Failed to send WebTransport stream header: 0x%x", status);
-    
+
     free(header_data);
     free(header_buffer);
     free(send_ctx);
@@ -567,7 +570,7 @@ wtf_result_t wtf_stream_send(wtf_stream* stream, const wtf_buffer_t* buffers, ui
 
     send_ctx->buffers = (wtf_buffer_t*)buffers;
     send_ctx->count = buffer_count;
-    send_ctx->internal_send = false; 
+    send_ctx->internal_send = false;
 
     QUIC_SEND_FLAGS flags = QUIC_SEND_FLAG_NONE;
     if (fin) {

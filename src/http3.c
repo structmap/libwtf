@@ -687,7 +687,7 @@ static wtf_result_t wtf_http3_encode_response(wtf_connection* conn, uint16_t sta
                                    (enum lsqpack_enc_flags)0)
                 == LQES_OK) {
                 enum lsqpack_enc_header_flags hflags;
-                size_t pref_sz = lsqpack_enc_end_header(&conn->qpack.encoder, status_data,
+                ssize_t pref_sz = lsqpack_enc_end_header(&conn->qpack.encoder, status_data,
                                                         prefix_len, &hflags);
                 if (pref_sz >= 0) {
                     status_len = (uint32_t)(pref_sz + header_len);

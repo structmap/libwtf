@@ -3387,7 +3387,7 @@ guarantee_out_bytes (struct lsqpack_dec *dec,
 
 
 static unsigned char *
-get_dst (struct lsqpack_dec *dec,
+get_dst (struct lsqpack_dec * /* dec */,
                     struct header_block_read_ctx *read_ctx, size_t *dst_size)
 {
     unsigned off;
@@ -5166,14 +5166,15 @@ qenc_huffman_enc (const unsigned char *src, const unsigned char *const src_end,
         switch (adj >> 3)
         {                               /* Write out */
 #if UINTPTR_MAX == 18446744073709551615ull
-        case 8: *dst++ = (unsigned char)(bits >> 56);
-        case 7: *dst++ = (unsigned char)(bits >> 48);
-        case 6: *dst++ = (unsigned char)(bits >> 40);
+        case 8: *dst++ = (unsigned char)(bits >> 56); // fall through
+        case 7: *dst++ = (unsigned char)(bits >> 48); // fall through
+        case 6: *dst++ = (unsigned char)(bits >> 40); // fall through
         case 5: *dst++ = (unsigned char)(bits >> 32);
 #endif
-        case 4: *dst++ = (unsigned char)(bits >> 24);
-        case 3: *dst++ = (unsigned char)(bits >> 16);
-        case 2: *dst++ = (unsigned char)(bits >> 8);
+        // fall through
+        case 4: *dst++ = (unsigned char)(bits >> 24); // fall through
+        case 3: *dst++ = (unsigned char)(bits >> 16); // fall through
+        case 2: *dst++ = (unsigned char)(bits >> 8); // fall through
         default: *dst++ = (unsigned char)bits;
         }
     }
@@ -5264,9 +5265,11 @@ huff_decode_fast (const unsigned char *src, int src_len,
             case 8:
                 buf <<= 8;
                 buf |= (uintptr_t) *src++;
+                // fall through
             case 7:
                 buf <<= 8;
                 buf |= (uintptr_t) *src++;
+                // fall through
             default:
                 buf <<= 48;
                 buf |= (uintptr_t) *src++ << 40;

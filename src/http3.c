@@ -584,7 +584,7 @@ static wtf_frame_result_t wtf_http3_process_frames(
                         // Need more data to parse session ID - buffer the signal and partial
                         // session ID
                         uint32_t remaining = length
-                            - (processed_bytes - wtf_varint_size(signal_value));
+                            - (uint32_t) (processed_bytes - wtf_varint_size(signal_value));
                         if (remaining > 0 && remaining <= sizeof(stream->buffered_frames)) {
                             memcpy(stream->buffered_frames,
                                    data + (processed_bytes - wtf_varint_size(signal_value)),

@@ -558,7 +558,7 @@ lsqpack_enc_init (struct lsqpack_enc *enc, void *logger_ctx,
     if (max_table_size / DYNAMIC_ENTRY_OVERHEAD)
     {
         nbits = 2;
-        buckets = malloc(sizeof(buckets[0]) * N_BUCKETS(nbits));
+        buckets = malloc(sizeof(buckets[0]) * (size_t) N_BUCKETS(nbits));
         if (!buckets)
         {
             free(enc->qpe_hist_els);
@@ -998,7 +998,7 @@ qenc_grow_tables (struct lsqpack_enc *enc)
 
     old_nbits = enc->qpe_nbits;
     new_buckets = malloc(sizeof(enc->qpe_buckets[0])
-                                                * N_BUCKETS(old_nbits + 1));
+                                                * (size_t) N_BUCKETS(old_nbits + 1));
     if (!new_buckets)
         return -1;
 
@@ -3387,9 +3387,10 @@ guarantee_out_bytes (struct lsqpack_dec *dec,
 
 
 static unsigned char *
-get_dst (struct lsqpack_dec * /* dec */,
+get_dst (struct lsqpack_dec *dec,
                     struct header_block_read_ctx *read_ctx, size_t *dst_size)
 {
+    (void) dec;
     unsigned off;
 
     assert(read_ctx->hbrc_out.xhdr);

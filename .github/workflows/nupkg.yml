@@ -1,0 +1,58 @@
+---
+name: nupkg
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-native:
+    strategy:
+      matrix:
+        os:
+          - runner: macos-latest
+            runtime: osx-arm64
+          - runner: macos-15-intel
+            runtime: osx-x64
+    runs-on: ${{ matrix.os.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          brew update
+          brew install libmsquic
+      - name: Get location of libmsquic
+        id: strings
+        run: |
+          echo -n "libmsquic=" >> $GITHUB_OUTPUT
+          brew --prefix libmsquic >> $GITHUB_OUTPUT
+      - name: Configure project
+        # expects cmake 4.1.3
+        run: >
+          cmake -S . -B build
+          -DWTF_USE_EXTERNAL_MSQUIC=on
+          -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.libmsquic }}
+      - name: Build project
+        run: cmake --build build
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Parse tag from build context
+        uses: olegtarasov/get-tag@v2.1.4
+        id: tagVersion
+        with:
+          tagRegex: "v(.*)"
+      - name: Restore, build and create NuGet package
+        run: >
+          dotnet pack csharp/WebTransportFast.csproj
+          -p:RuntimeTarget=${{ matrix.os.runtime }}
+          -p:PublishVersion=${{ steps.tagVersion.outputs.tag }}
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: csharp/bin/Release/Structmap.WebTransportFast.${{ matrix.os.runtime }}.${{ steps.tagVersion.outputs.tag }}.nupkg
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: ""

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup>
+        <PackageId>Structmap.WebTransportFast</PackageId>
+        <RootNamespace>Structmap.WebTransportFast</RootNamespace>
+        <Title>Structmap.WebTransportFast</Title>
+        <Product>Structmap.WebTransportFast</Product>
+        <AssemblyTitle>Structmap.WebTransportFast.$(RuntimeTarget)</AssemblyTitle>
+        <Authors>Andrew Sampson, bindings and packaging by James Davidson</Authors>
+        <Description>Bindings to libwtf: Web Transport Fast</Description>
+        <Copyright>Andrew Sampson</Copyright>
+        <PackageLicenseExpression>Apache 2.0</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/structmap/libwtf</RepositoryUrl>
+        <Company>N/A</Company>
+        <PackageTags>WebTransport;HTTP3</PackageTags>
+        <Version>$(PublishVersion)</Version>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="../build/output/libwtf.dylib" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
+    </ItemGroup>
+</Project>

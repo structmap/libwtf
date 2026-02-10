@@ -1,0 +1,29 @@
+---
+name: codegen
+
+on:
+  workflow_dispatch:
+    inputs: []
+
+jobs:
+  build-native:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Generate bindings
+        run: >
+          dotnet ClangSharpPInvokeGenerator
+          --language c
+          --file include/wtf.h
+          --namespace Structmap.WebTransportFast
+          --methodClassName Native
+          --output csharp/Native.cs
+          --headerFile <(echo "// generated code do not edit")
+          --libraryPath wtf
+      - name: Check for diff
+        run: git diff --exit-code -- csharp

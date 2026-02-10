@@ -6,20 +6,20 @@ on:
     inputs: {}
 
 jobs:
-  build-native:
-    runs-on: ubuntu-24.04-arm
+  clangsharp:
+    runs-on: macos-latest
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
       - name: Set up ClangSharp tool
-        run: dotnet tool restore
+        run: dotnet tool install -g ClangSharpPInvokeGenerator --version 20.1.2.4
       - name: Generate bindings
         env:
-          LD_LIBRARY_PATH: /home/runner/.dotnet/tools/.store/clangsharppinvokegenerator/20.1.2.4/clangsharppinvokegenerator.linux-arm64/20.1.2.4/tools/any/linux-arm64
+          DYLD_LIBRARY_PATH: /Users/runner/.dotnet/tools/.store/clangsharppinvokegenerator/20.1.2.4/clangsharppinvokegenerator.osx-arm64/20.1.2.4/tools/any/osx-arm64
         run: >
-          dotnet ClangSharpPInvokeGenerator
+          /Users/runner/.dotnet/tools/ClangSharpPInvokeGenerator
           --language c
           --file include/wtf.h
           --namespace Structmap.WebTransportFast
@@ -27,5 +27,6 @@ jobs:
           --output csharp/Native.cs
           --headerFile <(echo "// generated code do not edit")
           --libraryPath wtf
+          --additional "-isystem/Library/Developer/CommandLineTools/usr/lib/clang/17/include"
       - name: Check for diff
         run: git diff --exit-code -- csharp

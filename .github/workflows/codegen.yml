@@ -3,7 +3,7 @@ name: codegen
 
 on:
   workflow_dispatch:
-    inputs: []
+    inputs: {}
 
 jobs:
   build-native:

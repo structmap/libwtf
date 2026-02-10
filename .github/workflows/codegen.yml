@@ -15,6 +15,8 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
+      - name: Set up ClangSharp tool
+        run: dotnet tool restore
       - name: Generate bindings
         run: >
           dotnet ClangSharpPInvokeGenerator

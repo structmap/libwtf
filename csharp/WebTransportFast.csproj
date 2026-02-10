@@ -6,11 +6,11 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <PropertyGroup>
-        <PackageId>Structmap.WebTransportFast</PackageId>
+        <PackageId>Structmap.WebTransportFast.$(RuntimeTarget)</PackageId>
         <RootNamespace>Structmap.WebTransportFast</RootNamespace>
         <Title>Structmap.WebTransportFast</Title>
         <Product>Structmap.WebTransportFast</Product>
-        <AssemblyTitle>Structmap.WebTransportFast.$(RuntimeTarget)</AssemblyTitle>
+        <AssemblyTitle>Structmap.WebTransportFast</AssemblyTitle>
         <Authors>Andrew Sampson, bindings and packaging by James Davidson</Authors>
         <Description>Bindings to libwtf: Web Transport Fast</Description>
         <Copyright>Andrew Sampson</Copyright>

@@ -14,7 +14,7 @@
         <Authors>Andrew Sampson, bindings and packaging by James Davidson</Authors>
         <Description>Bindings to libwtf: Web Transport Fast</Description>
         <Copyright>Andrew Sampson</Copyright>
-        <PackageLicenseExpression>Apache 2.0</PackageLicenseExpression>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/structmap/libwtf</RepositoryUrl>
         <Company>N/A</Company>
         <PackageTags>WebTransport;HTTP3</PackageTags>

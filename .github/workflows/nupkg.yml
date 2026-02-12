@@ -10,10 +10,10 @@ jobs:
     strategy:
       matrix:
         os:
-          - runner: macos-latest
-            runtime: osx-arm64
-          - runner: macos-15-intel
-            runtime: osx-x64
+#          - runner: macos-latest
+#            runtime: osx-arm64
+#          - runner: macos-15-intel
+#            runtime: osx-x64
           - runner: windows-2022
             runtime: win-x64
             libmsquic: "c:\\users\\runneradmin\\.nuget\\packages\\microsoft.native.quic.msquic.openssl\\2.5.6\\build\\native"
@@ -36,7 +36,10 @@ jobs:
           -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.libmsquic || matrix.os.libmsquic }}
         if: runner.os == 'macOS'
       - name: Sanity check folders in nuget repo
-        run: dir ${{ matrix.os.libmsquic }}
+        run: |
+          echo ${{ env.USER_PROFILE }}
+          dir ${{ env.USER_PROFILE }}
+          dir ${{ matrix.os.libmsquic }}
         if: runner.os == 'Windows'
       - name: Configure project on Windows
         run: >

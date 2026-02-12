@@ -16,31 +16,31 @@ jobs:
             runtime: osx-x64
           - runner: windows-2022
             runtime: win-x64
+            libmsquic: "c:\\users\\runneradmin\\.nuget\\packages\\microsoft.native.quic.msquic.openssl\\2.5.6\\build\\native"
     runs-on: ${{ matrix.os.runner }}
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: brew update && brew install libmsquic
-        if: runner.os == 'macOS'
+        run: "${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'dotnet restore csharp' }}"
       - name: Get location of libmsquic
         id: strings
         run: |
           echo -n "libmsquic=" >> $GITHUB_OUTPUT
           brew --prefix libmsquic >> $GITHUB_OUTPUT
         if: runner.os == 'macOS'
-      - name: Configure project
+      - name: Configure project on macOS
         # expects cmake 4.1.3
         run: >
           cmake -S . -B build
           -DWTF_USE_EXTERNAL_MSQUIC=on
-          -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.libmsquic }}
+          -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.libmsquic || matrix.os.libmsquic }}
         if: runner.os == 'macOS'
-      - name: Configure project
-        # expects cmake 4.1.3
+      - name: Configure project on Windows
         run: >
           cmake -S . -B build
           -DWTF_USE_EXTERNAL_MSQUIC=on
-          -DVS_PACKAGE_REFERENCES="microsoft.native.quic.msquic.openssl_2.5.6"
+          -DCMAKE_INCLUDE_PATH=${{ matrix.os.libmsquic }}/include
+          -DCMAKE_LIBRARY_PATH=${{ matrix.os.libmsquic }}/lib/x64
         if: runner.os == 'Windows'
       - name: Build project
         run: cmake --build build

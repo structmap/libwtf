@@ -24,7 +24,7 @@
         <None Include="../build/output/libwtf.dylib" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
         <None Include="../build/output/libwtf.dll" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
     </ItemGroup>
-    <ItemGroup Condition="$(RuntimeIdentifier.StartsWith('win'))">
-      <PackageReference Include="Microsoft.Native.Quic.MsQuic.Schannel" Version="2.5.6" />
+    <ItemGroup Condition="'$(RuntimeIdentifier)'=='win-x64'">
+        <PackageReference Include="Microsoft.Native.Quic.MsQuic.Schannel" Version="2.5.6" />
     </ItemGroup>
 </Project>

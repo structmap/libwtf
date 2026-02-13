@@ -44,22 +44,7 @@ jobs:
         run: >
           cmake -S . -B build
           -DWTF_USE_EXTERNAL_MSQUIC=on
-          -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.libmsquic || matrix.os.libmsquic }}
-        if: runner.os == 'macOS'
-      - name: Sanity check folders in nuget repo
-        run: |
-          echo $env:USERPROFILE
-          dir $env:USERPROFILE
-          dir ${{ env.USER_PROFILE }}
-          dir ${{ matrix.os.libmsquic }}
-        if: runner.os == 'Windows'
-      - name: Configure project on Windows
-        run: >
-          cmake -S . -B build
-          -DWTF_USE_EXTERNAL_MSQUIC=on
-          -DCMAKE_INCLUDE_PATH=${{ matrix.os.libmsquic }}/include
-          -DCMAKE_LIBRARY_PATH=${{ matrix.os.libmsquic }}/lib/x64
-        if: runner.os == 'Windows'
+          -DCMAKE_PREFIX_PATH="${{ steps.strings.outputs.libmsquic || matrix.os.libmsquic }}"
       - name: Build project
         run: cmake --build build
       - name: Parse tag from build context

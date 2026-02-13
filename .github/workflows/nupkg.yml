@@ -49,7 +49,7 @@ jobs:
           --debug-find
           -DWTF_USE_EXTERNAL_MSQUIC=on
           -DCMAKE_INCLUDE_PATH="${{ matrix.os.libmsquic }}/include"
-          -DCMAKE_LIBRARY_PATH="${{ matrix.os.libmsquic }}/lib/x64"
+          -DCMAKE_LIBRARY_PATH="${{ matrix.os.libmsquic }}/bin/x64"
       - name: Build project
         run: cmake --build build
       - name: Parse tag from build context

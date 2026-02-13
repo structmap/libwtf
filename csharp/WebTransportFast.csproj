@@ -25,6 +25,6 @@
         <None Include="../build/output/libwtf.dll" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
     </ItemGroup>
     <ItemGroup Condition="'$(RuntimeIdentifier)'=='win-x64'">
-        <PackageReference Include="Microsoft.Native.Quic.MsQuic.Schannel" Version="2.5.6" />
+        <PackageReference Include="Microsoft.Native.Quic.MsQuic.OpenSSL" Version="2.5.6" />
     </ItemGroup>
 </Project>

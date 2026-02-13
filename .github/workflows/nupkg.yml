@@ -20,9 +20,13 @@ jobs:
     runs-on: ${{ matrix.os.runner }}
     steps:
       - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
       - name: Install dependencies
         run: |
-          "${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'dotnet restore csharp --packages ./packages' }}"
+          "${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'dotnet restore csharp --packages packages' }}"
           dir packages
           dir packages/microsoft.native.quic.msquic.openssl
           dir packages/microsoft.native.quic.msquic.openssl/2.5.6
@@ -58,10 +62,6 @@ jobs:
         if: runner.os == 'Windows'
       - name: Build project
         run: cmake --build build
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
       - name: Parse tag from build context
         uses: olegtarasov/get-tag@v2.1.4
         id: tagVersion

@@ -16,12 +16,12 @@ jobs:
 #            runtime: osx-x64
           - runner: windows-2022
             runtime: win-x64
-            libmsquic: "c:\\users\\runneradmin\\.nuget\\packages\\microsoft.native.quic.msquic.openssl\\2.5.6\\build\\native"
+            libmsquic: "packages/microsoft.native.quic.msquic.openssl/2.5.6/build/native"
     runs-on: ${{ matrix.os.runner }}
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: "${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'dotnet restore csharp' }}"
+        run: "${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'dotnet restore csharp --packages ./packages' }}"
       - name: Get location of libmsquic
         id: strings
         run: |

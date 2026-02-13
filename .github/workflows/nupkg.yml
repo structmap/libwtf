@@ -21,7 +21,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
-        run: "${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'dotnet restore csharp --packages ./packages' }}"
+        run: |
+          "${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'dotnet restore csharp --packages ./packages' }}"
+          dir packages
+          dir packages/microsoft.native.quic.msquic.openssl
+          dir packages/microsoft.native.quic.msquic.openssl/2.5.6
+          dir packages/microsoft.native.quic.msquic.openssl/2.5.6/build
+          dir packages/microsoft.native.quic.msquic.openssl/2.5.6/build/native
+          dir ${{ matrix.os.libmsquic }}
       - name: Get location of libmsquic
         id: strings
         run: |

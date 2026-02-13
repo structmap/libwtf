@@ -26,7 +26,7 @@ jobs:
           dotnet-version: 10.0.x
       - name: Install dependencies
         run: |
-          ${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'dotnet restore csharp --packages packages' }}
+          ${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'dotnet restore csharp --packages packages --use-current-runtime' }}
           dir packages
           dir packages/microsoft.native.quic.msquic.openssl
           dir packages/microsoft.native.quic.msquic.openssl/2.5.6

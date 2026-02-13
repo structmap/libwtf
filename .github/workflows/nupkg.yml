@@ -43,6 +43,7 @@ jobs:
         # expects cmake 4.1.3
         run: >
           cmake -S . -B build
+          --debug-find
           -DWTF_USE_EXTERNAL_MSQUIC=on
           -DCMAKE_PREFIX_PATH="${{ steps.strings.outputs.libmsquic || matrix.os.libmsquic }}"
           ${{ runner.os == 'Windows' && '-DCMAKE_LIBRARY_ARCHITECTURE="x64"' }}

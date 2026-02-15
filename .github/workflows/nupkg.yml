@@ -68,7 +68,6 @@ jobs:
       - name: Build project and create NuGet package
         run: >
           dotnet pack csharp
-          --use-current-runtime
           -p:RuntimeTarget=${{ matrix.os.runtime }}
           -p:PublishVersion=${{ steps.tagVersion.outputs.tag }}
       - name: Upload binaries to release

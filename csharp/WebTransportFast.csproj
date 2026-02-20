@@ -24,7 +24,7 @@
         <None Include="../build/output/libwtf.*" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
     </ItemGroup>
     <ItemGroup Condition="'$(RuntimeTarget)'=='win-x64'">
-        <None Include="../build/output/Debug/msquic.dll" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
+        <!--<None Include="../build/output/Debug/msquic.dll" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />-->
         <None Include="../build/output/Debug/wtf.dll" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
         <None Include="../build/output/Debug/wtf.exp" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
         <None Include="../build/output/Debug/wtf.lib" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />

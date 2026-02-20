@@ -1,0 +1,10 @@
+--language
+c
+--file
+include/wtf.h
+--output
+csharp/Native/Native.cs
+--namespace
+Structmap.WebTransportFast.Native
+--libraryPath
+wtf

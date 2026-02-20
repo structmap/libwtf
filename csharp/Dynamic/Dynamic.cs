@@ -1,9 +1,10 @@
 // generated code do not edit
 
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-namespace Structmap.WebTransportFast
+namespace Structmap.WebTransportFast.Dynamic
 {
     public partial struct wtf_context
     {
@@ -178,34 +179,34 @@ namespace Structmap.WebTransportFast
         WTF_STREAM_EVENT_ABORTED,
     }
 
-    public unsafe partial struct wtf_buffer_t
+    public partial struct wtf_buffer_t
     {
         [NativeTypeName("uint32_t")]
         public uint length;
 
         [NativeTypeName("uint8_t *")]
-        public byte* data;
+        public IntPtr data;
     }
 
-    public unsafe partial struct wtf_http_header_t
+    public partial struct wtf_http_header_t
     {
         [NativeTypeName("const char *")]
-        public sbyte* name;
+        public IntPtr name;
 
         [NativeTypeName("const char *")]
-        public sbyte* value;
+        public IntPtr value;
     }
 
     public unsafe partial struct wtf_connection_request_t
     {
         [NativeTypeName("const char *")]
-        public sbyte* origin;
+        public IntPtr origin;
 
         [NativeTypeName("const char *")]
-        public sbyte* path;
+        public IntPtr path;
 
         [NativeTypeName("const char *")]
-        public sbyte* authority;
+        public IntPtr authority;
 
         [NativeTypeName("const wtf_http_header_t *")]
         public wtf_http_header_t* headers;
@@ -213,20 +214,22 @@ namespace Structmap.WebTransportFast
         [NativeTypeName("size_t")]
         public nuint header_count;
 
-        public void* peer_address;
+        [NativeTypeName("void*")]
+        public IntPtr peer_address;
 
         [NativeTypeName("size_t")]
         public nuint address_length;
     }
 
-    public unsafe partial struct wtf_session_event_t
+    public partial struct wtf_session_event_t
     {
         public wtf_session_event_type_t type;
 
         [NativeTypeName("wtf_session_t *")]
-        public wtf_session* session;
+        public IntPtr session;
 
-        public void* user_context;
+        [NativeTypeName("void*")]
+        public IntPtr user_context;
 
         [NativeTypeName("__AnonymousRecord_wtf_L235_C5")]
         public _Anonymous_e__Union Anonymous;
@@ -286,19 +289,19 @@ namespace Structmap.WebTransportFast
             [NativeTypeName("__AnonymousRecord_wtf_L252_C9")]
             public _datagram_received_e__Struct datagram_received;
 
-            public unsafe partial struct _disconnected_e__Struct
+            public partial struct _disconnected_e__Struct
             {
                 [NativeTypeName("uint32_t")]
                 public uint error_code;
 
                 [NativeTypeName("const char *")]
-                public sbyte* reason;
+                public IntPtr reason;
             }
 
-            public unsafe partial struct _stream_opened_e__Struct
+            public partial struct _stream_opened_e__Struct
             {
                 [NativeTypeName("wtf_stream_t *")]
-                public wtf_stream* stream;
+                public IntPtr stream;
 
                 public wtf_stream_type_t stream_type;
             }
@@ -313,25 +316,26 @@ namespace Structmap.WebTransportFast
                 public wtf_datagram_send_state_t state;
             }
 
-            public unsafe partial struct _datagram_received_e__Struct
+            public partial struct _datagram_received_e__Struct
             {
                 [NativeTypeName("const uint32_t")]
                 public uint length;
 
                 [NativeTypeName("const uint8_t *")]
-                public byte* data;
+                public IntPtr data;
             }
         }
     }
 
-    public unsafe partial struct wtf_stream_event_t
+    public partial struct wtf_stream_event_t
     {
         public wtf_stream_event_type_t type;
 
         [NativeTypeName("wtf_stream_t *")]
-        public wtf_stream* stream;
+        public IntPtr stream;
 
-        public void* user_context;
+        [NativeTypeName("void*")]
+        public IntPtr user_context;
 
         [NativeTypeName("__AnonymousRecord_wtf_L265_C5")]
         public _Anonymous_e__Union Anonymous;
@@ -408,13 +412,13 @@ namespace Structmap.WebTransportFast
         }
     }
 
-    public unsafe partial struct wtf_error_details_t
+    public partial struct wtf_error_details_t
     {
         [NativeTypeName("uint32_t")]
         public uint error_code;
 
         [NativeTypeName("const char *")]
-        public sbyte* description;
+        public IntPtr description;
 
         [NativeTypeName("_Bool")]
         public byte is_application_error;
@@ -438,7 +442,7 @@ namespace Structmap.WebTransportFast
         WTF_CERT_TYPE_PKCS12,
     }
 
-    public unsafe partial struct wtf_certificate_config_t
+    public partial struct wtf_certificate_config_t
     {
         public wtf_certificate_type_t cert_type;
 
@@ -446,13 +450,13 @@ namespace Structmap.WebTransportFast
         public _cert_data_e__Union cert_data;
 
         [NativeTypeName("const char *")]
-        public sbyte* principal;
+        public IntPtr principal;
 
         [NativeTypeName("const char *")]
-        public sbyte* ca_cert_file;
+        public IntPtr ca_cert_file;
 
         [StructLayout(LayoutKind.Explicit)]
-        public unsafe partial struct _cert_data_e__Union
+        public partial struct _cert_data_e__Union
         {
             [FieldOffset(0)]
             [NativeTypeName("__AnonymousRecord_wtf_L342_C9")]
@@ -475,67 +479,69 @@ namespace Structmap.WebTransportFast
             public _pkcs12_e__Struct pkcs12;
 
             [FieldOffset(0)]
-            public void* context;
+            [NativeTypeName("void*")]
+            public IntPtr context;
 
-            public unsafe partial struct _file_e__Struct
+            public partial struct _file_e__Struct
             {
                 [NativeTypeName("const char *")]
-                public sbyte* cert_path;
+                public IntPtr cert_path;
 
                 [NativeTypeName("const char *")]
-                public sbyte* key_path;
+                public IntPtr key_path;
             }
 
-            public unsafe partial struct _protected_file_e__Struct
+            public partial struct _protected_file_e__Struct
             {
                 [NativeTypeName("const char *")]
-                public sbyte* cert_path;
+                public IntPtr cert_path;
 
                 [NativeTypeName("const char *")]
-                public sbyte* key_path;
+                public IntPtr key_path;
 
                 [NativeTypeName("const char *")]
-                public sbyte* password;
+                public IntPtr password;
             }
 
-            public unsafe partial struct _hash_e__Struct
+            public partial struct _hash_e__Struct
             {
                 [NativeTypeName("const char *")]
-                public sbyte* thumbprint;
+                public IntPtr thumbprint;
             }
 
-            public unsafe partial struct _hash_store_e__Struct
+            public partial struct _hash_store_e__Struct
             {
                 [NativeTypeName("const char *")]
-                public sbyte* thumbprint;
+                public IntPtr thumbprint;
 
                 [NativeTypeName("const char *")]
-                public sbyte* store_name;
+                public IntPtr store_name;
             }
 
-            public unsafe partial struct _pkcs12_e__Struct
+            public partial struct _pkcs12_e__Struct
             {
                 [NativeTypeName("const void *")]
-                public void* data;
+                public IntPtr data;
 
                 [NativeTypeName("size_t")]
                 public nuint data_size;
 
                 [NativeTypeName("const char *")]
-                public sbyte* password;
+                public IntPtr password;
             }
         }
     }
 
-    public unsafe partial struct wtf_server_config_t
+    public partial struct wtf_server_config_t
     {
         [NativeTypeName("const char *")]
-        public sbyte* host;
+        public IntPtr host;
 
         [NativeTypeName("uint16_t")]
         public ushort port;
 
-        public wtf_certificate_config_t* cert_config;
+        [NativeTypeName("wtf_certificate_config_t*")]
+        public IntPtr cert_config;
 
         [NativeTypeName("uint32_t")]
         public uint max_sessions_per_connection;
@@ -559,22 +565,24 @@ namespace Structmap.WebTransportFast
         public byte enable_migration;
 
         [NativeTypeName("wtf_connection_validator_t")]
-        public delegate* unmanaged[Cdecl]<wtf_connection_request_t*, void*, wtf_connection_decision_t> connection_validator;
+        public IntPtr connection_validator;
 
         [NativeTypeName("wtf_session_callback_t")]
-        public delegate* unmanaged[Cdecl]<wtf_session_event_t*, void> session_callback;
+        public IntPtr session_callback;
 
-        public void* user_context;
+        [NativeTypeName("void*")]
+        public IntPtr user_context;
     }
 
-    public unsafe partial struct wtf_context_config_t
+    public partial struct wtf_context_config_t
     {
         public wtf_log_level_t log_level;
 
         [NativeTypeName("wtf_log_callback_t")]
-        public delegate* unmanaged[Cdecl]<wtf_log_level_t, sbyte*, sbyte*, int, sbyte*, void*, void> log_callback;
+        public IntPtr log_callback;
 
-        public void* log_user_context;
+        [NativeTypeName("void*")]
+        public IntPtr log_user_context;
 
         [NativeTypeName("uint32_t")]
         public uint worker_thread_count;
@@ -588,7 +596,7 @@ namespace Structmap.WebTransportFast
         public wtf_execution_profile_t execution_profile;
     }
 
-    public unsafe partial struct wtf_version_info_t
+    public partial struct wtf_version_info_t
     {
         [NativeTypeName("uint32_t")]
         public uint major;
@@ -600,10 +608,10 @@ namespace Structmap.WebTransportFast
         public uint patch;
 
         [NativeTypeName("const char *")]
-        public sbyte* version;
+        public IntPtr version;
     }
 
-    public static unsafe partial class Native
+    public static unsafe partial class Methods
     {
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern wtf_version_info_t* wtf_get_version();
@@ -633,73 +641,75 @@ namespace Structmap.WebTransportFast
         public static extern void wtf_server_destroy([NativeTypeName("wtf_server_t *")] wtf_server* server);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_session_close([NativeTypeName("wtf_session_t *")] wtf_session* session, [NativeTypeName("uint32_t")] uint error_code, [NativeTypeName("const char *")] sbyte* reason);
+        public static extern wtf_result_t wtf_session_close([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("uint32_t")] uint error_code, [NativeTypeName("const char *")] IntPtr reason);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_session_drain([NativeTypeName("wtf_session_t *")] wtf_session* session);
+        public static extern wtf_result_t wtf_session_drain([NativeTypeName("wtf_session_t *")] IntPtr session);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_session_send_datagram([NativeTypeName("wtf_session_t *")] wtf_session* session, [NativeTypeName("const wtf_buffer_t *")] wtf_buffer_t* buffers, [NativeTypeName("uint32_t")] uint buffer_count);
+        public static extern wtf_result_t wtf_session_send_datagram([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("const wtf_buffer_t *")] wtf_buffer_t* buffers, [NativeTypeName("uint32_t")] uint buffer_count);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_session_create_stream([NativeTypeName("wtf_session_t *")] wtf_session* session, wtf_stream_type_t type, [NativeTypeName("wtf_stream_t **")] wtf_stream** stream);
+        public static extern wtf_result_t wtf_session_create_stream([NativeTypeName("wtf_session_t *")] IntPtr session, wtf_stream_type_t type, [NativeTypeName("wtf_stream_t **")] IntPtr* stream);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_session_state_t wtf_session_get_state([NativeTypeName("wtf_session_t *")] wtf_session* session);
+        public static extern wtf_session_state_t wtf_session_get_state([NativeTypeName("wtf_session_t *")] IntPtr session);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_session_get_peer_address([NativeTypeName("wtf_session_t *")] wtf_session* session, void* address_buffer, [NativeTypeName("size_t *")] nuint* buffer_size);
+        public static extern wtf_result_t wtf_session_get_peer_address([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("void*")] IntPtr address_buffer, [NativeTypeName("size_t *")] nuint* buffer_size);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void wtf_session_set_context([NativeTypeName("wtf_session_t *")] wtf_session* session, void* user_context);
+        public static extern void wtf_session_set_context([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("void*")] IntPtr user_context);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void* wtf_session_get_context([NativeTypeName("wtf_session_t *")] wtf_session* session);
+        [return: NativeTypeName("void*")]
+        public static extern IntPtr wtf_session_get_context([NativeTypeName("wtf_session_t *")] IntPtr session);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_stream_send([NativeTypeName("wtf_stream_t *")] wtf_stream* stream, [NativeTypeName("const wtf_buffer_t *")] wtf_buffer_t* buffers, [NativeTypeName("uint32_t")] uint buffer_count, [NativeTypeName("_Bool")] byte fin);
+        public static extern wtf_result_t wtf_stream_send([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("const wtf_buffer_t *")] wtf_buffer_t* buffers, [NativeTypeName("uint32_t")] uint buffer_count, [NativeTypeName("_Bool")] byte fin);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_stream_close([NativeTypeName("wtf_stream_t *")] wtf_stream* stream);
+        public static extern wtf_result_t wtf_stream_close([NativeTypeName("wtf_stream_t *")] IntPtr stream);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_stream_abort([NativeTypeName("wtf_stream_t *")] wtf_stream* stream, [NativeTypeName("uint32_t")] uint error_code);
+        public static extern wtf_result_t wtf_stream_abort([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("uint32_t")] uint error_code);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_stream_get_id([NativeTypeName("wtf_stream_t *")] wtf_stream* stream, [NativeTypeName("uint64_t *")] ulong* stream_id);
+        public static extern wtf_result_t wtf_stream_get_id([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("uint64_t *")] ulong* stream_id);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void wtf_stream_set_callback([NativeTypeName("wtf_stream_t *")] wtf_stream* stream, [NativeTypeName("wtf_stream_callback_t")] delegate* unmanaged[Cdecl]<wtf_stream_event_t*, void> callback);
+        public static extern void wtf_stream_set_callback([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("wtf_stream_callback_t")] delegate* unmanaged[Cdecl]<wtf_stream_event_t*, void> callback);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void wtf_stream_set_context([NativeTypeName("wtf_stream_t *")] wtf_stream* stream, void* user_context);
+        public static extern void wtf_stream_set_context([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("void*")] IntPtr user_context);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void* wtf_stream_get_context([NativeTypeName("wtf_stream_t *")] wtf_stream* stream);
+        [return: NativeTypeName("void*")]
+        public static extern IntPtr wtf_stream_get_context([NativeTypeName("wtf_stream_t *")] IntPtr stream);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_stream_type_t wtf_stream_get_type([NativeTypeName("wtf_stream_t *")] wtf_stream* stream);
+        public static extern wtf_stream_type_t wtf_stream_get_type([NativeTypeName("wtf_stream_t *")] IntPtr stream);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_stream_state_t wtf_stream_get_state([NativeTypeName("wtf_stream_t *")] wtf_stream* stream);
+        public static extern wtf_stream_state_t wtf_stream_get_state([NativeTypeName("wtf_stream_t *")] IntPtr stream);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_stream_set_priority([NativeTypeName("wtf_stream_t *")] wtf_stream* stream, [NativeTypeName("uint16_t")] ushort priority);
+        public static extern wtf_result_t wtf_stream_set_priority([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("uint16_t")] ushort priority);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_stream_set_receive_enabled([NativeTypeName("wtf_stream_t *")] wtf_stream* stream, [NativeTypeName("_Bool")] byte enabled);
+        public static extern wtf_result_t wtf_stream_set_receive_enabled([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("_Bool")] byte enabled);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: NativeTypeName("wtf_stream_t *")]
-        public static extern wtf_stream* wtf_session_find_stream_by_id([NativeTypeName("wtf_session_t *")] wtf_session* session, [NativeTypeName("uint64_t")] ulong stream_id);
+        public static extern IntPtr wtf_session_find_stream_by_id([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("uint64_t")] ulong stream_id);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: NativeTypeName("const char *")]
-        public static extern sbyte* wtf_result_to_string(wtf_result_t result);
+        public static extern IntPtr wtf_result_to_string(wtf_result_t result);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: NativeTypeName("const char *")]
-        public static extern sbyte* wtf_webtransport_error_to_string([NativeTypeName("uint32_t")] uint error_code);
+        public static extern IntPtr wtf_webtransport_error_to_string([NativeTypeName("uint32_t")] uint error_code);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern wtf_result_t wtf_get_error_details([NativeTypeName("uint32_t")] uint error_code, wtf_error_details_t* details);
@@ -710,6 +720,6 @@ namespace Structmap.WebTransportFast
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         [return: NativeTypeName("const char *")]
-        public static extern sbyte* wtf_http3_error_to_string([NativeTypeName("uint64_t")] ulong http3_error);
+        public static extern IntPtr wtf_http3_error_to_string([NativeTypeName("uint64_t")] ulong http3_error);
     }
 }

@@ -10,10 +10,10 @@ jobs:
     strategy:
       matrix:
         os:
-#          - runner: macos-latest
-#            runtime: osx-arm64
-#          - runner: macos-15-intel
-#            runtime: osx-x64
+          - runner: macos-latest
+            runtime: osx-arm64
+          - runner: macos-15-intel
+            runtime: osx-x64
           - runner: windows-2022
             runtime: win-x64
             libmsquic: "c:\\users\\runneradmin\\.nuget\\packages\\microsoft.native.quic.msquic.openssl\\2.5.6\\build\\native\\Microsoft.Native.Quic.MsQuic.quictls.targets"

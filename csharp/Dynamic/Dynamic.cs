@@ -617,7 +617,7 @@ namespace Structmap.WebTransportFast.Dynamic
         public static extern wtf_version_info_t* wtf_get_version();
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_context_create([NativeTypeName("const wtf_context_config_t *")] wtf_context_config_t* config, [NativeTypeName("wtf_context_t **")] wtf_context** context);
+        public static extern wtf_result_t wtf_context_create([NativeTypeName("const wtf_context_config_t *")] IntPtr config, [NativeTypeName("wtf_context_t **")] IntPtr context);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void wtf_context_destroy([NativeTypeName("wtf_context_t *")] wtf_context* context);
@@ -626,19 +626,19 @@ namespace Structmap.WebTransportFast.Dynamic
         public static extern wtf_result_t wtf_context_set_log_level([NativeTypeName("wtf_context_t *")] wtf_context* context, wtf_log_level_t level);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_server_create([NativeTypeName("wtf_context_t *")] wtf_context* context, [NativeTypeName("const wtf_server_config_t *")] wtf_server_config_t* config, [NativeTypeName("wtf_server_t **")] wtf_server** server);
+        public static extern wtf_result_t wtf_server_create([NativeTypeName("wtf_context_t *")] wtf_context* context, [NativeTypeName("const wtf_server_config_t *")] IntPtr config, [NativeTypeName("wtf_server_t **")] IntPtr* server);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_server_start([NativeTypeName("wtf_server_t *")] wtf_server* server);
+        public static extern wtf_result_t wtf_server_start([NativeTypeName("wtf_server_t *")] IntPtr server);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_server_stop([NativeTypeName("wtf_server_t *")] wtf_server* server);
+        public static extern wtf_result_t wtf_server_stop([NativeTypeName("wtf_server_t *")] IntPtr server);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_server_state_t wtf_server_get_state([NativeTypeName("wtf_server_t *")] wtf_server* server);
+        public static extern wtf_server_state_t wtf_server_get_state([NativeTypeName("wtf_server_t *")] IntPtr server);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void wtf_server_destroy([NativeTypeName("wtf_server_t *")] wtf_server* server);
+        public static extern void wtf_server_destroy([NativeTypeName("wtf_server_t *")] IntPtr server);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern wtf_result_t wtf_session_close([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("uint32_t")] uint error_code, [NativeTypeName("const char *")] IntPtr reason);

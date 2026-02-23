@@ -1,3 +1,5 @@
+// generated code do not edit
+
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 

@@ -620,13 +620,13 @@ namespace Structmap.WebTransportFast.Dynamic
         public static extern wtf_result_t wtf_context_create([NativeTypeName("const wtf_context_config_t *")] IntPtr config, [NativeTypeName("wtf_context_t **")] IntPtr context);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void wtf_context_destroy([NativeTypeName("wtf_context_t *")] wtf_context* context);
+        public static extern void wtf_context_destroy([NativeTypeName("wtf_context_t *")] IntPtr context);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_context_set_log_level([NativeTypeName("wtf_context_t *")] wtf_context* context, wtf_log_level_t level);
+        public static extern wtf_result_t wtf_context_set_log_level([NativeTypeName("wtf_context_t *")] IntPtr context, wtf_log_level_t level);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_server_create([NativeTypeName("wtf_context_t *")] wtf_context* context, [NativeTypeName("const wtf_server_config_t *")] IntPtr config, [NativeTypeName("wtf_server_t **")] IntPtr* server);
+        public static extern wtf_result_t wtf_server_create([NativeTypeName("wtf_context_t *")] IntPtr context, [NativeTypeName("const wtf_server_config_t *")] IntPtr config, [NativeTypeName("wtf_server_t **")] IntPtr server);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern wtf_result_t wtf_server_start([NativeTypeName("wtf_server_t *")] IntPtr server);
@@ -650,7 +650,7 @@ namespace Structmap.WebTransportFast.Dynamic
         public static extern wtf_result_t wtf_session_send_datagram([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("const wtf_buffer_t *")] wtf_buffer_t* buffers, [NativeTypeName("uint32_t")] uint buffer_count);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_session_create_stream([NativeTypeName("wtf_session_t *")] IntPtr session, wtf_stream_type_t type, [NativeTypeName("wtf_stream_t **")] IntPtr* stream);
+        public static extern wtf_result_t wtf_session_create_stream([NativeTypeName("wtf_session_t *")] IntPtr session, wtf_stream_type_t type, [NativeTypeName("wtf_stream_t **")] IntPtr stream);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern wtf_session_state_t wtf_session_get_state([NativeTypeName("wtf_session_t *")] IntPtr session);

@@ -7,9 +7,16 @@ namespace Structmap.WebTransportFast;
 
 public static unsafe partial class MemoryAllocator
 {
-    [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+
+#if WINDOWS
+    public const string DllName = "ucrtbase";
+#else
+    public const string DllName = "wtf";
+#endif
+
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
     public static extern IntPtr malloc([NativeTypeName("size_t")] UIntPtr n);
 
-    [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
     public static extern void free([NativeTypeName("void *")] IntPtr p);
 }

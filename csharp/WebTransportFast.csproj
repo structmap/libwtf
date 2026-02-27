@@ -6,6 +6,9 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
     <PropertyGroup>
+        <DefineConstants Condition="'$(RuntimeTarget)'=='win-x64'">$(DefineConstants);WINDOWS</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup>
         <PackageId>Structmap.WebTransportFast.$(RuntimeTarget)</PackageId>
         <RootNamespace>Structmap.WebTransportFast</RootNamespace>
         <Title>Structmap.WebTransportFast</Title>

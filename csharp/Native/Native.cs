@@ -1,5 +1,3 @@
-// generated code do not edit
-
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -21,8 +19,7 @@ namespace Structmap.WebTransportFast.Native
     {
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_execution_profile_t : uint
+    public enum wtf_execution_profile_t
     {
         WTF_EXECUTION_PROFILE_LOW_LATENCY = 0,
         WTF_EXECUTION_PROFILE_MAX_THROUGHPUT = 1,
@@ -30,8 +27,7 @@ namespace Structmap.WebTransportFast.Native
         WTF_EXECUTION_PROFILE_SCAVENGER = 3,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_result_t : uint
+    public enum wtf_result_t
     {
         WTF_SUCCESS = 0,
         WTF_ERROR_INVALID_PARAMETER,
@@ -49,8 +45,7 @@ namespace Structmap.WebTransportFast.Native
         WTF_ERROR_FLOW_CONTROL,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_log_level_t : uint
+    public enum wtf_log_level_t
     {
         WTF_LOG_LEVEL_TRACE = 0,
         WTF_LOG_LEVEL_DEBUG = 1,
@@ -61,8 +56,7 @@ namespace Structmap.WebTransportFast.Native
         WTF_LOG_LEVEL_NONE = 6,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_server_state_t : uint
+    public enum wtf_server_state_t
     {
         WTF_SERVER_STOPPED,
         WTF_SERVER_STARTING,
@@ -70,8 +64,7 @@ namespace Structmap.WebTransportFast.Native
         WTF_SERVER_STOPPING,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_session_state_t : uint
+    public enum wtf_session_state_t
     {
         WTF_SESSION_HANDSHAKING,
         WTF_SESSION_CONNECTED,
@@ -79,30 +72,26 @@ namespace Structmap.WebTransportFast.Native
         WTF_SESSION_CLOSED,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_stream_state_t : uint
+    public enum wtf_stream_state_t
     {
         WTF_STREAM_OPEN,
         WTF_STREAM_CLOSING,
         WTF_STREAM_CLOSED,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_stream_type_t : uint
+    public enum wtf_stream_type_t
     {
         WTF_STREAM_BIDIRECTIONAL = 0,
         WTF_STREAM_UNIDIRECTIONAL = 1,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_connection_decision_t : uint
+    public enum wtf_connection_decision_t
     {
         WTF_CONNECTION_ACCEPT,
         WTF_CONNECTION_REJECT,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_h3_error_t : uint
+    public enum wtf_h3_error_t
     {
         WTF_H3_NO_ERROR = 0x0100,
         WTF_H3_GENERAL_PROTOCOL_ERROR = 0x0101,
@@ -123,8 +112,7 @@ namespace Structmap.WebTransportFast.Native
         WTF_H3_VERSION_FALLBACK = 0x0110,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_datagram_send_state_t : uint
+    public enum wtf_datagram_send_state_t
     {
         WTF_DATAGRAM_SEND_UNKNOWN = 0,
         WTF_DATAGRAM_SEND_SENT = 1,
@@ -135,30 +123,26 @@ namespace Structmap.WebTransportFast.Native
         WTF_DATAGRAM_SEND_CANCELED = 6,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_qpack_error_t : uint
+    public enum wtf_qpack_error_t
     {
         WTF_QPACK_DECOMPRESSION_FAILED = 0x0200,
         WTF_QPACK_ENCODER_STREAM_ERROR = 0x0201,
         WTF_QPACK_DECODER_STREAM_ERROR = 0x0202,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_h3_datagram_error_t : uint
+    public enum wtf_h3_datagram_error_t
     {
         WTF_H3_DATAGRAM_ERROR = 0x33,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_capsule_type_t : uint
+    public enum wtf_capsule_type_t
     {
         WTF_CAPSULE_DATAGRAM = 0x00,
         WTF_CAPSULE_CLOSE_WEBTRANSPORT_SESSION = 0x2843,
         WTF_CAPSULE_DRAIN_WEBTRANSPORT_SESSION = 0x78ae,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_session_event_type_t : uint
+    public enum wtf_session_event_type_t
     {
         WTF_SESSION_EVENT_CONNECTED,
         WTF_SESSION_EVENT_DISCONNECTED,
@@ -168,8 +152,7 @@ namespace Structmap.WebTransportFast.Native
         WTF_SESSION_EVENT_DATAGRAM_RECEIVED,
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_stream_event_type_t : uint
+    public enum wtf_stream_event_type_t
     {
         WTF_STREAM_EVENT_DATA_RECEIVED,
         WTF_STREAM_EVENT_SEND_COMPLETE,
@@ -426,8 +409,7 @@ namespace Structmap.WebTransportFast.Native
         public byte is_protocol_error;
     }
 
-    [NativeTypeName("unsigned int")]
-    public enum wtf_certificate_type_t : uint
+    public enum wtf_certificate_type_t
     {
         WTF_CERT_TYPE_NONE,
         WTF_CERT_TYPE_FILE,
@@ -607,6 +589,12 @@ namespace Structmap.WebTransportFast.Native
     {
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern wtf_version_info_t* wtf_get_version();
+
+        [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void* wtf_malloc([NativeTypeName("size_t")] nuint n);
+
+        [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+        public static extern void wtf_free(void* p);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern wtf_result_t wtf_context_create([NativeTypeName("const wtf_context_config_t *")] wtf_context_config_t* config, [NativeTypeName("wtf_context_t **")] wtf_context** context);

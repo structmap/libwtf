@@ -257,6 +257,7 @@ set(WTF_SOURCES
     src/http3.c
     src/server.c
     src/context.c
+    src/mem.c
     ${WTF_EXPORT_SOURCES}
 )
 

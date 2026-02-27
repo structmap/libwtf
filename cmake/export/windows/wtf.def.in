@@ -3,6 +3,8 @@
 LIBRARY @WTF_LIBRARY_NAME@
 EXPORTS
     wtf_get_version
+    wtf_malloc
+    wtf_free
     wtf_context_create
     wtf_context_destroy
     wtf_context_set_log_level

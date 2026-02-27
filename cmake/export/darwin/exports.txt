@@ -1,6 +1,8 @@
 # Auto-generated Darwin export list from wtf.h
 # Do not edit manually - regenerate using export script
 _wtf_get_version
+_wtf_malloc
+_wtf_free
 _wtf_context_create
 _wtf_context_destroy
 _wtf_context_set_log_level

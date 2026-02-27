@@ -430,6 +430,14 @@ typedef struct {
 //! @return pointer to version structure
 WTF_API wtf_version_info_t* wtf_get_version();
 
+//! Allocate n bytes of memory.
+//! @return pointer to allocated memory.
+WTF_API void* wtf_malloc(size_t n);
+
+//! Free memory allocated by wtf_malloc.
+//! @param p pointer to memory to free
+WTF_API void wtf_free(void* p);
+
 //! Create a new WebTransport context
 //! @param config context configuration parameters
 //! @param context pointer to receive the created context

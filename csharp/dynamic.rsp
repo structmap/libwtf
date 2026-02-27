@@ -8,6 +8,8 @@ csharp/Dynamic/Dynamic.cs
 Structmap.WebTransportFast.Dynamic
 --libraryPath
 wtf
+--config
+exclude-anonymous-field-helpers
 --remap
 byte*=IntPtr
 sbyte*=IntPtr

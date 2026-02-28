@@ -1,7 +1,6 @@
 // generated code do not edit
 
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace Structmap.WebTransportFast.Dynamic
@@ -234,42 +233,6 @@ namespace Structmap.WebTransportFast.Dynamic
         [NativeTypeName("__AnonymousRecord_wtf_L235_C5")]
         public _Anonymous_e__Union Anonymous;
 
-        [UnscopedRef]
-        public ref _Anonymous_e__Union._disconnected_e__Struct disconnected
-        {
-            get
-            {
-                return ref Anonymous.disconnected;
-            }
-        }
-
-        [UnscopedRef]
-        public ref _Anonymous_e__Union._stream_opened_e__Struct stream_opened
-        {
-            get
-            {
-                return ref Anonymous.stream_opened;
-            }
-        }
-
-        [UnscopedRef]
-        public ref _Anonymous_e__Union._datagram_send_state_changed_e__Struct datagram_send_state_changed
-        {
-            get
-            {
-                return ref Anonymous.datagram_send_state_changed;
-            }
-        }
-
-        [UnscopedRef]
-        public ref _Anonymous_e__Union._datagram_received_e__Struct datagram_received
-        {
-            get
-            {
-                return ref Anonymous.datagram_received;
-            }
-        }
-
         [StructLayout(LayoutKind.Explicit)]
         public partial struct _Anonymous_e__Union
         {
@@ -306,9 +269,10 @@ namespace Structmap.WebTransportFast.Dynamic
                 public wtf_stream_type_t stream_type;
             }
 
-            public unsafe partial struct _datagram_send_state_changed_e__Struct
+            public partial struct _datagram_send_state_changed_e__Struct
             {
-                public wtf_buffer_t* buffers;
+                [NativeTypeName("wtf_buffer_t*")]
+                public IntPtr buffers;
 
                 [NativeTypeName("uint32_t")]
                 public uint buffer_count;
@@ -340,33 +304,6 @@ namespace Structmap.WebTransportFast.Dynamic
         [NativeTypeName("__AnonymousRecord_wtf_L265_C5")]
         public _Anonymous_e__Union Anonymous;
 
-        [UnscopedRef]
-        public ref _Anonymous_e__Union._data_received_e__Struct data_received
-        {
-            get
-            {
-                return ref Anonymous.data_received;
-            }
-        }
-
-        [UnscopedRef]
-        public ref _Anonymous_e__Union._send_complete_e__Struct send_complete
-        {
-            get
-            {
-                return ref Anonymous.send_complete;
-            }
-        }
-
-        [UnscopedRef]
-        public ref _Anonymous_e__Union._aborted_e__Struct aborted
-        {
-            get
-            {
-                return ref Anonymous.aborted;
-            }
-        }
-
         [StructLayout(LayoutKind.Explicit)]
         public partial struct _Anonymous_e__Union
         {
@@ -382,9 +319,10 @@ namespace Structmap.WebTransportFast.Dynamic
             [NativeTypeName("__AnonymousRecord_wtf_L278_C9")]
             public _aborted_e__Struct aborted;
 
-            public unsafe partial struct _data_received_e__Struct
+            public partial struct _data_received_e__Struct
             {
-                public wtf_buffer_t* buffers;
+                [NativeTypeName("wtf_buffer_t*")]
+                public IntPtr buffers;
 
                 [NativeTypeName("uint32_t")]
                 public uint buffer_count;
@@ -393,9 +331,10 @@ namespace Structmap.WebTransportFast.Dynamic
                 public byte fin;
             }
 
-            public unsafe partial struct _send_complete_e__Struct
+            public partial struct _send_complete_e__Struct
             {
-                public wtf_buffer_t* buffers;
+                [NativeTypeName("wtf_buffer_t*")]
+                public IntPtr buffers;
 
                 [NativeTypeName("uint32_t")]
                 public uint buffer_count;
@@ -647,7 +586,7 @@ namespace Structmap.WebTransportFast.Dynamic
         public static extern wtf_result_t wtf_session_drain([NativeTypeName("wtf_session_t *")] IntPtr session);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_session_send_datagram([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("const wtf_buffer_t *")] wtf_buffer_t* buffers, [NativeTypeName("uint32_t")] uint buffer_count);
+        public static extern wtf_result_t wtf_session_send_datagram([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("const wtf_buffer_t *")] IntPtr buffers, [NativeTypeName("uint32_t")] uint buffer_count);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern wtf_result_t wtf_session_create_stream([NativeTypeName("wtf_session_t *")] IntPtr session, wtf_stream_type_t type, [NativeTypeName("wtf_stream_t **")] IntPtr stream);
@@ -666,7 +605,7 @@ namespace Structmap.WebTransportFast.Dynamic
         public static extern IntPtr wtf_session_get_context([NativeTypeName("wtf_session_t *")] IntPtr session);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_stream_send([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("const wtf_buffer_t *")] wtf_buffer_t* buffers, [NativeTypeName("uint32_t")] uint buffer_count, [NativeTypeName("_Bool")] byte fin);
+        public static extern wtf_result_t wtf_stream_send([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("const wtf_buffer_t *")] IntPtr buffers, [NativeTypeName("uint32_t")] uint buffer_count, [NativeTypeName("_Bool")] byte fin);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern wtf_result_t wtf_stream_close([NativeTypeName("wtf_stream_t *")] IntPtr stream);

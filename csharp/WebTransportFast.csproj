@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Library</OutputType>
+        <TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+    <PropertyGroup>
+        <DefineConstants Condition="'$(RuntimeTarget)'=='win-x64'">$(DefineConstants);WINDOWS</DefineConstants>
+    </PropertyGroup>
+    <PropertyGroup>
+        <PackageId>Structmap.WebTransportFast.$(RuntimeTarget)</PackageId>
+        <RootNamespace>Structmap.WebTransportFast</RootNamespace>
+        <Title>Structmap.WebTransportFast</Title>
+        <Product>Structmap.WebTransportFast</Product>
+        <AssemblyTitle>Structmap.WebTransportFast</AssemblyTitle>
+        <Authors>Andrew Sampson, bindings and packaging by James Davidson</Authors>
+        <Description>Bindings to libwtf: Web Transport Fast</Description>
+        <Copyright>Andrew Sampson</Copyright>
+        <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+        <RepositoryUrl>https://github.com/structmap/libwtf</RepositoryUrl>
+        <Company>N/A</Company>
+        <PackageTags>WebTransport;HTTP3</PackageTags>
+        <Version>$(PublishVersion)</Version>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="../build/output/libwtf.*" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(RuntimeTarget)'=='win-x64'">
+        <None Include="../build/output/Release/msquic.dll" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
+        <None Include="../build/output/Release/wtf.dll" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
+        <None Include="../build/output/Release/wtf.exp" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
+        <None Include="../build/output/Release/wtf.lib" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
+        <None Include="../build/output/Release/wtf.pdb" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(RuntimeIdentifier)'=='win-x64'">
+        <PackageReference Include="Microsoft.Native.Quic.MsQuic.OpenSSL" Version="2.5.6" />
+    </ItemGroup>
+    <ItemGroup>
+      <PackageReference Include="QuickConstructor" Version="1.0.5" />
+    </ItemGroup>
+</Project>

@@ -595,7 +595,7 @@ namespace Structmap.WebTransportFast.Dynamic
         public static extern wtf_session_state_t wtf_session_get_state([NativeTypeName("wtf_session_t *")] IntPtr session);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern wtf_result_t wtf_session_get_peer_address([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("void*")] IntPtr address_buffer, [NativeTypeName("size_t *")] nuint* buffer_size);
+        public static extern wtf_result_t wtf_session_get_peer_address([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("void*")] IntPtr address_buffer, [NativeTypeName("size_t *")] IntPtr buffer_size);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void wtf_session_set_context([NativeTypeName("wtf_session_t *")] IntPtr session, [NativeTypeName("void*")] IntPtr user_context);

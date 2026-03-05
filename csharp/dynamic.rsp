@@ -12,6 +12,7 @@ wtf
 exclude-anonymous-field-helpers
 --remap
 byte*=IntPtr
+nuint*=IntPtr
 sbyte*=IntPtr
 void*=IntPtr
 wtf_buffer_t*=IntPtr

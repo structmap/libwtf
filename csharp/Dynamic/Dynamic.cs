@@ -617,7 +617,7 @@ namespace Structmap.WebTransportFast.Dynamic
         public static extern wtf_result_t wtf_stream_get_id([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("uint64_t *")] ulong* stream_id);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        public static extern void wtf_stream_set_callback([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("wtf_stream_callback_t")] delegate* unmanaged[Cdecl]<wtf_stream_event_t*, void> callback);
+        public static extern void wtf_stream_set_callback([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("wtf_stream_callback_t")] IntPtr callback);
 
         [DllImport("wtf", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         public static extern void wtf_stream_set_context([NativeTypeName("wtf_stream_t *")] IntPtr stream, [NativeTypeName("void*")] IntPtr user_context);

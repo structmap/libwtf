@@ -16,3 +16,8 @@ public delegate void LogCallback(wtf_log_level_t level, IntPtr component, IntPtr
 //delegate* unmanaged[Cdecl]<wtf_session_event_t*, void>=IntPtr
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 public delegate void SessionCallback(IntPtr evt);
+
+//typedef void (*wtf_stream_callback_t)(const wtf_stream_event_t* event);
+//delegate* unmanaged[Cdecl]<wtf_stream_event_t*, void>=IntPtr
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public delegate void StreamCallback(IntPtr evt);

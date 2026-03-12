@@ -5,34 +5,7 @@ using System.Text;
 using Structmap.WebTransportFast;
 
 var server = new DatagramServer(8443, "cert.pem", "key.pem");
-// unsafe
-// {
-//     server._connection_validator = (request, data) =>
-//     {
-//         var ret = wtf_connection_decision_t.WTF_CONNECTION_ACCEPT; // WTF_CONNECTION_REJECT
-//         for (var i = 0; i < (int)request->header_count; i++)
-//         {
-//             var header = request->headers[i];
-//             var name = Marshal.PtrToStringAnsi((IntPtr)header.name);
-//             if (name != null && name.Equals("Authorization", StringComparison.OrdinalIgnoreCase))
-//             {
-//                 var value= Marshal.PtrToStringAnsi((IntPtr)header.value);
-//                 if (value != null)
-//                 {
-//                     var token = value.Replace("Bearer ", "");
-//                     if (token == "secret")
-//                     {
-//                         ret = wtf_connection_decision_t.WTF_CONNECTION_ACCEPT;
-//                         break;
-//                     }
-//                 }
-//             }
-//         }
-//
-//         return ret;
-//     };
-// }
-//
+
 // server.Handler = async (events) =>
 // {
 //     await foreach (var e in events)
@@ -90,7 +63,7 @@ public unsafe class DatagramServer
     public delegate wtf_connection_decision_t connection_validator_delegate(wtf_connection_request_t* request,
         void* user_data);
 
-    public connection_validator_delegate _connection_validator;
+    private connection_validator_delegate _connection_validator;
 
     public ConcurrentDictionary<Object,Object> Sessions = new();
     public ConcurrentDictionary<Object,Object> Streams = new();

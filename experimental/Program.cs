@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Reflection;
 using Structmap.WebTransportFast.Native;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -6,17 +7,17 @@ using Structmap.WebTransportFast;
 
 var server = new DatagramServer(8443, "cert.pem", "key.pem");
 
-// server.Handler = async (events) =>
-// {
-//     await foreach (var e in events)
-//     {
-//         if (e is Datagram d)
-//         {
-//             Console.Out.WriteLine(Encoding.ASCII.GetString(d.Payload));
-//             d.Context.Server.
-//         }
-//     }
-// };
+server.Handler = async (events) =>
+{
+    await foreach (var e in events)
+    {
+        if (e is Datagram d)
+        {
+            Console.Out.WriteLine(Encoding.ASCII.GetString(d.Payload));
+            d.Context.Server.
+        }
+    }
+};
 
 using var tokenSource = new CancellationTokenSource();
 Console.CancelKeyPress += (_, _) => {
@@ -185,33 +186,33 @@ public unsafe class DatagramServer
         }
     }
 
-    // public bool Send(Object session, byte[] data)
-    // {
-    //     var n = (uint)data.Length;
-    //     var dst = MemoryAllocator.malloc(n);
-    //     Marshal.Copy(data, 0, dst, data.Length);
-    //     var buffer = new wtf_buffer_t()
-    //     {
-    //         data = (byte*)dst,
-    //         length = n,
-    //     };
-    //
-    //     typeof(session) == 
-    //     if (session is (wtf_session*)s)
-    //     {
-    //         
-    //     }
-    //     wtf_result_t result = Methods.wtf_session_send_datagram(session, &buffer,1);
-    //     if (result == wtf_result_t.WTF_SUCCESS) {
-    //         Console.Out.WriteLine("[DATAGRAM] Echoed {0} bytes", n);
-    //     } else
-    //     {
-    //         var msg = Marshal.PtrToStringAnsi((IntPtr)Methods.wtf_result_to_string(result));
-    //         Console.Out.WriteLine("[DATAGRAM] Failed to echo: {0}", msg);
-    //         Marshal.FreeHGlobal((IntPtr)reversed);
-    //     }
-    //
-    // }
+    public bool Send(Object session, byte[] data)
+    {
+        var n = (uint)data.Length;
+        var dst = MemoryAllocator.malloc(n);
+        Marshal.Copy(data, 0, dst, data.Length);
+        var buffer = new wtf_buffer_t()
+        {
+            data = (byte*)dst,
+            length = n,
+        };
+
+        if (session is Pointer p)
+        {
+            wtf_result_t result = Methods.wtf_session_send_datagram((wtf_session*)Pointer.Unbox(p), &buffer, 1);
+            if (result != wtf_result_t.WTF_SUCCESS)
+            {
+                var msg = Marshal.PtrToStringAnsi((IntPtr)Methods.wtf_result_to_string(result));
+                Console.Out.WriteLine("[DATAGRAM] Failed to echo: {0}", msg);
+                MemoryAllocator.free(dst);
+                return false;
+            }
+            Console.Out.WriteLine("[DATAGRAM] Echoed {0} bytes", n);
+            return true;
+        }
+
+        return false;
+    }
 
     public bool Start()
     {

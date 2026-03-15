@@ -3,18 +3,25 @@ using System.Reflection;
 using Structmap.WebTransportFast.Native;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Channels;
 using Structmap.WebTransportFast;
 
 var server = new DatagramServer(8443, "cert.pem", "key.pem");
 
-server.Handler = async (events) =>
+server.ChannelFactory = () =>
 {
-    await foreach (var e in events)
+    var n = 10;
+    return Channel.CreateBounded<Object>(n);
+};
+
+server.Handler = async (ch) =>
+{
+    await foreach (var e in ch.Reader.ReadAllAsync())
     {
         if (e is Datagram d)
         {
-            Console.Out.WriteLine(Encoding.ASCII.GetString(d.Payload));
-            d.Context.Server.
+            Console.Out.WriteLine("[HANDLER] Ready to echo payload {0}", Encoding.ASCII.GetString(d.Payload));
+            d.Context.Server.Send(d.Context.Identifier, d.Payload);
         }
     }
 };
@@ -66,10 +73,11 @@ public unsafe class DatagramServer
 
     private connection_validator_delegate _connection_validator;
 
-    public ConcurrentDictionary<Object,Object> Sessions = new();
+    public ConcurrentDictionary<Object,Channel<Object>> Sessions = new();
     public ConcurrentDictionary<Object,Object> Streams = new();
 
-    public Action<IAsyncEnumerable<Object>> Handler;
+    public Func<Channel<Object>> ChannelFactory;
+    public Action<Channel<Object>> Handler;
 
     public DatagramServer(int port, string cert, string key)
     {
@@ -105,7 +113,11 @@ public unsafe class DatagramServer
         {
             case wtf_session_event_type_t.WTF_SESSION_EVENT_CONNECTED:
             {
-                Console.Out.WriteLine("[SESSION] New session connected {0}", (IntPtr)evt->user_context);
+                var sessionPointer = Pointer.Box(evt->session, typeof(wtf_session*));
+                Console.Out.WriteLine("[SESSION] New session connected 0x{0:x}", (IntPtr)evt->session);
+                var ch = ChannelFactory();
+                Sessions.TryAdd(sessionPointer, ch);
+                Task.Run(() => Handler(ch));
                 break;
             }
 
@@ -113,47 +125,48 @@ public unsafe class DatagramServer
                 var msg = Marshal.PtrToStringAnsi((IntPtr)evt->disconnected.reason);
                 if (msg == null || msg == "") msg = "none";
 
-                Console.Out.WriteLine("[SESSION] Session {0} disconnected (error: {1}, reason: {2})",
-                    (IntPtr)evt->user_context,
+                Console.Out.WriteLine("[SESSION] Session 0x{0:x} disconnected (error: {1}, reason: {2})",
+                    (IntPtr)evt->session,
                     evt->disconnected.error_code,
                     msg);
 
+                var sessionPointer = Pointer.Box(evt->session, typeof(wtf_session*));
+                if (Sessions.TryGetValue(sessionPointer, out var ch))
+                {
+                    ch.Writer.TryComplete();
+                    Sessions.TryRemove(sessionPointer, out _);
+                }
                 break;
             }
 
-            case wtf_session_event_type_t.WTF_SESSION_EVENT_DATAGRAM_RECEIVED: {
-                Console.Out.WriteLine("[DATAGRAM] Received on session {0} ({1} bytes)",
-                    (IntPtr)evt->user_context,
-                    evt->datagram_received.length);
+            case wtf_session_event_type_t.WTF_SESSION_EVENT_DATAGRAM_RECEIVED:
+            {
+                var sessionPointer = Pointer.Box(evt->session, typeof(wtf_session*));
+                var n = (int)evt->datagram_received.length;
+                Console.Out.WriteLine("[DATAGRAM] Received on session 0x{0:x} ({1} bytes)",
+                    (IntPtr)evt->session,
+                    n);
 
-                ReadOnlySpan<byte> datagramData = new ReadOnlySpan<byte>(evt->datagram_received.data, (int)evt->datagram_received.length);
-
-                var n = datagramData.Length;
-                var reversedPtr = MemoryAllocator.malloc((uint)n);
-                var reversed = (byte*)reversedPtr;
-                Console.Out.WriteLine($"reversedPtr = {reversedPtr}");
-                Console.Out.WriteLine($"reversed = {(IntPtr)reversed}");
-                for (int i = 0; i < n; i++)
+                var bs = new byte[n];
+                Marshal.Copy((IntPtr)evt->datagram_received.data, bs, 0, n);
+                var s = new Session()
                 {
-                    reversed[i] = datagramData[n - i - 1];
-                }
-
-                var buffer = new wtf_buffer_t()
-                {
-                    data = reversed,
-                    length = (uint)n,
+                    Identifier = sessionPointer,
+                    Server = this,
                 };
-
-                wtf_result_t result = Methods.wtf_session_send_datagram(evt->session, &buffer,1);
-                if (result == wtf_result_t.WTF_SUCCESS) {
-                    Console.Out.WriteLine("[DATAGRAM] Echoed {0} bytes", n);
-                } else
+                var d = new Datagram()
                 {
-                    var msg = Marshal.PtrToStringAnsi((IntPtr)Methods.wtf_result_to_string(result));
-                    Console.Out.WriteLine("[DATAGRAM] Failed to echo: {0}", msg);
-                    MemoryAllocator.free(reversedPtr);
+                    Context = s,
+                    Payload = bs,
+                };
+                if (Sessions.TryGetValue(sessionPointer, out var ch))
+                {
+                    ch.Writer.TryWrite(d);
                 }
-
+                else
+                {
+                    Console.Error.WriteLine("No channel for session 0x{0:x}", (IntPtr)evt->session);
+                }
                 break;
             }
 
@@ -167,8 +180,8 @@ public unsafe class DatagramServer
                     {
                         var data = evt->datagram_send_state_changed.buffers[i].data;
                         var dataPtr = (IntPtr)data;
-                        Console.Out.WriteLine($"data = {(IntPtr)data}");
-                        Console.Out.WriteLine($"dataPtr = {dataPtr}");
+                        Console.Out.WriteLine("data = 0x{0:x}", (IntPtr)data);
+                        Console.Out.WriteLine("dataPtr = 0x{0:x}", dataPtr);
 
                         if (dataPtr != IntPtr.Zero)
                         {
@@ -181,7 +194,7 @@ public unsafe class DatagramServer
             }
 
             case wtf_session_event_type_t.WTF_SESSION_EVENT_DRAINING:
-                Console.Out.WriteLine("[SESSION] Session {0} is draining", (IntPtr)evt->user_context);
+                Console.Out.WriteLine("[SESSION] Session 0x{0:x} is draining", (IntPtr)evt->session);
                 break;
         }
     }

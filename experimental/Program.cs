@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using System.Reflection;
 using Structmap.WebTransportFast.Native;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -113,8 +112,8 @@ public unsafe class DatagramServer
         {
             case wtf_session_event_type_t.WTF_SESSION_EVENT_CONNECTED:
             {
-                var sessionPointer = Pointer.Box(evt->session, typeof(wtf_session*));
-                Console.Out.WriteLine("[SESSION] New session connected 0x{0:x}", (IntPtr)evt->session);
+                var sessionPointer = new IntPtr(evt->session);
+                Console.Out.WriteLine("[SESSION] New session connected 0x{0:x}", sessionPointer);
                 var ch = ChannelFactory();
                 Sessions.TryAdd(sessionPointer, ch);
                 Task.Run(() => Handler(ch));
@@ -130,7 +129,7 @@ public unsafe class DatagramServer
                     evt->disconnected.error_code,
                     msg);
 
-                var sessionPointer = Pointer.Box(evt->session, typeof(wtf_session*));
+                var sessionPointer = new IntPtr(evt->session);
                 if (Sessions.TryGetValue(sessionPointer, out var ch))
                 {
                     ch.Writer.TryComplete();
@@ -141,7 +140,7 @@ public unsafe class DatagramServer
 
             case wtf_session_event_type_t.WTF_SESSION_EVENT_DATAGRAM_RECEIVED:
             {
-                var sessionPointer = Pointer.Box(evt->session, typeof(wtf_session*));
+                var sessionPointer = new IntPtr(evt->session);
                 var n = (int)evt->datagram_received.length;
                 Console.Out.WriteLine("[DATAGRAM] Received on session 0x{0:x} ({1} bytes)",
                     (IntPtr)evt->session,
@@ -210,9 +209,9 @@ public unsafe class DatagramServer
             length = n,
         };
 
-        if (session is Pointer p)
+        if (session is IntPtr p)
         {
-            wtf_result_t result = Methods.wtf_session_send_datagram((wtf_session*)Pointer.Unbox(p), &buffer, 1);
+            wtf_result_t result = Methods.wtf_session_send_datagram((wtf_session*)p, &buffer, 1);
             if (result != wtf_result_t.WTF_SUCCESS)
             {
                 var msg = Marshal.PtrToStringAnsi((IntPtr)Methods.wtf_result_to_string(result));

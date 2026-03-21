@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.IO.Pipelines;
 using Structmap.WebTransportFast.Native;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -21,6 +22,13 @@ server.Handler = async (ch) =>
         {
             Console.Out.WriteLine("[HANDLER] Ready to echo payload {0}", Encoding.ASCII.GetString(d.Payload));
             d.Context.Server.Send(d.Context.Identifier, d.Payload);
+        }
+
+        if (e is Stream s)
+        {
+            Console.Out.WriteLine("[HANDLER] Ready to echo stream 0x{0:x}", (IntPtr)s.Identifier);
+            // await s.Incoming.CopyToAsync(Console.OpenStandardOutput());
+            await s.Incoming.CopyToAsync(s.Outgoing);
         }
     }
 };
@@ -47,6 +55,7 @@ await Task.Delay(Timeout.Infinite, tokenSource.Token);
 
 public record struct Session(DatagramServer Server, Object Identifier);
 public record struct Datagram(Session Context, byte[] Payload);
+public record struct Stream(Session Context, Object Identifier, System.IO.Stream Incoming, System.IO.Stream Outgoing);
 
 public unsafe class DatagramServer
 {
@@ -67,6 +76,11 @@ public unsafe class DatagramServer
     private session_callback_delegate _session_callback;
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void stream_callback_delegate(wtf_stream_event_t* evt);
+
+    private stream_callback_delegate _stream_callback;
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate wtf_connection_decision_t connection_validator_delegate(wtf_connection_request_t* request,
         void* user_data);
 
@@ -84,6 +98,7 @@ public unsafe class DatagramServer
         this.cert = cert;
         this.key = key;
         _session_callback = session_callback;
+        _stream_callback = stream_callback;
         _connection_validator = connection_validator;
     }
 
@@ -117,6 +132,37 @@ public unsafe class DatagramServer
                 var ch = ChannelFactory();
                 Sessions.TryAdd(sessionPointer, ch);
                 Task.Run(() => Handler(ch));
+                break;
+            }
+
+            case wtf_session_event_type_t.WTF_SESSION_EVENT_STREAM_OPENED: {
+                var sessionPointer = new IntPtr(evt->session);
+                var streamPointer = new IntPtr(evt->stream_opened.stream);
+                Console.Out.WriteLine("[SESSION] New stream 0x{0:x} opened on session 0x{1:x}", streamPointer, sessionPointer);
+
+                if (Sessions.TryGetValue(sessionPointer, out var ch))
+                {
+                    bool bidi = evt->stream_opened.stream_type == wtf_stream_type_t.WTF_STREAM_BIDIRECTIONAL;
+                    var pipes = (new Pipe(PipeOptions.Default), new Pipe(PipeOptions.Default));
+                    if (!bidi)
+                    {
+                        pipes.Item2.Writer.Complete();
+                    }
+
+                    Streams.TryAdd(streamPointer, pipes);
+                    ch.Writer.TryWrite(new Stream()
+                    {
+                        Context = new Session(this, sessionPointer),
+                        Identifier = streamPointer,
+                        Incoming = pipes.Item1.Reader.AsStream(),
+                        Outgoing = bidi ? pipes.Item2.Writer.AsStream() : System.IO.Stream.Null,
+                    });
+                }
+
+                Methods.wtf_stream_set_callback(evt->stream_opened.stream,
+                    (delegate* unmanaged[Cdecl]<wtf_stream_event_t*, void>)Marshal.GetFunctionPointerForDelegate(_stream_callback));
+
+                Console.Out.WriteLine("[SESSION] Stream 0x{0:x} configured", streamPointer);
                 break;
             }
 
@@ -194,6 +240,76 @@ public unsafe class DatagramServer
 
             case wtf_session_event_type_t.WTF_SESSION_EVENT_DRAINING:
                 Console.Out.WriteLine("[SESSION] Session 0x{0:x} is draining", (IntPtr)evt->session);
+                break;
+        }
+    }
+
+    void stream_callback(wtf_stream_event_t* evt)
+    {
+        var streamPointer = new IntPtr(evt->stream);
+
+        switch (evt->type)
+        {
+            case wtf_stream_event_type_t.WTF_STREAM_EVENT_SEND_COMPLETE: {
+                for (var i = 0; i < evt->send_complete.buffer_count; i++) {
+                    if (evt->send_complete.buffers[i].data != (byte*)0) {
+                        MemoryAllocator.free((IntPtr)evt->send_complete.buffers[i].data);
+                    }
+                }
+                break;
+            }
+
+            case wtf_stream_event_type_t.WTF_STREAM_EVENT_DATA_RECEIVED:
+            {
+                if (Streams.TryGetValue(streamPointer, out var pipes))
+                {
+                    if (pipes is ValueTuple<Pipe, Pipe> pp)
+                    {
+                        using var w = pp.Item1.Writer.AsStream(true);
+                        for (var i = 0; i < evt->data_received.buffer_count; i++)
+                        {
+                            var buf = evt->data_received.buffers[i];
+                            var n = (int)buf.length;
+                            var bs = new byte[n];
+                            Marshal.Copy((nint)buf.data, bs, 0, n);
+                            w.Write(bs, 0, n);
+                        }
+                        if (evt->data_received.fin == TRUE)
+                        {
+                            pp.Item1.Writer.Complete();
+                        }
+                    }
+                    else
+                    {
+                        Console.Error.WriteLine("Failed to cast pipes for stream 0x{0:x}", (IntPtr)evt->stream);
+                    }
+                }
+                else
+                {
+                    Console.Error.WriteLine("No pipe for stream 0x{0:x}", (IntPtr)evt->stream);
+                }
+                break;
+            }
+
+            case wtf_stream_event_type_t.WTF_STREAM_EVENT_PEER_CLOSED:
+                Console.Out.WriteLine("[STREAM] Stream 0x{0:x} closed by peer", (IntPtr)evt->stream);
+                break;
+
+            case wtf_stream_event_type_t.WTF_STREAM_EVENT_CLOSED:
+                Console.Out.WriteLine("[STREAM] Stream 0x{0:x} fully closed", (IntPtr)evt->stream);
+                if (!Streams.TryRemove(streamPointer, out _))
+                {
+                    Console.Error.WriteLine("Failed to remove stream 0x{0:x}", streamPointer);
+                }
+                break;
+
+            case wtf_stream_event_type_t.WTF_STREAM_EVENT_ABORTED:
+                Console.Out.WriteLine("[STREAM] Stream 0x{0:x} aborted with error {1}", (IntPtr)evt->stream,
+                    evt->aborted.error_code);
+                // if (!Streams.TryRemove(streamPointer, out _))
+                // {
+                //     Console.Error.WriteLine("Failed to remove stream 0x{0:x}", streamPointer);
+                // }
                 break;
         }
     }

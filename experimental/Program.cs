@@ -157,6 +157,40 @@ public unsafe class DatagramServer
                         Incoming = pipes.Item1.Reader.AsStream(),
                         Outgoing = bidi ? pipes.Item2.Writer.AsStream() : System.IO.Stream.Null,
                     });
+                    if (bidi)
+                    {
+                        // using a sync thread feels wasteful but async and unsafe don't mix
+                        Task.Run(() =>
+                        {
+                            using var r = pipes.Item2.Reader.AsStream();
+                            var buffer = new byte[8192];
+                            int bytesRead;
+                            while ((bytesRead = r.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                var nativeBuffer = MemoryAllocator.malloc((uint)bytesRead);
+                                Marshal.Copy(buffer, 0, nativeBuffer, bytesRead);
+
+                                var buffers = MemoryAllocator.malloc((uint)Marshal.SizeOf(typeof(wtf_buffer_t)));
+                                Marshal.WriteIntPtr(buffers, IntPtr.Zero);
+                                Marshal.StructureToPtr(new wtf_buffer_t()
+                                {
+                                    data = (byte*)nativeBuffer,
+                                    length = (uint)bytesRead,
+                                }, buffers, false);
+
+                                // use the fact that an array of one item is just pointer to the first
+                                var result = Methods.wtf_stream_send((wtf_stream*)streamPointer, (wtf_buffer_t*)buffers, 1, FALSE);
+                                if (result != wtf_result_t.WTF_SUCCESS)
+                                {
+                                    var msg = Marshal.PtrToStringAnsi((IntPtr)Methods.wtf_result_to_string(result));
+                                    Console.Error.WriteLine("[STREAM] Failed to write to stream 0x{0:x}: {1}",
+                                        streamPointer, msg);
+                                    MemoryAllocator.free(nativeBuffer);
+                                }
+                            }
+                            r.Close();
+                        });
+                    }
                 }
 
                 Methods.wtf_stream_set_callback(evt->stream_opened.stream,

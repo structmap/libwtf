@@ -161,6 +161,8 @@ public unsafe class DatagramServer
                     if (bidi)
                     {
                         // using a sync thread feels wasteful but async and unsafe don't mix
+                        // TODO: rewrite to use pipes.Outgoing.Reader.ReadAsync with .AdvanceTo and .IsCompleted check
+                        //       which in combination with SendBufferingEnabled=True should enable backpressure
                         Task.Run(() =>
                         {
                             using var r = pipes.Outgoing.Reader.AsStream();
@@ -305,6 +307,7 @@ public unsafe class DatagramServer
                             var n = (int)buf.length;
                             var bs = new byte[n];
                             Marshal.Copy((nint)buf.data, bs, 0, n);
+                            // TODO: in backpressure scenario won't this block event handler loop? need to fix
                             w.Write(bs, 0, n);
                         }
                         if (evt->data_received.fin == TRUE)

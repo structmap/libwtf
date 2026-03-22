@@ -56,6 +56,7 @@ await Task.Delay(Timeout.Infinite, tokenSource.Token);
 public record struct Session(DatagramServer Server, Object Identifier);
 public record struct Datagram(Session Context, byte[] Payload);
 public record struct Stream(Session Context, Object Identifier, System.IO.Stream Incoming, System.IO.Stream Outgoing);
+public record struct DuplexPipes(Pipe Incoming, Pipe Outgoing);
 
 public unsafe class DatagramServer
 {
@@ -143,10 +144,10 @@ public unsafe class DatagramServer
                 if (Sessions.TryGetValue(sessionPointer, out var ch))
                 {
                     bool bidi = evt->stream_opened.stream_type == wtf_stream_type_t.WTF_STREAM_BIDIRECTIONAL;
-                    var pipes = (new Pipe(PipeOptions.Default), new Pipe(PipeOptions.Default));
+                    var pipes = new DuplexPipes(new Pipe(PipeOptions.Default), new Pipe(PipeOptions.Default));
                     if (!bidi)
                     {
-                        pipes.Item2.Writer.Complete();
+                        pipes.Outgoing.Writer.Complete();
                     }
 
                     Streams.TryAdd(streamPointer, pipes);
@@ -154,15 +155,15 @@ public unsafe class DatagramServer
                     {
                         Context = new Session(this, sessionPointer),
                         Identifier = streamPointer,
-                        Incoming = pipes.Item1.Reader.AsStream(),
-                        Outgoing = bidi ? pipes.Item2.Writer.AsStream() : System.IO.Stream.Null,
+                        Incoming = pipes.Incoming.Reader.AsStream(),
+                        Outgoing = bidi ? pipes.Outgoing.Writer.AsStream() : System.IO.Stream.Null,
                     });
                     if (bidi)
                     {
                         // using a sync thread feels wasteful but async and unsafe don't mix
                         Task.Run(() =>
                         {
-                            using var r = pipes.Item2.Reader.AsStream();
+                            using var r = pipes.Outgoing.Reader.AsStream();
                             var buffer = new byte[8192];
                             int bytesRead;
                             while ((bytesRead = r.Read(buffer, 0, buffer.Length)) > 0)
@@ -297,9 +298,9 @@ public unsafe class DatagramServer
             {
                 if (Streams.TryGetValue(streamPointer, out var pipes))
                 {
-                    if (pipes is ValueTuple<Pipe, Pipe> pp)
+                    if (pipes is DuplexPipes pp)
                     {
-                        using var w = pp.Item1.Writer.AsStream(true);
+                        using var w = pp.Incoming.Writer.AsStream(true);
                         for (var i = 0; i < evt->data_received.buffer_count; i++)
                         {
                             var buf = evt->data_received.buffers[i];
@@ -310,7 +311,7 @@ public unsafe class DatagramServer
                         }
                         if (evt->data_received.fin == TRUE)
                         {
-                            pp.Item1.Writer.Complete();
+                            pp.Incoming.Writer.Complete();
                         }
                     }
                     else

@@ -260,8 +260,6 @@ public unsafe class DatagramServer
                     {
                         var data = evt->datagram_send_state_changed.buffers[i].data;
                         var dataPtr = (IntPtr)data;
-                        Console.Out.WriteLine("data = 0x{0:x}", (IntPtr)data);
-                        Console.Out.WriteLine("dataPtr = 0x{0:x}", dataPtr);
 
                         if (dataPtr != IntPtr.Zero)
                         {

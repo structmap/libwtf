@@ -60,8 +60,8 @@ public record struct DuplexPipes(Pipe Incoming, Pipe Outgoing);
 
 public unsafe class DatagramServer
 {
-    const byte FALSE = 0;
-    const byte TRUE = 1;
+    public const byte FALSE = 0;
+    public const byte TRUE = 1;
 
     public int port;
     public string cert;

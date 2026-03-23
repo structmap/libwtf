@@ -58,6 +58,48 @@ public record struct Datagram(Session Context, byte[] Payload);
 public record struct Stream(Session Context, Object Identifier, System.IO.Stream Incoming, System.IO.Stream Outgoing);
 public record struct DuplexPipes(Pipe Incoming, Pipe Outgoing);
 
+public static class DatagramServerUtil
+{
+    public static unsafe void Send(IntPtr streamPointer, byte[] buffer, int bytesRead)
+    {
+        var nativeBuffer = MemoryAllocator.malloc((uint)bytesRead);
+        Marshal.Copy(buffer, 0, nativeBuffer, bytesRead);
+
+        var buffers = MemoryAllocator.malloc((uint)Marshal.SizeOf(typeof(wtf_buffer_t)));
+        Marshal.WriteIntPtr(buffers, IntPtr.Zero);
+        Marshal.StructureToPtr(new wtf_buffer_t()
+        {
+            data = (byte*)nativeBuffer,
+            length = (uint)bytesRead,
+        }, buffers, false);
+
+        // use the fact that an array of one item is just pointer to the first
+        var result = Methods.wtf_stream_send((wtf_stream*)streamPointer, (wtf_buffer_t*)buffers, 1, DatagramServer.FALSE);
+        if (result != wtf_result_t.WTF_SUCCESS)
+        {
+            var msg = Marshal.PtrToStringAnsi((IntPtr)Methods.wtf_result_to_string(result));
+            Console.Error.WriteLine("[STREAM] Failed to write to stream 0x{0:x}: {1}",
+                streamPointer, msg);
+            MemoryAllocator.free(nativeBuffer);
+        }
+    }
+    public static async void SendLoop(PipeReader reader, IntPtr streamPointer)
+    {
+        // using a sync thread feels wasteful but async and unsafe don't mix
+        // TODO: rewrite to use pipes.Outgoing.Reader.ReadAsync with .AdvanceTo and .IsCompleted check
+        //       which in combination with SendBufferingEnabled=True should enable backpressure
+        using var r = reader.AsStream();
+        var buffer = new byte[8192];
+        int bytesRead;
+        // reader, stream
+        while ((bytesRead = await r.ReadAsync(buffer, 0, buffer.Length)) > 0)
+        {
+            Send(streamPointer, buffer, bytesRead);
+        }
+        r.Close();
+    }
+}
+
 public unsafe class DatagramServer
 {
     public const byte FALSE = 0;
@@ -160,39 +202,7 @@ public unsafe class DatagramServer
                     });
                     if (bidi)
                     {
-                        // using a sync thread feels wasteful but async and unsafe don't mix
-                        // TODO: rewrite to use pipes.Outgoing.Reader.ReadAsync with .AdvanceTo and .IsCompleted check
-                        //       which in combination with SendBufferingEnabled=True should enable backpressure
-                        Task.Run(() =>
-                        {
-                            using var r = pipes.Outgoing.Reader.AsStream();
-                            var buffer = new byte[8192];
-                            int bytesRead;
-                            while ((bytesRead = r.Read(buffer, 0, buffer.Length)) > 0)
-                            {
-                                var nativeBuffer = MemoryAllocator.malloc((uint)bytesRead);
-                                Marshal.Copy(buffer, 0, nativeBuffer, bytesRead);
-
-                                var buffers = MemoryAllocator.malloc((uint)Marshal.SizeOf(typeof(wtf_buffer_t)));
-                                Marshal.WriteIntPtr(buffers, IntPtr.Zero);
-                                Marshal.StructureToPtr(new wtf_buffer_t()
-                                {
-                                    data = (byte*)nativeBuffer,
-                                    length = (uint)bytesRead,
-                                }, buffers, false);
-
-                                // use the fact that an array of one item is just pointer to the first
-                                var result = Methods.wtf_stream_send((wtf_stream*)streamPointer, (wtf_buffer_t*)buffers, 1, FALSE);
-                                if (result != wtf_result_t.WTF_SUCCESS)
-                                {
-                                    var msg = Marshal.PtrToStringAnsi((IntPtr)Methods.wtf_result_to_string(result));
-                                    Console.Error.WriteLine("[STREAM] Failed to write to stream 0x{0:x}: {1}",
-                                        streamPointer, msg);
-                                    MemoryAllocator.free(nativeBuffer);
-                                }
-                            }
-                            r.Close();
-                        });
+                        Task.Run(() => DatagramServerUtil.SendLoop(pipes.Outgoing.Reader, streamPointer));
                     }
                 }
 

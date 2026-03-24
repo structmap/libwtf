@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Collections.Concurrent;
 using System.IO.Pipelines;
 using Structmap.WebTransportFast.Native;
@@ -56,20 +57,17 @@ await Task.Delay(Timeout.Infinite, tokenSource.Token);
 public record struct Session(DatagramServer Server, Object Identifier);
 public record struct Datagram(Session Context, byte[] Payload);
 public record struct Stream(Session Context, Object Identifier, System.IO.Stream Incoming, System.IO.Stream Outgoing);
-public record struct DuplexPipes(Pipe Incoming, Pipe Outgoing);
+public record struct DuplexPipes(Pipe Incoming, Pipe Outgoing, Channel<IntPtr> Sent);
 
 public static class DatagramServerUtil
 {
-    public static unsafe void Send(IntPtr streamPointer, byte[] buffer, int bytesRead)
+    public static unsafe bool TrySend(IntPtr streamPointer, IntPtr buffer, int bytesRead)
     {
-        var nativeBuffer = MemoryAllocator.malloc((uint)bytesRead);
-        Marshal.Copy(buffer, 0, nativeBuffer, bytesRead);
-
         var buffers = MemoryAllocator.malloc((uint)Marshal.SizeOf(typeof(wtf_buffer_t)));
         Marshal.WriteIntPtr(buffers, IntPtr.Zero);
         Marshal.StructureToPtr(new wtf_buffer_t()
         {
-            data = (byte*)nativeBuffer,
+            data = (byte*)buffer,
             length = (uint)bytesRead,
         }, buffers, false);
 
@@ -80,23 +78,35 @@ public static class DatagramServerUtil
             var msg = Marshal.PtrToStringAnsi((IntPtr)Methods.wtf_result_to_string(result));
             Console.Error.WriteLine("[STREAM] Failed to write to stream 0x{0:x}: {1}",
                 streamPointer, msg);
-            MemoryAllocator.free(nativeBuffer);
+            return false;
         }
+
+        return true;
     }
-    public static async void SendLoop(PipeReader reader, IntPtr streamPointer)
+    public static async void SendLoop(DuplexPipes pp, IntPtr streamPointer)
     {
-        // using a sync thread feels wasteful but async and unsafe don't mix
-        // TODO: rewrite to use pipes.Outgoing.Reader.ReadAsync with .AdvanceTo and .IsCompleted check
-        //       which in combination with SendBufferingEnabled=True should enable backpressure
-        using var r = reader.AsStream();
-        var buffer = new byte[8192];
-        int bytesRead;
-        // reader, stream
-        while ((bytesRead = await r.ReadAsync(buffer, 0, buffer.Length)) > 0)
+        PipeReader reader = pp.Outgoing.Reader;
+        ChannelReader<IntPtr> ppSentReader = pp.Sent.Reader;
+        ReadResult result;
+        do
         {
-            Send(streamPointer, buffer, bytesRead);
-        }
-        r.Close();
+            result = await reader.ReadAsync();
+            if (result.IsCanceled) break;
+            var buffer = result.Buffer.ToArray();
+            var gch = GCHandle.Alloc(buffer, GCHandleType.Pinned);
+            if (!TrySend(streamPointer, gch.AddrOfPinnedObject(), buffer.Length))
+            {
+                gch.Free();
+                break;
+            }
+            var ptr = await ppSentReader.ReadAsync();
+            if (ptr != gch.AddrOfPinnedObject())
+            {
+                throw new InvalidOperationException("Buffer pointer mismatch");
+            }
+            gch.Free();
+            reader.AdvanceTo(result.Buffer.Start, result.Buffer.End);
+        } while (!result.IsCompleted);
     }
 }
 
@@ -186,7 +196,13 @@ public unsafe class DatagramServer
                 if (Sessions.TryGetValue(sessionPointer, out var ch))
                 {
                     bool bidi = evt->stream_opened.stream_type == wtf_stream_type_t.WTF_STREAM_BIDIRECTIONAL;
-                    var pipes = new DuplexPipes(new Pipe(PipeOptions.Default), new Pipe(PipeOptions.Default));
+                    var pipes = new DuplexPipes()
+                    {
+                        Incoming = new Pipe(PipeOptions.Default),
+                        Outgoing = new Pipe(PipeOptions.Default),
+                        Sent = Channel.CreateBounded<IntPtr>(0)
+                    };
+
                     if (!bidi)
                     {
                         pipes.Outgoing.Writer.Complete();
@@ -202,7 +218,7 @@ public unsafe class DatagramServer
                     });
                     if (bidi)
                     {
-                        Task.Run(() => DatagramServerUtil.SendLoop(pipes.Outgoing.Reader, streamPointer));
+                        Task.Run(() => DatagramServerUtil.SendLoop(pipes, streamPointer));
                     }
                 }
 
@@ -296,11 +312,21 @@ public unsafe class DatagramServer
         switch (evt->type)
         {
             case wtf_stream_event_type_t.WTF_STREAM_EVENT_SEND_COMPLETE: {
-                for (var i = 0; i < evt->send_complete.buffer_count; i++) {
-                    if (evt->send_complete.buffers[i].data != (byte*)0) {
-                        MemoryAllocator.free((IntPtr)evt->send_complete.buffers[i].data);
+                if (Streams.TryGetValue(streamPointer, out var pipes))
+                {
+                    if (pipes is DuplexPipes pp)
+                    {
+                        for (var i = 0; i < evt->send_complete.buffer_count; i++)
+                        {
+                            if (evt->send_complete.buffers[i].data != (byte*)0)
+                            {
+                                pp.Sent.Writer.TryWrite((IntPtr)evt->send_complete.buffers[i].data);
+                                //MemoryAllocator.free((IntPtr)evt->send_complete.buffers[i].data);
+                            }
+                        }
                     }
                 }
+
                 break;
             }
 

@@ -136,6 +136,12 @@ public unsafe class DatagramServer
 
     private connection_validator_delegate _connection_validator;
 
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    public delegate void log_callback_delegate(wtf_log_level_t level, sbyte* component,
+        sbyte* file, int line, sbyte* message, void* user_context);
+
+    private log_callback_delegate _log_callback;
+
     public ConcurrentDictionary<Object,Channel<Object>> Sessions = new();
     public ConcurrentDictionary<Object,Object> Streams = new();
 
@@ -150,6 +156,7 @@ public unsafe class DatagramServer
         _session_callback = session_callback;
         _stream_callback = stream_callback;
         _connection_validator = connection_validator;
+        _log_callback = log_callback;
     }
 
     wtf_connection_decision_t connection_validator(wtf_connection_request_t* request, void* user_data)
@@ -164,6 +171,12 @@ public unsafe class DatagramServer
         }
 
         return wtf_connection_decision_t.WTF_CONNECTION_ACCEPT;
+    }
+
+    void log_callback(wtf_log_level_t level, sbyte* component, sbyte* file, int line, sbyte* message,
+        void* user_context)
+    {
+        Console.Out.WriteLine("{0}\t{1}", level, Marshal.PtrToStringAnsi((IntPtr)message));
     }
 
     void session_callback(wtf_session_event_t* evt)
@@ -423,7 +436,9 @@ public unsafe class DatagramServer
         wtf_context_config_t context_config = new()
         {
             log_level = wtf_log_level_t.WTF_LOG_LEVEL_TRACE,
-            log_callback = null,
+            log_callback =
+                (delegate* unmanaged[Cdecl]<wtf_log_level_t, sbyte*, sbyte*, int, sbyte*, void*, void>)Marshal.GetFunctionPointerForDelegate(
+                    _log_callback),
             worker_thread_count = 4,
             enable_load_balancing = TRUE,
         };

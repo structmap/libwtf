@@ -91,18 +91,28 @@ public static class DatagramServerUtil
         do
         {
             result = await reader.ReadAsync();
+            Console.Out.WriteLine("readasync success");
             if (result.IsCanceled) break;
-            foreach (var memory in result.Buffer)
+            var memoryHandles = new List<MemoryHandle>();
+            foreach (var memory in result.Buffer.Slice(result.Buffer.Start, result.Buffer.End))
             {
                 var mh = memory.Pin();
                 unsafe
                 {
-                    if (!TrySend(streamPointer, (IntPtr)mh.Pointer, memory.Length))
+                    if (TrySend(streamPointer, (IntPtr)mh.Pointer, memory.Length))
                     {
+                        Console.Out.WriteLine("trysend success {0}", memory.Length);
+                        memoryHandles.Add(mh);
+                    } else
+                    {
+                        Console.Out.WriteLine("trysend fail");
                         mh.Dispose();
                         break;
                     }
                 }
+            }
+            foreach (var mh in memoryHandles) {
+                Console.Out.WriteLine("waiting for send to complete");
                 var ptr = await ppSentReader.ReadAsync();
                 unsafe
                 {
@@ -113,7 +123,7 @@ public static class DatagramServerUtil
                 }
                 mh.Dispose();
             }
-            reader.AdvanceTo(result.Buffer.Start, result.Buffer.End);
+            reader.AdvanceTo(result.Buffer.End);
         } while (!result.IsCompleted);
     }
 }
@@ -208,7 +218,7 @@ public unsafe class DatagramServer
                     {
                         Incoming = new Pipe(PipeOptions.Default),
                         Outgoing = new Pipe(PipeOptions.Default),
-                        Sent = Channel.CreateBounded<IntPtr>(0)
+                        Sent = Channel.CreateBounded<IntPtr>(10)
                     };
 
                     if (!bidi)

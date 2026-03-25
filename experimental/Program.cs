@@ -61,28 +61,6 @@ public record struct DuplexPipes(Pipe Incoming, Pipe Outgoing, Channel<IntPtr> S
 
 public static class DatagramServerUtil
 {
-    public static unsafe bool TrySend(IntPtr streamPointer, IntPtr buffer, int bytesRead)
-    {
-        var buffers = MemoryAllocator.malloc((uint)Marshal.SizeOf(typeof(wtf_buffer_t)));
-        Marshal.WriteIntPtr(buffers, IntPtr.Zero);
-        Marshal.StructureToPtr(new wtf_buffer_t()
-        {
-            data = (byte*)buffer,
-            length = (uint)bytesRead,
-        }, buffers, false);
-
-        // use the fact that an array of one item is just pointer to the first
-        var result = Methods.wtf_stream_send((wtf_stream*)streamPointer, (wtf_buffer_t*)buffers, 1, DatagramServer.FALSE);
-        if (result != wtf_result_t.WTF_SUCCESS)
-        {
-            var msg = Marshal.PtrToStringAnsi((IntPtr)Methods.wtf_result_to_string(result));
-            Console.Error.WriteLine("[STREAM] Failed to write to stream 0x{0:x}: {1}",
-                streamPointer, msg);
-            return false;
-        }
-
-        return true;
-    }
     public static async void SendLoop(DuplexPipes pp, IntPtr streamPointer)
     {
         PipeReader reader = pp.Outgoing.Reader;
@@ -99,16 +77,28 @@ public static class DatagramServerUtil
                 var mh = memory.Pin();
                 unsafe
                 {
-                    if (TrySend(streamPointer, (IntPtr)mh.Pointer, memory.Length))
+                    var buffers = MemoryAllocator.malloc((uint)Marshal.SizeOf(typeof(wtf_buffer_t)));
+                    Marshal.WriteIntPtr(buffers, IntPtr.Zero);
+                    Marshal.StructureToPtr(new wtf_buffer_t()
                     {
-                        Console.Out.WriteLine("trysend success {0}", memory.Length);
-                        memoryHandles.Add(mh);
-                    } else
+                        data = (byte*)mh.Pointer,
+                        length = (uint)memory.Length,
+                    }, buffers, false);
+
+                    // use the fact that an array of one item is just pointer to the first
+                    var sendResult = Methods.wtf_stream_send((wtf_stream*)streamPointer, (wtf_buffer_t*)buffers, 1, DatagramServer.FALSE);
+                    if (sendResult != wtf_result_t.WTF_SUCCESS)
                     {
+                        var msg = Marshal.PtrToStringAnsi((IntPtr)Methods.wtf_result_to_string(sendResult));
+                        Console.Error.WriteLine("[STREAM] Failed to write to stream 0x{0:x}: {1}",
+                            streamPointer, msg);
                         Console.Out.WriteLine("trysend fail");
                         mh.Dispose();
                         break;
                     }
+
+                    Console.Out.WriteLine("trysend success {0}", memory.Length);
+                    memoryHandles.Add(mh);
                 }
             }
             foreach (var mh in memoryHandles) {

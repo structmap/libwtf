@@ -92,19 +92,27 @@ public static class DatagramServerUtil
         {
             result = await reader.ReadAsync();
             if (result.IsCanceled) break;
-            var buffer = result.Buffer.ToArray();
-            var gch = GCHandle.Alloc(buffer, GCHandleType.Pinned);
-            if (!TrySend(streamPointer, gch.AddrOfPinnedObject(), buffer.Length))
+            foreach (var memory in result.Buffer)
             {
-                gch.Free();
-                break;
+                var mh = memory.Pin();
+                unsafe
+                {
+                    if (!TrySend(streamPointer, (IntPtr)mh.Pointer, memory.Length))
+                    {
+                        mh.Dispose();
+                        break;
+                    }
+                }
+                var ptr = await ppSentReader.ReadAsync();
+                unsafe
+                {
+                    if (ptr != (IntPtr)mh.Pointer)
+                    {
+                        throw new InvalidOperationException("Buffer pointer mismatch");
+                    }
+                }
+                mh.Dispose();
             }
-            var ptr = await ppSentReader.ReadAsync();
-            if (ptr != gch.AddrOfPinnedObject())
-            {
-                throw new InvalidOperationException("Buffer pointer mismatch");
-            }
-            gch.Free();
             reader.AdvanceTo(result.Buffer.Start, result.Buffer.End);
         } while (!result.IsCompleted);
     }

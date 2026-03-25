@@ -57,24 +57,25 @@ await Task.Delay(Timeout.Infinite, tokenSource.Token);
 public record struct Session(DatagramServer Server, Object Identifier);
 public record struct Datagram(Session Context, byte[] Payload);
 public record struct Stream(Session Context, Object Identifier, System.IO.Stream Incoming, System.IO.Stream Outgoing);
-public record struct DuplexPipes(Pipe Incoming, Pipe Outgoing, Channel<IntPtr> Sent);
+public record struct DuplexPipes(Pipe Incoming, Pipe Outgoing, Channel<MemoryHandle> Sent);
 
 public static class DatagramServerUtil
 {
     public static async void SendLoop(DuplexPipes pp, IntPtr streamPointer)
     {
         PipeReader reader = pp.Outgoing.Reader;
-        ChannelReader<IntPtr> ppSentReader = pp.Sent.Reader;
+        var ppSent = pp.Sent.Writer;
         ReadResult result;
         do
         {
             result = await reader.ReadAsync();
-            Console.Out.WriteLine("readasync success");
+            //Console.Out.WriteLine("readasync success");
             if (result.IsCanceled) break;
             var memoryHandles = new List<MemoryHandle>();
             foreach (var memory in result.Buffer.Slice(result.Buffer.Start, result.Buffer.End))
             {
                 var mh = memory.Pin();
+                await ppSent.WriteAsync(mh); // potential backpressure here
                 unsafe
                 {
                     var buffers = MemoryAllocator.malloc((uint)Marshal.SizeOf(typeof(wtf_buffer_t)));
@@ -92,26 +93,14 @@ public static class DatagramServerUtil
                         var msg = Marshal.PtrToStringAnsi((IntPtr)Methods.wtf_result_to_string(sendResult));
                         Console.Error.WriteLine("[STREAM] Failed to write to stream 0x{0:x}: {1}",
                             streamPointer, msg);
-                        Console.Out.WriteLine("trysend fail");
+                        //Console.Out.WriteLine("trysend fail");
                         mh.Dispose();
                         break;
                     }
 
-                    Console.Out.WriteLine("trysend success {0}", memory.Length);
+                    //Console.Out.WriteLine("trysend success {0}", memory.Length);
                     memoryHandles.Add(mh);
                 }
-            }
-            foreach (var mh in memoryHandles) {
-                Console.Out.WriteLine("waiting for send to complete");
-                var ptr = await ppSentReader.ReadAsync();
-                unsafe
-                {
-                    if (ptr != (IntPtr)mh.Pointer)
-                    {
-                        throw new InvalidOperationException("Buffer pointer mismatch");
-                    }
-                }
-                mh.Dispose();
             }
             reader.AdvanceTo(result.Buffer.End);
         } while (!result.IsCompleted);
@@ -208,7 +197,7 @@ public unsafe class DatagramServer
                     {
                         Incoming = new Pipe(PipeOptions.Default),
                         Outgoing = new Pipe(PipeOptions.Default),
-                        Sent = Channel.CreateBounded<IntPtr>(10)
+                        Sent = Channel.CreateBounded<MemoryHandle>(2) // max in-flight
                     };
 
                     if (!bidi)
@@ -328,7 +317,13 @@ public unsafe class DatagramServer
                         {
                             if (evt->send_complete.buffers[i].data != (byte*)0)
                             {
-                                pp.Sent.Writer.TryWrite((IntPtr)evt->send_complete.buffers[i].data);
+                                if (pp.Sent.Reader.TryRead(out MemoryHandle mh)) {
+                                    if (evt->send_complete.buffers[i].data != mh.Pointer)
+                                    {
+                                        Console.Error.WriteLine("Buffer pointer mismatch for stream 0x{0:x}", (IntPtr)evt->stream);
+                                    }
+                                    mh.Dispose();
+                                }
                                 //MemoryAllocator.free((IntPtr)evt->send_complete.buffers[i].data);
                             }
                         }

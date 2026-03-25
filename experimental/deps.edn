@@ -1,3 +1,4 @@
-{:deps
- {org.clojure/clojurescript {:mvn/version "1.11.132"}
-  org.clojure/core.async {:mvn/version "1.9.865"}}}
+{:deps {org.clojure/clojure {:mvn/version "1.11.1"}
+        org.clojure/clojurescript {:mvn/version "1.11.54"}
+        org.clojure/core.async {:mvn/version "1.5.648"}}
+ :paths ["src/main/cljs"]}

@@ -346,7 +346,7 @@ public unsafe class DatagramServer
                             var n = (int)buf.length;
                             var bs = new byte[n];
                             Marshal.Copy((nint)buf.data, bs, 0, n);
-                            // TODO: in backpressure scenario won't this block event handler loop? need to fix
+                            // TODO: in backpressure scenario won't this block event handler loop? need to fix. possibly with wtf_stream_set_receive_enabled ?
                             w.Write(bs, 0, n);
                         }
                         if (evt->data_received.fin == TRUE)

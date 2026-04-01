@@ -1,6 +1,6 @@
 (ns libwtf.experimental
   (:require
-   [cljs.core.async :refer [go]]
+   [cljs.core.async :as a :refer [go <!]]
    [cljs.core.async.interop :refer-macros [<p!]]))
 
 (comment
@@ -50,17 +50,20 @@
 (def enc (new js/TextEncoder "utf-8"))
 (def data (.encode enc "hello world"))
 
-;; wait
-(go (def s (<p! (.createBidirectionalStream wt))))
-
-;; wait
-(log-stream-data (.-readable s))
-(def w (some-> s .-writable .getWriter))
-
-(go (println (<p! (.write w data))))
-
-(.write w data)
-
-(.close w)
+;; send messages repeatedly but if there is backpressure then wait
+(go
+  (let [s (<p! (.createBidirectionalStream wt))
+        _ (log-stream-data (.-readable s))
+        w (some-> s .-writable .getWriter)]
+    (<p! (.-ready w))
+    (time
+      (do
+        (loop [i 100]
+          (when (pos? i)
+            (let [tick (a/timeout 100)]
+              (<p! (.write w data))
+              (<! tick)
+              (recur (dec i)))))
+        (<p! (.close w))))))
 
 )

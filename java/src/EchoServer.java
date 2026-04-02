@@ -9,16 +9,32 @@ class EchoServer {
         System.loadLibrary("msquic");
         System.loadLibrary("wtf");
     }
+    static void log_callback(int level, MemorySegment component, MemorySegment file, int line,
+                             MemorySegment message, MemorySegment user_context) {
+        String[] logLevels = {
+          "WTF_LOG_LEVEL_TRACE", // 0
+          "WTF_LOG_LEVEL_DEBUG", // 1
+          "WTF_LOG_LEVEL_INFO", // 2
+          "WTF_LOG_LEVEL_WARN", // 3
+          "WTF_LOG_LEVEL_ERROR", // 4
+          "WTF_LOG_LEVEL_CRITICAL", // 5
+          "WTF_LOG_LEVEL_NONE" // 6
+        };
+        System.out.println(logLevels[level] + "\t" + message.getString(0));
+    }
     public static void main() {
         System.out.println("Starting echo server...");
 
         var arena = Arena.global();
+        var logCallback = wtf_log_callback_t.allocate(
+                EchoServer::log_callback,
+                arena
+        );
         var context_config = wtf_context_config_t.allocate(arena);
         wtf_context_config_t.log_level(context_config, wtf_h.WTF_LOG_LEVEL_TRACE());
-        wtf_context_config_t.log_callback(context_config, MemorySegment.NULL);
+        wtf_context_config_t.log_callback(context_config, logCallback);
         wtf_context_config_t.worker_thread_count(context_config, 4);
         wtf_context_config_t.enable_load_balancing(context_config, true);
-
         var g_context = arena.allocate(ValueLayout.ADDRESS);
         var status = wtf_h.wtf_context_create(context_config, g_context);
         if (status != wtf_h.WTF_SUCCESS()) {

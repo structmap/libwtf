@@ -2,227 +2,405 @@
 
 package com.structmap.webtransportfast;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
+
 import static java.lang.foreign.ValueLayout.*;
+import static java.lang.foreign.MemoryLayout.PathElement.*;
+
 /**
- * {@snippet :
+ * {@snippet lang=c :
  * struct {
  *     wtf_log_level_t log_level;
  *     wtf_log_callback_t log_callback;
- *     void* log_user_context;
+ *     void *log_user_context;
  *     uint32_t worker_thread_count;
- *     _Bool enable_load_balancing;
- *     _Bool disable_encryption;
+ *     bool enable_load_balancing;
+ *     bool disable_encryption;
  *     wtf_execution_profile_t execution_profile;
- * };
+ * }
  * }
  */
 public class wtf_context_config_t {
 
-    public static MemoryLayout $LAYOUT() {
-        return constants$17.const$2;
+    wtf_context_config_t() {
+        // Should not be called directly
     }
-    public static VarHandle log_level$VH() {
-        return constants$17.const$3;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * wtf_log_level_t log_level;
-     * }
-     */
-    public static int log_level$get(MemorySegment seg) {
-        return (int)constants$17.const$3.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * wtf_log_level_t log_level;
-     * }
-     */
-    public static void log_level$set(MemorySegment seg, int x) {
-        constants$17.const$3.set(seg, x);
-    }
-    public static int log_level$get(MemorySegment seg, long index) {
-        return (int)constants$17.const$3.get(seg.asSlice(index*sizeof()));
-    }
-    public static void log_level$set(MemorySegment seg, long index, int x) {
-        constants$17.const$3.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle log_callback$VH() {
-        return constants$17.const$4;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * wtf_log_callback_t log_callback;
-     * }
-     */
-    public static MemorySegment log_callback$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$17.const$4.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * wtf_log_callback_t log_callback;
-     * }
-     */
-    public static void log_callback$set(MemorySegment seg, MemorySegment x) {
-        constants$17.const$4.set(seg, x);
-    }
-    public static MemorySegment log_callback$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$17.const$4.get(seg.asSlice(index*sizeof()));
-    }
-    public static void log_callback$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$17.const$4.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static wtf_log_callback_t log_callback(MemorySegment segment, Arena scope) {
-        return wtf_log_callback_t.ofAddress(log_callback$get(segment), scope);
-    }
-    public static VarHandle log_user_context$VH() {
-        return constants$17.const$5;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * void* log_user_context;
-     * }
-     */
-    public static MemorySegment log_user_context$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$17.const$5.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * void* log_user_context;
-     * }
-     */
-    public static void log_user_context$set(MemorySegment seg, MemorySegment x) {
-        constants$17.const$5.set(seg, x);
-    }
-    public static MemorySegment log_user_context$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$17.const$5.get(seg.asSlice(index*sizeof()));
-    }
-    public static void log_user_context$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$17.const$5.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle worker_thread_count$VH() {
-        return constants$18.const$0;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * uint32_t worker_thread_count;
-     * }
-     */
-    public static int worker_thread_count$get(MemorySegment seg) {
-        return (int)constants$18.const$0.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * uint32_t worker_thread_count;
-     * }
-     */
-    public static void worker_thread_count$set(MemorySegment seg, int x) {
-        constants$18.const$0.set(seg, x);
-    }
-    public static int worker_thread_count$get(MemorySegment seg, long index) {
-        return (int)constants$18.const$0.get(seg.asSlice(index*sizeof()));
-    }
-    public static void worker_thread_count$set(MemorySegment seg, long index, int x) {
-        constants$18.const$0.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle enable_load_balancing$VH() {
-        return constants$18.const$1;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * _Bool enable_load_balancing;
-     * }
-     */
-    public static boolean enable_load_balancing$get(MemorySegment seg) {
-        return (boolean)constants$18.const$1.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * _Bool enable_load_balancing;
-     * }
-     */
-    public static void enable_load_balancing$set(MemorySegment seg, boolean x) {
-        constants$18.const$1.set(seg, x);
-    }
-    public static boolean enable_load_balancing$get(MemorySegment seg, long index) {
-        return (boolean)constants$18.const$1.get(seg.asSlice(index*sizeof()));
-    }
-    public static void enable_load_balancing$set(MemorySegment seg, long index, boolean x) {
-        constants$18.const$1.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle disable_encryption$VH() {
-        return constants$18.const$2;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * _Bool disable_encryption;
-     * }
-     */
-    public static boolean disable_encryption$get(MemorySegment seg) {
-        return (boolean)constants$18.const$2.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * _Bool disable_encryption;
-     * }
-     */
-    public static void disable_encryption$set(MemorySegment seg, boolean x) {
-        constants$18.const$2.set(seg, x);
-    }
-    public static boolean disable_encryption$get(MemorySegment seg, long index) {
-        return (boolean)constants$18.const$2.get(seg.asSlice(index*sizeof()));
-    }
-    public static void disable_encryption$set(MemorySegment seg, long index, boolean x) {
-        constants$18.const$2.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle execution_profile$VH() {
-        return constants$18.const$3;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * wtf_execution_profile_t execution_profile;
-     * }
-     */
-    public static int execution_profile$get(MemorySegment seg) {
-        return (int)constants$18.const$3.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * wtf_execution_profile_t execution_profile;
-     * }
-     */
-    public static void execution_profile$set(MemorySegment seg, int x) {
-        constants$18.const$3.set(seg, x);
-    }
-    public static int execution_profile$get(MemorySegment seg, long index) {
-        return (int)constants$18.const$3.get(seg.asSlice(index*sizeof()));
-    }
-    public static void execution_profile$set(MemorySegment seg, long index, int x) {
-        constants$18.const$3.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static long sizeof() { return $LAYOUT().byteSize(); }
-    public static MemorySegment allocate(SegmentAllocator allocator) { return allocator.allocate($LAYOUT()); }
-    public static MemorySegment allocateArray(long len, SegmentAllocator allocator) {
-        return allocator.allocate(MemoryLayout.sequenceLayout(len, $LAYOUT()));
-    }
-    public static MemorySegment ofAddress(MemorySegment addr, Arena arena) { return RuntimeHelper.asArray(addr, $LAYOUT(), 1, arena); }
-}
 
+    private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
+        wtf_h.C_INT.withName("log_level"),
+        MemoryLayout.paddingLayout(4),
+        wtf_h.C_POINTER.withName("log_callback"),
+        wtf_h.C_POINTER.withName("log_user_context"),
+        wtf_h.C_INT.withName("worker_thread_count"),
+        wtf_h.C_BOOL.withName("enable_load_balancing"),
+        wtf_h.C_BOOL.withName("disable_encryption"),
+        MemoryLayout.paddingLayout(2),
+        wtf_h.C_INT.withName("execution_profile"),
+        MemoryLayout.paddingLayout(4)
+    ).withName("$anon$407:9");
+
+    /**
+     * The layout of this struct
+     */
+    public static final GroupLayout layout() {
+        return $LAYOUT;
+    }
+
+    private static final OfInt log_level$LAYOUT = (OfInt)$LAYOUT.select(groupElement("log_level"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * wtf_log_level_t log_level
+     * }
+     */
+    public static final OfInt log_level$layout() {
+        return log_level$LAYOUT;
+    }
+
+    private static final long log_level$OFFSET = $LAYOUT.byteOffset(groupElement("log_level"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * wtf_log_level_t log_level
+     * }
+     */
+    public static final long log_level$offset() {
+        return log_level$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * wtf_log_level_t log_level
+     * }
+     */
+    public static int log_level(MemorySegment struct) {
+        return struct.get(log_level$LAYOUT, log_level$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * wtf_log_level_t log_level
+     * }
+     */
+    public static void log_level(MemorySegment struct, int fieldValue) {
+        struct.set(log_level$LAYOUT, log_level$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout log_callback$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("log_callback"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * wtf_log_callback_t log_callback
+     * }
+     */
+    public static final AddressLayout log_callback$layout() {
+        return log_callback$LAYOUT;
+    }
+
+    private static final long log_callback$OFFSET = $LAYOUT.byteOffset(groupElement("log_callback"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * wtf_log_callback_t log_callback
+     * }
+     */
+    public static final long log_callback$offset() {
+        return log_callback$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * wtf_log_callback_t log_callback
+     * }
+     */
+    public static MemorySegment log_callback(MemorySegment struct) {
+        return struct.get(log_callback$LAYOUT, log_callback$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * wtf_log_callback_t log_callback
+     * }
+     */
+    public static void log_callback(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(log_callback$LAYOUT, log_callback$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout log_user_context$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("log_user_context"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * void *log_user_context
+     * }
+     */
+    public static final AddressLayout log_user_context$layout() {
+        return log_user_context$LAYOUT;
+    }
+
+    private static final long log_user_context$OFFSET = $LAYOUT.byteOffset(groupElement("log_user_context"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * void *log_user_context
+     * }
+     */
+    public static final long log_user_context$offset() {
+        return log_user_context$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * void *log_user_context
+     * }
+     */
+    public static MemorySegment log_user_context(MemorySegment struct) {
+        return struct.get(log_user_context$LAYOUT, log_user_context$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * void *log_user_context
+     * }
+     */
+    public static void log_user_context(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(log_user_context$LAYOUT, log_user_context$OFFSET, fieldValue);
+    }
+
+    private static final OfInt worker_thread_count$LAYOUT = (OfInt)$LAYOUT.select(groupElement("worker_thread_count"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * uint32_t worker_thread_count
+     * }
+     */
+    public static final OfInt worker_thread_count$layout() {
+        return worker_thread_count$LAYOUT;
+    }
+
+    private static final long worker_thread_count$OFFSET = $LAYOUT.byteOffset(groupElement("worker_thread_count"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * uint32_t worker_thread_count
+     * }
+     */
+    public static final long worker_thread_count$offset() {
+        return worker_thread_count$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * uint32_t worker_thread_count
+     * }
+     */
+    public static int worker_thread_count(MemorySegment struct) {
+        return struct.get(worker_thread_count$LAYOUT, worker_thread_count$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * uint32_t worker_thread_count
+     * }
+     */
+    public static void worker_thread_count(MemorySegment struct, int fieldValue) {
+        struct.set(worker_thread_count$LAYOUT, worker_thread_count$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean enable_load_balancing$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("enable_load_balancing"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * bool enable_load_balancing
+     * }
+     */
+    public static final OfBoolean enable_load_balancing$layout() {
+        return enable_load_balancing$LAYOUT;
+    }
+
+    private static final long enable_load_balancing$OFFSET = $LAYOUT.byteOffset(groupElement("enable_load_balancing"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * bool enable_load_balancing
+     * }
+     */
+    public static final long enable_load_balancing$offset() {
+        return enable_load_balancing$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * bool enable_load_balancing
+     * }
+     */
+    public static boolean enable_load_balancing(MemorySegment struct) {
+        return struct.get(enable_load_balancing$LAYOUT, enable_load_balancing$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * bool enable_load_balancing
+     * }
+     */
+    public static void enable_load_balancing(MemorySegment struct, boolean fieldValue) {
+        struct.set(enable_load_balancing$LAYOUT, enable_load_balancing$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean disable_encryption$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("disable_encryption"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * bool disable_encryption
+     * }
+     */
+    public static final OfBoolean disable_encryption$layout() {
+        return disable_encryption$LAYOUT;
+    }
+
+    private static final long disable_encryption$OFFSET = $LAYOUT.byteOffset(groupElement("disable_encryption"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * bool disable_encryption
+     * }
+     */
+    public static final long disable_encryption$offset() {
+        return disable_encryption$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * bool disable_encryption
+     * }
+     */
+    public static boolean disable_encryption(MemorySegment struct) {
+        return struct.get(disable_encryption$LAYOUT, disable_encryption$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * bool disable_encryption
+     * }
+     */
+    public static void disable_encryption(MemorySegment struct, boolean fieldValue) {
+        struct.set(disable_encryption$LAYOUT, disable_encryption$OFFSET, fieldValue);
+    }
+
+    private static final OfInt execution_profile$LAYOUT = (OfInt)$LAYOUT.select(groupElement("execution_profile"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * wtf_execution_profile_t execution_profile
+     * }
+     */
+    public static final OfInt execution_profile$layout() {
+        return execution_profile$LAYOUT;
+    }
+
+    private static final long execution_profile$OFFSET = $LAYOUT.byteOffset(groupElement("execution_profile"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * wtf_execution_profile_t execution_profile
+     * }
+     */
+    public static final long execution_profile$offset() {
+        return execution_profile$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * wtf_execution_profile_t execution_profile
+     * }
+     */
+    public static int execution_profile(MemorySegment struct) {
+        return struct.get(execution_profile$LAYOUT, execution_profile$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * wtf_execution_profile_t execution_profile
+     * }
+     */
+    public static void execution_profile(MemorySegment struct, int fieldValue) {
+        struct.set(execution_profile$LAYOUT, execution_profile$OFFSET, fieldValue);
+    }
+
+    /**
+     * Obtains a slice of {@code arrayParam} which selects the array element at {@code index}.
+     * The returned segment has address {@code arrayParam.address() + index * layout().byteSize()}
+     */
+    public static MemorySegment asSlice(MemorySegment array, long index) {
+        return array.asSlice(layout().byteSize() * index);
+    }
+
+    /**
+     * The size (in bytes) of this struct
+     */
+    public static long sizeof() { return layout().byteSize(); }
+
+    /**
+     * Allocate a segment of size {@code layout().byteSize()} using {@code allocator}
+     */
+    public static MemorySegment allocate(SegmentAllocator allocator) {
+        return allocator.allocate(layout());
+    }
+
+    /**
+     * Allocate an array of size {@code elementCount} using {@code allocator}.
+     * The returned segment has size {@code elementCount * layout().byteSize()}.
+     */
+    public static MemorySegment allocateArray(long elementCount, SegmentAllocator allocator) {
+        return allocator.allocate(MemoryLayout.sequenceLayout(elementCount, layout()));
+    }
+
+    /**
+     * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+     * The returned segment has size {@code layout().byteSize()}
+     */
+    public static MemorySegment reinterpret(MemorySegment addr, Arena arena, Consumer<MemorySegment> cleanup) {
+        return reinterpret(addr, 1, arena, cleanup);
+    }
+
+    /**
+     * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+     * The returned segment has size {@code elementCount * layout().byteSize()}
+     */
+    public static MemorySegment reinterpret(MemorySegment addr, long elementCount, Arena arena, Consumer<MemorySegment> cleanup) {
+        return addr.reinterpret(layout().byteSize() * elementCount, arena, cleanup);
+    }
+}
 

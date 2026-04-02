@@ -2,224 +2,402 @@
 
 package com.structmap.webtransportfast;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
+
 import static java.lang.foreign.ValueLayout.*;
+import static java.lang.foreign.MemoryLayout.PathElement.*;
+
 /**
- * {@snippet :
+ * {@snippet lang=c :
  * struct {
- *     char* origin;
- *     char* path;
- *     char* authority;
- *     const wtf_http_header_t* headers;
+ *     const char *origin;
+ *     const char *path;
+ *     const char *authority;
+ *     const wtf_http_header_t *headers;
  *     size_t header_count;
- *     void* peer_address;
+ *     void *peer_address;
  *     size_t address_length;
- * };
+ * }
  * }
  */
 public class wtf_connection_request_t {
 
-    public static MemoryLayout $LAYOUT() {
-        return constants$2.const$3;
+    wtf_connection_request_t() {
+        // Should not be called directly
     }
-    public static VarHandle origin$VH() {
-        return constants$2.const$4;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * char* origin;
-     * }
-     */
-    public static MemorySegment origin$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$2.const$4.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * char* origin;
-     * }
-     */
-    public static void origin$set(MemorySegment seg, MemorySegment x) {
-        constants$2.const$4.set(seg, x);
-    }
-    public static MemorySegment origin$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$2.const$4.get(seg.asSlice(index*sizeof()));
-    }
-    public static void origin$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$2.const$4.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle path$VH() {
-        return constants$2.const$5;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * char* path;
-     * }
-     */
-    public static MemorySegment path$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$2.const$5.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * char* path;
-     * }
-     */
-    public static void path$set(MemorySegment seg, MemorySegment x) {
-        constants$2.const$5.set(seg, x);
-    }
-    public static MemorySegment path$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$2.const$5.get(seg.asSlice(index*sizeof()));
-    }
-    public static void path$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$2.const$5.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle authority$VH() {
-        return constants$3.const$0;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * char* authority;
-     * }
-     */
-    public static MemorySegment authority$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$3.const$0.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * char* authority;
-     * }
-     */
-    public static void authority$set(MemorySegment seg, MemorySegment x) {
-        constants$3.const$0.set(seg, x);
-    }
-    public static MemorySegment authority$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$3.const$0.get(seg.asSlice(index*sizeof()));
-    }
-    public static void authority$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$3.const$0.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle headers$VH() {
-        return constants$3.const$1;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * const wtf_http_header_t* headers;
-     * }
-     */
-    public static MemorySegment headers$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$3.const$1.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * const wtf_http_header_t* headers;
-     * }
-     */
-    public static void headers$set(MemorySegment seg, MemorySegment x) {
-        constants$3.const$1.set(seg, x);
-    }
-    public static MemorySegment headers$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$3.const$1.get(seg.asSlice(index*sizeof()));
-    }
-    public static void headers$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$3.const$1.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle header_count$VH() {
-        return constants$3.const$2;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * size_t header_count;
-     * }
-     */
-    public static long header_count$get(MemorySegment seg) {
-        return (long)constants$3.const$2.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * size_t header_count;
-     * }
-     */
-    public static void header_count$set(MemorySegment seg, long x) {
-        constants$3.const$2.set(seg, x);
-    }
-    public static long header_count$get(MemorySegment seg, long index) {
-        return (long)constants$3.const$2.get(seg.asSlice(index*sizeof()));
-    }
-    public static void header_count$set(MemorySegment seg, long index, long x) {
-        constants$3.const$2.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle peer_address$VH() {
-        return constants$3.const$3;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * void* peer_address;
-     * }
-     */
-    public static MemorySegment peer_address$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$3.const$3.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * void* peer_address;
-     * }
-     */
-    public static void peer_address$set(MemorySegment seg, MemorySegment x) {
-        constants$3.const$3.set(seg, x);
-    }
-    public static MemorySegment peer_address$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$3.const$3.get(seg.asSlice(index*sizeof()));
-    }
-    public static void peer_address$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$3.const$3.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle address_length$VH() {
-        return constants$3.const$4;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * size_t address_length;
-     * }
-     */
-    public static long address_length$get(MemorySegment seg) {
-        return (long)constants$3.const$4.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * size_t address_length;
-     * }
-     */
-    public static void address_length$set(MemorySegment seg, long x) {
-        constants$3.const$4.set(seg, x);
-    }
-    public static long address_length$get(MemorySegment seg, long index) {
-        return (long)constants$3.const$4.get(seg.asSlice(index*sizeof()));
-    }
-    public static void address_length$set(MemorySegment seg, long index, long x) {
-        constants$3.const$4.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static long sizeof() { return $LAYOUT().byteSize(); }
-    public static MemorySegment allocate(SegmentAllocator allocator) { return allocator.allocate($LAYOUT()); }
-    public static MemorySegment allocateArray(long len, SegmentAllocator allocator) {
-        return allocator.allocate(MemoryLayout.sequenceLayout(len, $LAYOUT()));
-    }
-    public static MemorySegment ofAddress(MemorySegment addr, Arena arena) { return RuntimeHelper.asArray(addr, $LAYOUT(), 1, arena); }
-}
 
+    private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
+        wtf_h.C_POINTER.withName("origin"),
+        wtf_h.C_POINTER.withName("path"),
+        wtf_h.C_POINTER.withName("authority"),
+        wtf_h.C_POINTER.withName("headers"),
+        wtf_h.C_LONG_LONG.withName("header_count"),
+        wtf_h.C_POINTER.withName("peer_address"),
+        wtf_h.C_LONG_LONG.withName("address_length")
+    ).withName("$anon$219:9");
+
+    /**
+     * The layout of this struct
+     */
+    public static final GroupLayout layout() {
+        return $LAYOUT;
+    }
+
+    private static final AddressLayout origin$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("origin"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * const char *origin
+     * }
+     */
+    public static final AddressLayout origin$layout() {
+        return origin$LAYOUT;
+    }
+
+    private static final long origin$OFFSET = $LAYOUT.byteOffset(groupElement("origin"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * const char *origin
+     * }
+     */
+    public static final long origin$offset() {
+        return origin$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * const char *origin
+     * }
+     */
+    public static MemorySegment origin(MemorySegment struct) {
+        return struct.get(origin$LAYOUT, origin$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * const char *origin
+     * }
+     */
+    public static void origin(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(origin$LAYOUT, origin$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout path$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("path"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * const char *path
+     * }
+     */
+    public static final AddressLayout path$layout() {
+        return path$LAYOUT;
+    }
+
+    private static final long path$OFFSET = $LAYOUT.byteOffset(groupElement("path"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * const char *path
+     * }
+     */
+    public static final long path$offset() {
+        return path$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * const char *path
+     * }
+     */
+    public static MemorySegment path(MemorySegment struct) {
+        return struct.get(path$LAYOUT, path$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * const char *path
+     * }
+     */
+    public static void path(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(path$LAYOUT, path$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout authority$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("authority"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * const char *authority
+     * }
+     */
+    public static final AddressLayout authority$layout() {
+        return authority$LAYOUT;
+    }
+
+    private static final long authority$OFFSET = $LAYOUT.byteOffset(groupElement("authority"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * const char *authority
+     * }
+     */
+    public static final long authority$offset() {
+        return authority$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * const char *authority
+     * }
+     */
+    public static MemorySegment authority(MemorySegment struct) {
+        return struct.get(authority$LAYOUT, authority$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * const char *authority
+     * }
+     */
+    public static void authority(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(authority$LAYOUT, authority$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout headers$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("headers"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * const wtf_http_header_t *headers
+     * }
+     */
+    public static final AddressLayout headers$layout() {
+        return headers$LAYOUT;
+    }
+
+    private static final long headers$OFFSET = $LAYOUT.byteOffset(groupElement("headers"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * const wtf_http_header_t *headers
+     * }
+     */
+    public static final long headers$offset() {
+        return headers$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * const wtf_http_header_t *headers
+     * }
+     */
+    public static MemorySegment headers(MemorySegment struct) {
+        return struct.get(headers$LAYOUT, headers$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * const wtf_http_header_t *headers
+     * }
+     */
+    public static void headers(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(headers$LAYOUT, headers$OFFSET, fieldValue);
+    }
+
+    private static final OfLong header_count$LAYOUT = (OfLong)$LAYOUT.select(groupElement("header_count"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * size_t header_count
+     * }
+     */
+    public static final OfLong header_count$layout() {
+        return header_count$LAYOUT;
+    }
+
+    private static final long header_count$OFFSET = $LAYOUT.byteOffset(groupElement("header_count"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * size_t header_count
+     * }
+     */
+    public static final long header_count$offset() {
+        return header_count$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * size_t header_count
+     * }
+     */
+    public static long header_count(MemorySegment struct) {
+        return struct.get(header_count$LAYOUT, header_count$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * size_t header_count
+     * }
+     */
+    public static void header_count(MemorySegment struct, long fieldValue) {
+        struct.set(header_count$LAYOUT, header_count$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout peer_address$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("peer_address"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * void *peer_address
+     * }
+     */
+    public static final AddressLayout peer_address$layout() {
+        return peer_address$LAYOUT;
+    }
+
+    private static final long peer_address$OFFSET = $LAYOUT.byteOffset(groupElement("peer_address"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * void *peer_address
+     * }
+     */
+    public static final long peer_address$offset() {
+        return peer_address$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * void *peer_address
+     * }
+     */
+    public static MemorySegment peer_address(MemorySegment struct) {
+        return struct.get(peer_address$LAYOUT, peer_address$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * void *peer_address
+     * }
+     */
+    public static void peer_address(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(peer_address$LAYOUT, peer_address$OFFSET, fieldValue);
+    }
+
+    private static final OfLong address_length$LAYOUT = (OfLong)$LAYOUT.select(groupElement("address_length"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * size_t address_length
+     * }
+     */
+    public static final OfLong address_length$layout() {
+        return address_length$LAYOUT;
+    }
+
+    private static final long address_length$OFFSET = $LAYOUT.byteOffset(groupElement("address_length"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * size_t address_length
+     * }
+     */
+    public static final long address_length$offset() {
+        return address_length$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * size_t address_length
+     * }
+     */
+    public static long address_length(MemorySegment struct) {
+        return struct.get(address_length$LAYOUT, address_length$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * size_t address_length
+     * }
+     */
+    public static void address_length(MemorySegment struct, long fieldValue) {
+        struct.set(address_length$LAYOUT, address_length$OFFSET, fieldValue);
+    }
+
+    /**
+     * Obtains a slice of {@code arrayParam} which selects the array element at {@code index}.
+     * The returned segment has address {@code arrayParam.address() + index * layout().byteSize()}
+     */
+    public static MemorySegment asSlice(MemorySegment array, long index) {
+        return array.asSlice(layout().byteSize() * index);
+    }
+
+    /**
+     * The size (in bytes) of this struct
+     */
+    public static long sizeof() { return layout().byteSize(); }
+
+    /**
+     * Allocate a segment of size {@code layout().byteSize()} using {@code allocator}
+     */
+    public static MemorySegment allocate(SegmentAllocator allocator) {
+        return allocator.allocate(layout());
+    }
+
+    /**
+     * Allocate an array of size {@code elementCount} using {@code allocator}.
+     * The returned segment has size {@code elementCount * layout().byteSize()}.
+     */
+    public static MemorySegment allocateArray(long elementCount, SegmentAllocator allocator) {
+        return allocator.allocate(MemoryLayout.sequenceLayout(elementCount, layout()));
+    }
+
+    /**
+     * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+     * The returned segment has size {@code layout().byteSize()}
+     */
+    public static MemorySegment reinterpret(MemorySegment addr, Arena arena, Consumer<MemorySegment> cleanup) {
+        return reinterpret(addr, 1, arena, cleanup);
+    }
+
+    /**
+     * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+     * The returned segment has size {@code elementCount * layout().byteSize()}
+     */
+    public static MemorySegment reinterpret(MemorySegment addr, long elementCount, Arena arena, Consumer<MemorySegment> cleanup) {
+        return addr.reinterpret(layout().byteSize() * elementCount, arena, cleanup);
+    }
+}
 

@@ -2,598 +2,1644 @@
 
 package com.structmap.webtransportfast;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
+
 import static java.lang.foreign.ValueLayout.*;
+import static java.lang.foreign.MemoryLayout.PathElement.*;
+
 /**
- * {@snippet :
+ * {@snippet lang=c :
  * struct {
  *     wtf_certificate_type_t cert_type;
- *     union  cert_data;
- *     char* principal;
- *     char* ca_cert_file;
- * };
+ *     union {
+ *         struct {
+ *             const char *cert_path;
+ *             const char *key_path;
+ *         } file;
+ *         struct {
+ *             const char *cert_path;
+ *             const char *key_path;
+ *             const char *password;
+ *         } protected_file;
+ *         struct {
+ *             const char *thumbprint;
+ *         } hash;
+ *         struct {
+ *             const char *thumbprint;
+ *             const char *store_name;
+ *         } hash_store;
+ *         struct {
+ *             const void *data;
+ *             size_t data_size;
+ *             const char *password;
+ *         } pkcs12;
+ *         void *context;
+ *     } cert_data;
+ *     const char *principal;
+ *     const char *ca_cert_file;
+ * }
  * }
  */
 public class wtf_certificate_config_t {
 
-    public static MemoryLayout $LAYOUT() {
-        return constants$11.const$2;
+    wtf_certificate_config_t() {
+        // Should not be called directly
     }
-    public static VarHandle cert_type$VH() {
-        return constants$11.const$3;
+
+    private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
+        wtf_h.C_INT.withName("cert_type"),
+        MemoryLayout.paddingLayout(4),
+        wtf_certificate_config_t.cert_data.layout().withName("cert_data"),
+        wtf_h.C_POINTER.withName("principal"),
+        wtf_h.C_POINTER.withName("ca_cert_file")
+    ).withName("$anon$336:9");
+
+    /**
+     * The layout of this struct
+     */
+    public static final GroupLayout layout() {
+        return $LAYOUT;
     }
+
+    private static final OfInt cert_type$LAYOUT = (OfInt)$LAYOUT.select(groupElement("cert_type"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * wtf_certificate_type_t cert_type
+     * }
+     */
+    public static final OfInt cert_type$layout() {
+        return cert_type$LAYOUT;
+    }
+
+    private static final long cert_type$OFFSET = $LAYOUT.byteOffset(groupElement("cert_type"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * wtf_certificate_type_t cert_type
+     * }
+     */
+    public static final long cert_type$offset() {
+        return cert_type$OFFSET;
+    }
+
     /**
      * Getter for field:
-     * {@snippet :
-     * wtf_certificate_type_t cert_type;
+     * {@snippet lang=c :
+     * wtf_certificate_type_t cert_type
      * }
      */
-    public static int cert_type$get(MemorySegment seg) {
-        return (int)constants$11.const$3.get(seg);
+    public static int cert_type(MemorySegment struct) {
+        return struct.get(cert_type$LAYOUT, cert_type$OFFSET);
     }
+
     /**
      * Setter for field:
-     * {@snippet :
-     * wtf_certificate_type_t cert_type;
+     * {@snippet lang=c :
+     * wtf_certificate_type_t cert_type
      * }
      */
-    public static void cert_type$set(MemorySegment seg, int x) {
-        constants$11.const$3.set(seg, x);
+    public static void cert_type(MemorySegment struct, int fieldValue) {
+        struct.set(cert_type$LAYOUT, cert_type$OFFSET, fieldValue);
     }
-    public static int cert_type$get(MemorySegment seg, long index) {
-        return (int)constants$11.const$3.get(seg.asSlice(index*sizeof()));
-    }
-    public static void cert_type$set(MemorySegment seg, long index, int x) {
-        constants$11.const$3.set(seg.asSlice(index*sizeof()), x);
-    }
+
     /**
-     * {@snippet :
+     * {@snippet lang=c :
      * union {
-     *     struct  file;
-     *     struct  protected_file;
-     *     struct  hash;
-     *     struct  hash_store;
-     *     struct  pkcs12;
-     *     void* context;
-     * };
+     *     struct {
+     *         const char *cert_path;
+     *         const char *key_path;
+     *     } file;
+     *     struct {
+     *         const char *cert_path;
+     *         const char *key_path;
+     *         const char *password;
+     *     } protected_file;
+     *     struct {
+     *         const char *thumbprint;
+     *     } hash;
+     *     struct {
+     *         const char *thumbprint;
+     *         const char *store_name;
+     *     } hash_store;
+     *     struct {
+     *         const void *data;
+     *         size_t data_size;
+     *         const char *password;
+     *     } pkcs12;
+     *     void *context;
+     * }
      * }
      */
-    public static final class cert_data {
+    public static class cert_data {
 
-        // Suppresses default constructor, ensuring non-instantiability.
-        private cert_data() {}
-        public static MemoryLayout $LAYOUT() {
-            return constants$11.const$4;
+        cert_data() {
+            // Should not be called directly
         }
+
+        private static final GroupLayout $LAYOUT = MemoryLayout.unionLayout(
+            wtf_certificate_config_t.cert_data.file.layout().withName("file"),
+            wtf_certificate_config_t.cert_data.protected_file.layout().withName("protected_file"),
+            wtf_certificate_config_t.cert_data.hash.layout().withName("hash"),
+            wtf_certificate_config_t.cert_data.hash_store.layout().withName("hash_store"),
+            wtf_certificate_config_t.cert_data.pkcs12.layout().withName("pkcs12"),
+            wtf_h.C_POINTER.withName("context")
+        ).withName("$anon$340:5");
+
         /**
-         * {@snippet :
+         * The layout of this union
+         */
+        public static final GroupLayout layout() {
+            return $LAYOUT;
+        }
+
+        /**
+         * {@snippet lang=c :
          * struct {
-         *     char* cert_path;
-         *     char* key_path;
-         * };
+         *     const char *cert_path;
+         *     const char *key_path;
+         * }
          * }
          */
-        public static final class file {
+        public static class file {
 
-            // Suppresses default constructor, ensuring non-instantiability.
-            private file() {}
-            public static MemoryLayout $LAYOUT() {
-                return constants$11.const$5;
+            file() {
+                // Should not be called directly
             }
-            public static VarHandle cert_path$VH() {
-                return constants$12.const$0;
+
+            private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
+                wtf_h.C_POINTER.withName("cert_path"),
+                wtf_h.C_POINTER.withName("key_path")
+            ).withName("$anon$342:9");
+
+            /**
+             * The layout of this struct
+             */
+            public static final GroupLayout layout() {
+                return $LAYOUT;
             }
+
+            private static final AddressLayout cert_path$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("cert_path"));
+
+            /**
+             * Layout for field:
+             * {@snippet lang=c :
+             * const char *cert_path
+             * }
+             */
+            public static final AddressLayout cert_path$layout() {
+                return cert_path$LAYOUT;
+            }
+
+            private static final long cert_path$OFFSET = $LAYOUT.byteOffset(groupElement("cert_path"));
+
+            /**
+             * Offset for field:
+             * {@snippet lang=c :
+             * const char *cert_path
+             * }
+             */
+            public static final long cert_path$offset() {
+                return cert_path$OFFSET;
+            }
+
             /**
              * Getter for field:
-             * {@snippet :
-             * char* cert_path;
+             * {@snippet lang=c :
+             * const char *cert_path
              * }
              */
-            public static MemorySegment cert_path$get(MemorySegment seg) {
-                return (java.lang.foreign.MemorySegment)constants$12.const$0.get(seg);
+            public static MemorySegment cert_path(MemorySegment struct) {
+                return struct.get(cert_path$LAYOUT, cert_path$OFFSET);
             }
+
             /**
              * Setter for field:
-             * {@snippet :
-             * char* cert_path;
+             * {@snippet lang=c :
+             * const char *cert_path
              * }
              */
-            public static void cert_path$set(MemorySegment seg, MemorySegment x) {
-                constants$12.const$0.set(seg, x);
+            public static void cert_path(MemorySegment struct, MemorySegment fieldValue) {
+                struct.set(cert_path$LAYOUT, cert_path$OFFSET, fieldValue);
             }
-            public static MemorySegment cert_path$get(MemorySegment seg, long index) {
-                return (java.lang.foreign.MemorySegment)constants$12.const$0.get(seg.asSlice(index*sizeof()));
+
+            private static final AddressLayout key_path$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("key_path"));
+
+            /**
+             * Layout for field:
+             * {@snippet lang=c :
+             * const char *key_path
+             * }
+             */
+            public static final AddressLayout key_path$layout() {
+                return key_path$LAYOUT;
             }
-            public static void cert_path$set(MemorySegment seg, long index, MemorySegment x) {
-                constants$12.const$0.set(seg.asSlice(index*sizeof()), x);
+
+            private static final long key_path$OFFSET = $LAYOUT.byteOffset(groupElement("key_path"));
+
+            /**
+             * Offset for field:
+             * {@snippet lang=c :
+             * const char *key_path
+             * }
+             */
+            public static final long key_path$offset() {
+                return key_path$OFFSET;
             }
-            public static VarHandle key_path$VH() {
-                return constants$12.const$1;
-            }
+
             /**
              * Getter for field:
-             * {@snippet :
-             * char* key_path;
+             * {@snippet lang=c :
+             * const char *key_path
              * }
              */
-            public static MemorySegment key_path$get(MemorySegment seg) {
-                return (java.lang.foreign.MemorySegment)constants$12.const$1.get(seg);
+            public static MemorySegment key_path(MemorySegment struct) {
+                return struct.get(key_path$LAYOUT, key_path$OFFSET);
             }
+
             /**
              * Setter for field:
-             * {@snippet :
-             * char* key_path;
+             * {@snippet lang=c :
+             * const char *key_path
              * }
              */
-            public static void key_path$set(MemorySegment seg, MemorySegment x) {
-                constants$12.const$1.set(seg, x);
+            public static void key_path(MemorySegment struct, MemorySegment fieldValue) {
+                struct.set(key_path$LAYOUT, key_path$OFFSET, fieldValue);
             }
-            public static MemorySegment key_path$get(MemorySegment seg, long index) {
-                return (java.lang.foreign.MemorySegment)constants$12.const$1.get(seg.asSlice(index*sizeof()));
+
+            /**
+             * Obtains a slice of {@code arrayParam} which selects the array element at {@code index}.
+             * The returned segment has address {@code arrayParam.address() + index * layout().byteSize()}
+             */
+            public static MemorySegment asSlice(MemorySegment array, long index) {
+                return array.asSlice(layout().byteSize() * index);
             }
-            public static void key_path$set(MemorySegment seg, long index, MemorySegment x) {
-                constants$12.const$1.set(seg.asSlice(index*sizeof()), x);
+
+            /**
+             * The size (in bytes) of this struct
+             */
+            public static long sizeof() { return layout().byteSize(); }
+
+            /**
+             * Allocate a segment of size {@code layout().byteSize()} using {@code allocator}
+             */
+            public static MemorySegment allocate(SegmentAllocator allocator) {
+                return allocator.allocate(layout());
             }
-            public static long sizeof() { return $LAYOUT().byteSize(); }
-            public static MemorySegment allocate(SegmentAllocator allocator) { return allocator.allocate($LAYOUT()); }
-            public static MemorySegment allocateArray(long len, SegmentAllocator allocator) {
-                return allocator.allocate(MemoryLayout.sequenceLayout(len, $LAYOUT()));
+
+            /**
+             * Allocate an array of size {@code elementCount} using {@code allocator}.
+             * The returned segment has size {@code elementCount * layout().byteSize()}.
+             */
+            public static MemorySegment allocateArray(long elementCount, SegmentAllocator allocator) {
+                return allocator.allocate(MemoryLayout.sequenceLayout(elementCount, layout()));
             }
-            public static MemorySegment ofAddress(MemorySegment addr, Arena arena) { return RuntimeHelper.asArray(addr, $LAYOUT(), 1, arena); }
+
+            /**
+             * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+             * The returned segment has size {@code layout().byteSize()}
+             */
+            public static MemorySegment reinterpret(MemorySegment addr, Arena arena, Consumer<MemorySegment> cleanup) {
+                return reinterpret(addr, 1, arena, cleanup);
+            }
+
+            /**
+             * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+             * The returned segment has size {@code elementCount * layout().byteSize()}
+             */
+            public static MemorySegment reinterpret(MemorySegment addr, long elementCount, Arena arena, Consumer<MemorySegment> cleanup) {
+                return addr.reinterpret(layout().byteSize() * elementCount, arena, cleanup);
+            }
         }
 
-        public static MemorySegment file$slice(MemorySegment seg) {
-            return seg.asSlice(0, 16);
-        }
+        private static final GroupLayout file$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("file"));
+
         /**
-         * {@snippet :
+         * Layout for field:
+         * {@snippet lang=c :
          * struct {
-         *     char* cert_path;
-         *     char* key_path;
-         *     char* password;
-         * };
+         *     const char *cert_path;
+         *     const char *key_path;
+         * } file
          * }
          */
-        public static final class protected_file {
-
-            // Suppresses default constructor, ensuring non-instantiability.
-            private protected_file() {}
-            public static MemoryLayout $LAYOUT() {
-                return constants$12.const$2;
-            }
-            public static VarHandle cert_path$VH() {
-                return constants$12.const$3;
-            }
-            /**
-             * Getter for field:
-             * {@snippet :
-             * char* cert_path;
-             * }
-             */
-            public static MemorySegment cert_path$get(MemorySegment seg) {
-                return (java.lang.foreign.MemorySegment)constants$12.const$3.get(seg);
-            }
-            /**
-             * Setter for field:
-             * {@snippet :
-             * char* cert_path;
-             * }
-             */
-            public static void cert_path$set(MemorySegment seg, MemorySegment x) {
-                constants$12.const$3.set(seg, x);
-            }
-            public static MemorySegment cert_path$get(MemorySegment seg, long index) {
-                return (java.lang.foreign.MemorySegment)constants$12.const$3.get(seg.asSlice(index*sizeof()));
-            }
-            public static void cert_path$set(MemorySegment seg, long index, MemorySegment x) {
-                constants$12.const$3.set(seg.asSlice(index*sizeof()), x);
-            }
-            public static VarHandle key_path$VH() {
-                return constants$12.const$4;
-            }
-            /**
-             * Getter for field:
-             * {@snippet :
-             * char* key_path;
-             * }
-             */
-            public static MemorySegment key_path$get(MemorySegment seg) {
-                return (java.lang.foreign.MemorySegment)constants$12.const$4.get(seg);
-            }
-            /**
-             * Setter for field:
-             * {@snippet :
-             * char* key_path;
-             * }
-             */
-            public static void key_path$set(MemorySegment seg, MemorySegment x) {
-                constants$12.const$4.set(seg, x);
-            }
-            public static MemorySegment key_path$get(MemorySegment seg, long index) {
-                return (java.lang.foreign.MemorySegment)constants$12.const$4.get(seg.asSlice(index*sizeof()));
-            }
-            public static void key_path$set(MemorySegment seg, long index, MemorySegment x) {
-                constants$12.const$4.set(seg.asSlice(index*sizeof()), x);
-            }
-            public static VarHandle password$VH() {
-                return constants$12.const$5;
-            }
-            /**
-             * Getter for field:
-             * {@snippet :
-             * char* password;
-             * }
-             */
-            public static MemorySegment password$get(MemorySegment seg) {
-                return (java.lang.foreign.MemorySegment)constants$12.const$5.get(seg);
-            }
-            /**
-             * Setter for field:
-             * {@snippet :
-             * char* password;
-             * }
-             */
-            public static void password$set(MemorySegment seg, MemorySegment x) {
-                constants$12.const$5.set(seg, x);
-            }
-            public static MemorySegment password$get(MemorySegment seg, long index) {
-                return (java.lang.foreign.MemorySegment)constants$12.const$5.get(seg.asSlice(index*sizeof()));
-            }
-            public static void password$set(MemorySegment seg, long index, MemorySegment x) {
-                constants$12.const$5.set(seg.asSlice(index*sizeof()), x);
-            }
-            public static long sizeof() { return $LAYOUT().byteSize(); }
-            public static MemorySegment allocate(SegmentAllocator allocator) { return allocator.allocate($LAYOUT()); }
-            public static MemorySegment allocateArray(long len, SegmentAllocator allocator) {
-                return allocator.allocate(MemoryLayout.sequenceLayout(len, $LAYOUT()));
-            }
-            public static MemorySegment ofAddress(MemorySegment addr, Arena arena) { return RuntimeHelper.asArray(addr, $LAYOUT(), 1, arena); }
+        public static final GroupLayout file$layout() {
+            return file$LAYOUT;
         }
 
-        public static MemorySegment protected_file$slice(MemorySegment seg) {
-            return seg.asSlice(0, 24);
-        }
+        private static final long file$OFFSET = $LAYOUT.byteOffset(groupElement("file"));
+
         /**
-         * {@snippet :
+         * Offset for field:
+         * {@snippet lang=c :
          * struct {
-         *     char* thumbprint;
-         * };
+         *     const char *cert_path;
+         *     const char *key_path;
+         * } file
          * }
          */
-        public static final class hash {
-
-            // Suppresses default constructor, ensuring non-instantiability.
-            private hash() {}
-            public static MemoryLayout $LAYOUT() {
-                return constants$13.const$0;
-            }
-            public static VarHandle thumbprint$VH() {
-                return constants$13.const$1;
-            }
-            /**
-             * Getter for field:
-             * {@snippet :
-             * char* thumbprint;
-             * }
-             */
-            public static MemorySegment thumbprint$get(MemorySegment seg) {
-                return (java.lang.foreign.MemorySegment)constants$13.const$1.get(seg);
-            }
-            /**
-             * Setter for field:
-             * {@snippet :
-             * char* thumbprint;
-             * }
-             */
-            public static void thumbprint$set(MemorySegment seg, MemorySegment x) {
-                constants$13.const$1.set(seg, x);
-            }
-            public static MemorySegment thumbprint$get(MemorySegment seg, long index) {
-                return (java.lang.foreign.MemorySegment)constants$13.const$1.get(seg.asSlice(index*sizeof()));
-            }
-            public static void thumbprint$set(MemorySegment seg, long index, MemorySegment x) {
-                constants$13.const$1.set(seg.asSlice(index*sizeof()), x);
-            }
-            public static long sizeof() { return $LAYOUT().byteSize(); }
-            public static MemorySegment allocate(SegmentAllocator allocator) { return allocator.allocate($LAYOUT()); }
-            public static MemorySegment allocateArray(long len, SegmentAllocator allocator) {
-                return allocator.allocate(MemoryLayout.sequenceLayout(len, $LAYOUT()));
-            }
-            public static MemorySegment ofAddress(MemorySegment addr, Arena arena) { return RuntimeHelper.asArray(addr, $LAYOUT(), 1, arena); }
+        public static final long file$offset() {
+            return file$OFFSET;
         }
 
-        public static MemorySegment hash$slice(MemorySegment seg) {
-            return seg.asSlice(0, 8);
-        }
-        /**
-         * {@snippet :
-         * struct {
-         *     char* thumbprint;
-         *     char* store_name;
-         * };
-         * }
-         */
-        public static final class hash_store {
-
-            // Suppresses default constructor, ensuring non-instantiability.
-            private hash_store() {}
-            public static MemoryLayout $LAYOUT() {
-                return constants$13.const$2;
-            }
-            public static VarHandle thumbprint$VH() {
-                return constants$13.const$3;
-            }
-            /**
-             * Getter for field:
-             * {@snippet :
-             * char* thumbprint;
-             * }
-             */
-            public static MemorySegment thumbprint$get(MemorySegment seg) {
-                return (java.lang.foreign.MemorySegment)constants$13.const$3.get(seg);
-            }
-            /**
-             * Setter for field:
-             * {@snippet :
-             * char* thumbprint;
-             * }
-             */
-            public static void thumbprint$set(MemorySegment seg, MemorySegment x) {
-                constants$13.const$3.set(seg, x);
-            }
-            public static MemorySegment thumbprint$get(MemorySegment seg, long index) {
-                return (java.lang.foreign.MemorySegment)constants$13.const$3.get(seg.asSlice(index*sizeof()));
-            }
-            public static void thumbprint$set(MemorySegment seg, long index, MemorySegment x) {
-                constants$13.const$3.set(seg.asSlice(index*sizeof()), x);
-            }
-            public static VarHandle store_name$VH() {
-                return constants$13.const$4;
-            }
-            /**
-             * Getter for field:
-             * {@snippet :
-             * char* store_name;
-             * }
-             */
-            public static MemorySegment store_name$get(MemorySegment seg) {
-                return (java.lang.foreign.MemorySegment)constants$13.const$4.get(seg);
-            }
-            /**
-             * Setter for field:
-             * {@snippet :
-             * char* store_name;
-             * }
-             */
-            public static void store_name$set(MemorySegment seg, MemorySegment x) {
-                constants$13.const$4.set(seg, x);
-            }
-            public static MemorySegment store_name$get(MemorySegment seg, long index) {
-                return (java.lang.foreign.MemorySegment)constants$13.const$4.get(seg.asSlice(index*sizeof()));
-            }
-            public static void store_name$set(MemorySegment seg, long index, MemorySegment x) {
-                constants$13.const$4.set(seg.asSlice(index*sizeof()), x);
-            }
-            public static long sizeof() { return $LAYOUT().byteSize(); }
-            public static MemorySegment allocate(SegmentAllocator allocator) { return allocator.allocate($LAYOUT()); }
-            public static MemorySegment allocateArray(long len, SegmentAllocator allocator) {
-                return allocator.allocate(MemoryLayout.sequenceLayout(len, $LAYOUT()));
-            }
-            public static MemorySegment ofAddress(MemorySegment addr, Arena arena) { return RuntimeHelper.asArray(addr, $LAYOUT(), 1, arena); }
-        }
-
-        public static MemorySegment hash_store$slice(MemorySegment seg) {
-            return seg.asSlice(0, 16);
-        }
-        /**
-         * {@snippet :
-         * struct {
-         *     void* data;
-         *     size_t data_size;
-         *     char* password;
-         * };
-         * }
-         */
-        public static final class pkcs12 {
-
-            // Suppresses default constructor, ensuring non-instantiability.
-            private pkcs12() {}
-            public static MemoryLayout $LAYOUT() {
-                return constants$13.const$5;
-            }
-            public static VarHandle data$VH() {
-                return constants$14.const$0;
-            }
-            /**
-             * Getter for field:
-             * {@snippet :
-             * void* data;
-             * }
-             */
-            public static MemorySegment data$get(MemorySegment seg) {
-                return (java.lang.foreign.MemorySegment)constants$14.const$0.get(seg);
-            }
-            /**
-             * Setter for field:
-             * {@snippet :
-             * void* data;
-             * }
-             */
-            public static void data$set(MemorySegment seg, MemorySegment x) {
-                constants$14.const$0.set(seg, x);
-            }
-            public static MemorySegment data$get(MemorySegment seg, long index) {
-                return (java.lang.foreign.MemorySegment)constants$14.const$0.get(seg.asSlice(index*sizeof()));
-            }
-            public static void data$set(MemorySegment seg, long index, MemorySegment x) {
-                constants$14.const$0.set(seg.asSlice(index*sizeof()), x);
-            }
-            public static VarHandle data_size$VH() {
-                return constants$14.const$1;
-            }
-            /**
-             * Getter for field:
-             * {@snippet :
-             * size_t data_size;
-             * }
-             */
-            public static long data_size$get(MemorySegment seg) {
-                return (long)constants$14.const$1.get(seg);
-            }
-            /**
-             * Setter for field:
-             * {@snippet :
-             * size_t data_size;
-             * }
-             */
-            public static void data_size$set(MemorySegment seg, long x) {
-                constants$14.const$1.set(seg, x);
-            }
-            public static long data_size$get(MemorySegment seg, long index) {
-                return (long)constants$14.const$1.get(seg.asSlice(index*sizeof()));
-            }
-            public static void data_size$set(MemorySegment seg, long index, long x) {
-                constants$14.const$1.set(seg.asSlice(index*sizeof()), x);
-            }
-            public static VarHandle password$VH() {
-                return constants$14.const$2;
-            }
-            /**
-             * Getter for field:
-             * {@snippet :
-             * char* password;
-             * }
-             */
-            public static MemorySegment password$get(MemorySegment seg) {
-                return (java.lang.foreign.MemorySegment)constants$14.const$2.get(seg);
-            }
-            /**
-             * Setter for field:
-             * {@snippet :
-             * char* password;
-             * }
-             */
-            public static void password$set(MemorySegment seg, MemorySegment x) {
-                constants$14.const$2.set(seg, x);
-            }
-            public static MemorySegment password$get(MemorySegment seg, long index) {
-                return (java.lang.foreign.MemorySegment)constants$14.const$2.get(seg.asSlice(index*sizeof()));
-            }
-            public static void password$set(MemorySegment seg, long index, MemorySegment x) {
-                constants$14.const$2.set(seg.asSlice(index*sizeof()), x);
-            }
-            public static long sizeof() { return $LAYOUT().byteSize(); }
-            public static MemorySegment allocate(SegmentAllocator allocator) { return allocator.allocate($LAYOUT()); }
-            public static MemorySegment allocateArray(long len, SegmentAllocator allocator) {
-                return allocator.allocate(MemoryLayout.sequenceLayout(len, $LAYOUT()));
-            }
-            public static MemorySegment ofAddress(MemorySegment addr, Arena arena) { return RuntimeHelper.asArray(addr, $LAYOUT(), 1, arena); }
-        }
-
-        public static MemorySegment pkcs12$slice(MemorySegment seg) {
-            return seg.asSlice(0, 24);
-        }
-        public static VarHandle context$VH() {
-            return constants$14.const$3;
-        }
         /**
          * Getter for field:
-         * {@snippet :
-         * void* context;
+         * {@snippet lang=c :
+         * struct {
+         *     const char *cert_path;
+         *     const char *key_path;
+         * } file
          * }
          */
-        public static MemorySegment context$get(MemorySegment seg) {
-            return (java.lang.foreign.MemorySegment)constants$14.const$3.get(seg);
+        public static MemorySegment file(MemorySegment union) {
+            return union.asSlice(file$OFFSET, file$LAYOUT.byteSize());
         }
+
         /**
          * Setter for field:
-         * {@snippet :
-         * void* context;
+         * {@snippet lang=c :
+         * struct {
+         *     const char *cert_path;
+         *     const char *key_path;
+         * } file
          * }
          */
-        public static void context$set(MemorySegment seg, MemorySegment x) {
-            constants$14.const$3.set(seg, x);
+        public static void file(MemorySegment union, MemorySegment fieldValue) {
+            MemorySegment.copy(fieldValue, 0L, union, file$OFFSET, file$LAYOUT.byteSize());
         }
-        public static MemorySegment context$get(MemorySegment seg, long index) {
-            return (java.lang.foreign.MemorySegment)constants$14.const$3.get(seg.asSlice(index*sizeof()));
+
+        /**
+         * {@snippet lang=c :
+         * struct {
+         *     const char *cert_path;
+         *     const char *key_path;
+         *     const char *password;
+         * }
+         * }
+         */
+        public static class protected_file {
+
+            protected_file() {
+                // Should not be called directly
+            }
+
+            private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
+                wtf_h.C_POINTER.withName("cert_path"),
+                wtf_h.C_POINTER.withName("key_path"),
+                wtf_h.C_POINTER.withName("password")
+            ).withName("$anon$348:9");
+
+            /**
+             * The layout of this struct
+             */
+            public static final GroupLayout layout() {
+                return $LAYOUT;
+            }
+
+            private static final AddressLayout cert_path$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("cert_path"));
+
+            /**
+             * Layout for field:
+             * {@snippet lang=c :
+             * const char *cert_path
+             * }
+             */
+            public static final AddressLayout cert_path$layout() {
+                return cert_path$LAYOUT;
+            }
+
+            private static final long cert_path$OFFSET = $LAYOUT.byteOffset(groupElement("cert_path"));
+
+            /**
+             * Offset for field:
+             * {@snippet lang=c :
+             * const char *cert_path
+             * }
+             */
+            public static final long cert_path$offset() {
+                return cert_path$OFFSET;
+            }
+
+            /**
+             * Getter for field:
+             * {@snippet lang=c :
+             * const char *cert_path
+             * }
+             */
+            public static MemorySegment cert_path(MemorySegment struct) {
+                return struct.get(cert_path$LAYOUT, cert_path$OFFSET);
+            }
+
+            /**
+             * Setter for field:
+             * {@snippet lang=c :
+             * const char *cert_path
+             * }
+             */
+            public static void cert_path(MemorySegment struct, MemorySegment fieldValue) {
+                struct.set(cert_path$LAYOUT, cert_path$OFFSET, fieldValue);
+            }
+
+            private static final AddressLayout key_path$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("key_path"));
+
+            /**
+             * Layout for field:
+             * {@snippet lang=c :
+             * const char *key_path
+             * }
+             */
+            public static final AddressLayout key_path$layout() {
+                return key_path$LAYOUT;
+            }
+
+            private static final long key_path$OFFSET = $LAYOUT.byteOffset(groupElement("key_path"));
+
+            /**
+             * Offset for field:
+             * {@snippet lang=c :
+             * const char *key_path
+             * }
+             */
+            public static final long key_path$offset() {
+                return key_path$OFFSET;
+            }
+
+            /**
+             * Getter for field:
+             * {@snippet lang=c :
+             * const char *key_path
+             * }
+             */
+            public static MemorySegment key_path(MemorySegment struct) {
+                return struct.get(key_path$LAYOUT, key_path$OFFSET);
+            }
+
+            /**
+             * Setter for field:
+             * {@snippet lang=c :
+             * const char *key_path
+             * }
+             */
+            public static void key_path(MemorySegment struct, MemorySegment fieldValue) {
+                struct.set(key_path$LAYOUT, key_path$OFFSET, fieldValue);
+            }
+
+            private static final AddressLayout password$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("password"));
+
+            /**
+             * Layout for field:
+             * {@snippet lang=c :
+             * const char *password
+             * }
+             */
+            public static final AddressLayout password$layout() {
+                return password$LAYOUT;
+            }
+
+            private static final long password$OFFSET = $LAYOUT.byteOffset(groupElement("password"));
+
+            /**
+             * Offset for field:
+             * {@snippet lang=c :
+             * const char *password
+             * }
+             */
+            public static final long password$offset() {
+                return password$OFFSET;
+            }
+
+            /**
+             * Getter for field:
+             * {@snippet lang=c :
+             * const char *password
+             * }
+             */
+            public static MemorySegment password(MemorySegment struct) {
+                return struct.get(password$LAYOUT, password$OFFSET);
+            }
+
+            /**
+             * Setter for field:
+             * {@snippet lang=c :
+             * const char *password
+             * }
+             */
+            public static void password(MemorySegment struct, MemorySegment fieldValue) {
+                struct.set(password$LAYOUT, password$OFFSET, fieldValue);
+            }
+
+            /**
+             * Obtains a slice of {@code arrayParam} which selects the array element at {@code index}.
+             * The returned segment has address {@code arrayParam.address() + index * layout().byteSize()}
+             */
+            public static MemorySegment asSlice(MemorySegment array, long index) {
+                return array.asSlice(layout().byteSize() * index);
+            }
+
+            /**
+             * The size (in bytes) of this struct
+             */
+            public static long sizeof() { return layout().byteSize(); }
+
+            /**
+             * Allocate a segment of size {@code layout().byteSize()} using {@code allocator}
+             */
+            public static MemorySegment allocate(SegmentAllocator allocator) {
+                return allocator.allocate(layout());
+            }
+
+            /**
+             * Allocate an array of size {@code elementCount} using {@code allocator}.
+             * The returned segment has size {@code elementCount * layout().byteSize()}.
+             */
+            public static MemorySegment allocateArray(long elementCount, SegmentAllocator allocator) {
+                return allocator.allocate(MemoryLayout.sequenceLayout(elementCount, layout()));
+            }
+
+            /**
+             * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+             * The returned segment has size {@code layout().byteSize()}
+             */
+            public static MemorySegment reinterpret(MemorySegment addr, Arena arena, Consumer<MemorySegment> cleanup) {
+                return reinterpret(addr, 1, arena, cleanup);
+            }
+
+            /**
+             * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+             * The returned segment has size {@code elementCount * layout().byteSize()}
+             */
+            public static MemorySegment reinterpret(MemorySegment addr, long elementCount, Arena arena, Consumer<MemorySegment> cleanup) {
+                return addr.reinterpret(layout().byteSize() * elementCount, arena, cleanup);
+            }
         }
-        public static void context$set(MemorySegment seg, long index, MemorySegment x) {
-            constants$14.const$3.set(seg.asSlice(index*sizeof()), x);
+
+        private static final GroupLayout protected_file$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("protected_file"));
+
+        /**
+         * Layout for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *cert_path;
+         *     const char *key_path;
+         *     const char *password;
+         * } protected_file
+         * }
+         */
+        public static final GroupLayout protected_file$layout() {
+            return protected_file$LAYOUT;
         }
-        public static long sizeof() { return $LAYOUT().byteSize(); }
-        public static MemorySegment allocate(SegmentAllocator allocator) { return allocator.allocate($LAYOUT()); }
-        public static MemorySegment allocateArray(long len, SegmentAllocator allocator) {
-            return allocator.allocate(MemoryLayout.sequenceLayout(len, $LAYOUT()));
+
+        private static final long protected_file$OFFSET = $LAYOUT.byteOffset(groupElement("protected_file"));
+
+        /**
+         * Offset for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *cert_path;
+         *     const char *key_path;
+         *     const char *password;
+         * } protected_file
+         * }
+         */
+        public static final long protected_file$offset() {
+            return protected_file$OFFSET;
         }
-        public static MemorySegment ofAddress(MemorySegment addr, Arena arena) { return RuntimeHelper.asArray(addr, $LAYOUT(), 1, arena); }
+
+        /**
+         * Getter for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *cert_path;
+         *     const char *key_path;
+         *     const char *password;
+         * } protected_file
+         * }
+         */
+        public static MemorySegment protected_file(MemorySegment union) {
+            return union.asSlice(protected_file$OFFSET, protected_file$LAYOUT.byteSize());
+        }
+
+        /**
+         * Setter for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *cert_path;
+         *     const char *key_path;
+         *     const char *password;
+         * } protected_file
+         * }
+         */
+        public static void protected_file(MemorySegment union, MemorySegment fieldValue) {
+            MemorySegment.copy(fieldValue, 0L, union, protected_file$OFFSET, protected_file$LAYOUT.byteSize());
+        }
+
+        /**
+         * {@snippet lang=c :
+         * struct {
+         *     const char *thumbprint;
+         * }
+         * }
+         */
+        public static class hash {
+
+            hash() {
+                // Should not be called directly
+            }
+
+            private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
+                wtf_h.C_POINTER.withName("thumbprint")
+            ).withName("$anon$355:9");
+
+            /**
+             * The layout of this struct
+             */
+            public static final GroupLayout layout() {
+                return $LAYOUT;
+            }
+
+            private static final AddressLayout thumbprint$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("thumbprint"));
+
+            /**
+             * Layout for field:
+             * {@snippet lang=c :
+             * const char *thumbprint
+             * }
+             */
+            public static final AddressLayout thumbprint$layout() {
+                return thumbprint$LAYOUT;
+            }
+
+            private static final long thumbprint$OFFSET = $LAYOUT.byteOffset(groupElement("thumbprint"));
+
+            /**
+             * Offset for field:
+             * {@snippet lang=c :
+             * const char *thumbprint
+             * }
+             */
+            public static final long thumbprint$offset() {
+                return thumbprint$OFFSET;
+            }
+
+            /**
+             * Getter for field:
+             * {@snippet lang=c :
+             * const char *thumbprint
+             * }
+             */
+            public static MemorySegment thumbprint(MemorySegment struct) {
+                return struct.get(thumbprint$LAYOUT, thumbprint$OFFSET);
+            }
+
+            /**
+             * Setter for field:
+             * {@snippet lang=c :
+             * const char *thumbprint
+             * }
+             */
+            public static void thumbprint(MemorySegment struct, MemorySegment fieldValue) {
+                struct.set(thumbprint$LAYOUT, thumbprint$OFFSET, fieldValue);
+            }
+
+            /**
+             * Obtains a slice of {@code arrayParam} which selects the array element at {@code index}.
+             * The returned segment has address {@code arrayParam.address() + index * layout().byteSize()}
+             */
+            public static MemorySegment asSlice(MemorySegment array, long index) {
+                return array.asSlice(layout().byteSize() * index);
+            }
+
+            /**
+             * The size (in bytes) of this struct
+             */
+            public static long sizeof() { return layout().byteSize(); }
+
+            /**
+             * Allocate a segment of size {@code layout().byteSize()} using {@code allocator}
+             */
+            public static MemorySegment allocate(SegmentAllocator allocator) {
+                return allocator.allocate(layout());
+            }
+
+            /**
+             * Allocate an array of size {@code elementCount} using {@code allocator}.
+             * The returned segment has size {@code elementCount * layout().byteSize()}.
+             */
+            public static MemorySegment allocateArray(long elementCount, SegmentAllocator allocator) {
+                return allocator.allocate(MemoryLayout.sequenceLayout(elementCount, layout()));
+            }
+
+            /**
+             * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+             * The returned segment has size {@code layout().byteSize()}
+             */
+            public static MemorySegment reinterpret(MemorySegment addr, Arena arena, Consumer<MemorySegment> cleanup) {
+                return reinterpret(addr, 1, arena, cleanup);
+            }
+
+            /**
+             * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+             * The returned segment has size {@code elementCount * layout().byteSize()}
+             */
+            public static MemorySegment reinterpret(MemorySegment addr, long elementCount, Arena arena, Consumer<MemorySegment> cleanup) {
+                return addr.reinterpret(layout().byteSize() * elementCount, arena, cleanup);
+            }
+        }
+
+        private static final GroupLayout hash$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("hash"));
+
+        /**
+         * Layout for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *thumbprint;
+         * } hash
+         * }
+         */
+        public static final GroupLayout hash$layout() {
+            return hash$LAYOUT;
+        }
+
+        private static final long hash$OFFSET = $LAYOUT.byteOffset(groupElement("hash"));
+
+        /**
+         * Offset for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *thumbprint;
+         * } hash
+         * }
+         */
+        public static final long hash$offset() {
+            return hash$OFFSET;
+        }
+
+        /**
+         * Getter for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *thumbprint;
+         * } hash
+         * }
+         */
+        public static MemorySegment hash(MemorySegment union) {
+            return union.asSlice(hash$OFFSET, hash$LAYOUT.byteSize());
+        }
+
+        /**
+         * Setter for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *thumbprint;
+         * } hash
+         * }
+         */
+        public static void hash(MemorySegment union, MemorySegment fieldValue) {
+            MemorySegment.copy(fieldValue, 0L, union, hash$OFFSET, hash$LAYOUT.byteSize());
+        }
+
+        /**
+         * {@snippet lang=c :
+         * struct {
+         *     const char *thumbprint;
+         *     const char *store_name;
+         * }
+         * }
+         */
+        public static class hash_store {
+
+            hash_store() {
+                // Should not be called directly
+            }
+
+            private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
+                wtf_h.C_POINTER.withName("thumbprint"),
+                wtf_h.C_POINTER.withName("store_name")
+            ).withName("$anon$360:9");
+
+            /**
+             * The layout of this struct
+             */
+            public static final GroupLayout layout() {
+                return $LAYOUT;
+            }
+
+            private static final AddressLayout thumbprint$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("thumbprint"));
+
+            /**
+             * Layout for field:
+             * {@snippet lang=c :
+             * const char *thumbprint
+             * }
+             */
+            public static final AddressLayout thumbprint$layout() {
+                return thumbprint$LAYOUT;
+            }
+
+            private static final long thumbprint$OFFSET = $LAYOUT.byteOffset(groupElement("thumbprint"));
+
+            /**
+             * Offset for field:
+             * {@snippet lang=c :
+             * const char *thumbprint
+             * }
+             */
+            public static final long thumbprint$offset() {
+                return thumbprint$OFFSET;
+            }
+
+            /**
+             * Getter for field:
+             * {@snippet lang=c :
+             * const char *thumbprint
+             * }
+             */
+            public static MemorySegment thumbprint(MemorySegment struct) {
+                return struct.get(thumbprint$LAYOUT, thumbprint$OFFSET);
+            }
+
+            /**
+             * Setter for field:
+             * {@snippet lang=c :
+             * const char *thumbprint
+             * }
+             */
+            public static void thumbprint(MemorySegment struct, MemorySegment fieldValue) {
+                struct.set(thumbprint$LAYOUT, thumbprint$OFFSET, fieldValue);
+            }
+
+            private static final AddressLayout store_name$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("store_name"));
+
+            /**
+             * Layout for field:
+             * {@snippet lang=c :
+             * const char *store_name
+             * }
+             */
+            public static final AddressLayout store_name$layout() {
+                return store_name$LAYOUT;
+            }
+
+            private static final long store_name$OFFSET = $LAYOUT.byteOffset(groupElement("store_name"));
+
+            /**
+             * Offset for field:
+             * {@snippet lang=c :
+             * const char *store_name
+             * }
+             */
+            public static final long store_name$offset() {
+                return store_name$OFFSET;
+            }
+
+            /**
+             * Getter for field:
+             * {@snippet lang=c :
+             * const char *store_name
+             * }
+             */
+            public static MemorySegment store_name(MemorySegment struct) {
+                return struct.get(store_name$LAYOUT, store_name$OFFSET);
+            }
+
+            /**
+             * Setter for field:
+             * {@snippet lang=c :
+             * const char *store_name
+             * }
+             */
+            public static void store_name(MemorySegment struct, MemorySegment fieldValue) {
+                struct.set(store_name$LAYOUT, store_name$OFFSET, fieldValue);
+            }
+
+            /**
+             * Obtains a slice of {@code arrayParam} which selects the array element at {@code index}.
+             * The returned segment has address {@code arrayParam.address() + index * layout().byteSize()}
+             */
+            public static MemorySegment asSlice(MemorySegment array, long index) {
+                return array.asSlice(layout().byteSize() * index);
+            }
+
+            /**
+             * The size (in bytes) of this struct
+             */
+            public static long sizeof() { return layout().byteSize(); }
+
+            /**
+             * Allocate a segment of size {@code layout().byteSize()} using {@code allocator}
+             */
+            public static MemorySegment allocate(SegmentAllocator allocator) {
+                return allocator.allocate(layout());
+            }
+
+            /**
+             * Allocate an array of size {@code elementCount} using {@code allocator}.
+             * The returned segment has size {@code elementCount * layout().byteSize()}.
+             */
+            public static MemorySegment allocateArray(long elementCount, SegmentAllocator allocator) {
+                return allocator.allocate(MemoryLayout.sequenceLayout(elementCount, layout()));
+            }
+
+            /**
+             * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+             * The returned segment has size {@code layout().byteSize()}
+             */
+            public static MemorySegment reinterpret(MemorySegment addr, Arena arena, Consumer<MemorySegment> cleanup) {
+                return reinterpret(addr, 1, arena, cleanup);
+            }
+
+            /**
+             * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+             * The returned segment has size {@code elementCount * layout().byteSize()}
+             */
+            public static MemorySegment reinterpret(MemorySegment addr, long elementCount, Arena arena, Consumer<MemorySegment> cleanup) {
+                return addr.reinterpret(layout().byteSize() * elementCount, arena, cleanup);
+            }
+        }
+
+        private static final GroupLayout hash_store$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("hash_store"));
+
+        /**
+         * Layout for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *thumbprint;
+         *     const char *store_name;
+         * } hash_store
+         * }
+         */
+        public static final GroupLayout hash_store$layout() {
+            return hash_store$LAYOUT;
+        }
+
+        private static final long hash_store$OFFSET = $LAYOUT.byteOffset(groupElement("hash_store"));
+
+        /**
+         * Offset for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *thumbprint;
+         *     const char *store_name;
+         * } hash_store
+         * }
+         */
+        public static final long hash_store$offset() {
+            return hash_store$OFFSET;
+        }
+
+        /**
+         * Getter for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *thumbprint;
+         *     const char *store_name;
+         * } hash_store
+         * }
+         */
+        public static MemorySegment hash_store(MemorySegment union) {
+            return union.asSlice(hash_store$OFFSET, hash_store$LAYOUT.byteSize());
+        }
+
+        /**
+         * Setter for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const char *thumbprint;
+         *     const char *store_name;
+         * } hash_store
+         * }
+         */
+        public static void hash_store(MemorySegment union, MemorySegment fieldValue) {
+            MemorySegment.copy(fieldValue, 0L, union, hash_store$OFFSET, hash_store$LAYOUT.byteSize());
+        }
+
+        /**
+         * {@snippet lang=c :
+         * struct {
+         *     const void *data;
+         *     size_t data_size;
+         *     const char *password;
+         * }
+         * }
+         */
+        public static class pkcs12 {
+
+            pkcs12() {
+                // Should not be called directly
+            }
+
+            private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
+                wtf_h.C_POINTER.withName("data"),
+                wtf_h.C_LONG_LONG.withName("data_size"),
+                wtf_h.C_POINTER.withName("password")
+            ).withName("$anon$366:9");
+
+            /**
+             * The layout of this struct
+             */
+            public static final GroupLayout layout() {
+                return $LAYOUT;
+            }
+
+            private static final AddressLayout data$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("data"));
+
+            /**
+             * Layout for field:
+             * {@snippet lang=c :
+             * const void *data
+             * }
+             */
+            public static final AddressLayout data$layout() {
+                return data$LAYOUT;
+            }
+
+            private static final long data$OFFSET = $LAYOUT.byteOffset(groupElement("data"));
+
+            /**
+             * Offset for field:
+             * {@snippet lang=c :
+             * const void *data
+             * }
+             */
+            public static final long data$offset() {
+                return data$OFFSET;
+            }
+
+            /**
+             * Getter for field:
+             * {@snippet lang=c :
+             * const void *data
+             * }
+             */
+            public static MemorySegment data(MemorySegment struct) {
+                return struct.get(data$LAYOUT, data$OFFSET);
+            }
+
+            /**
+             * Setter for field:
+             * {@snippet lang=c :
+             * const void *data
+             * }
+             */
+            public static void data(MemorySegment struct, MemorySegment fieldValue) {
+                struct.set(data$LAYOUT, data$OFFSET, fieldValue);
+            }
+
+            private static final OfLong data_size$LAYOUT = (OfLong)$LAYOUT.select(groupElement("data_size"));
+
+            /**
+             * Layout for field:
+             * {@snippet lang=c :
+             * size_t data_size
+             * }
+             */
+            public static final OfLong data_size$layout() {
+                return data_size$LAYOUT;
+            }
+
+            private static final long data_size$OFFSET = $LAYOUT.byteOffset(groupElement("data_size"));
+
+            /**
+             * Offset for field:
+             * {@snippet lang=c :
+             * size_t data_size
+             * }
+             */
+            public static final long data_size$offset() {
+                return data_size$OFFSET;
+            }
+
+            /**
+             * Getter for field:
+             * {@snippet lang=c :
+             * size_t data_size
+             * }
+             */
+            public static long data_size(MemorySegment struct) {
+                return struct.get(data_size$LAYOUT, data_size$OFFSET);
+            }
+
+            /**
+             * Setter for field:
+             * {@snippet lang=c :
+             * size_t data_size
+             * }
+             */
+            public static void data_size(MemorySegment struct, long fieldValue) {
+                struct.set(data_size$LAYOUT, data_size$OFFSET, fieldValue);
+            }
+
+            private static final AddressLayout password$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("password"));
+
+            /**
+             * Layout for field:
+             * {@snippet lang=c :
+             * const char *password
+             * }
+             */
+            public static final AddressLayout password$layout() {
+                return password$LAYOUT;
+            }
+
+            private static final long password$OFFSET = $LAYOUT.byteOffset(groupElement("password"));
+
+            /**
+             * Offset for field:
+             * {@snippet lang=c :
+             * const char *password
+             * }
+             */
+            public static final long password$offset() {
+                return password$OFFSET;
+            }
+
+            /**
+             * Getter for field:
+             * {@snippet lang=c :
+             * const char *password
+             * }
+             */
+            public static MemorySegment password(MemorySegment struct) {
+                return struct.get(password$LAYOUT, password$OFFSET);
+            }
+
+            /**
+             * Setter for field:
+             * {@snippet lang=c :
+             * const char *password
+             * }
+             */
+            public static void password(MemorySegment struct, MemorySegment fieldValue) {
+                struct.set(password$LAYOUT, password$OFFSET, fieldValue);
+            }
+
+            /**
+             * Obtains a slice of {@code arrayParam} which selects the array element at {@code index}.
+             * The returned segment has address {@code arrayParam.address() + index * layout().byteSize()}
+             */
+            public static MemorySegment asSlice(MemorySegment array, long index) {
+                return array.asSlice(layout().byteSize() * index);
+            }
+
+            /**
+             * The size (in bytes) of this struct
+             */
+            public static long sizeof() { return layout().byteSize(); }
+
+            /**
+             * Allocate a segment of size {@code layout().byteSize()} using {@code allocator}
+             */
+            public static MemorySegment allocate(SegmentAllocator allocator) {
+                return allocator.allocate(layout());
+            }
+
+            /**
+             * Allocate an array of size {@code elementCount} using {@code allocator}.
+             * The returned segment has size {@code elementCount * layout().byteSize()}.
+             */
+            public static MemorySegment allocateArray(long elementCount, SegmentAllocator allocator) {
+                return allocator.allocate(MemoryLayout.sequenceLayout(elementCount, layout()));
+            }
+
+            /**
+             * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+             * The returned segment has size {@code layout().byteSize()}
+             */
+            public static MemorySegment reinterpret(MemorySegment addr, Arena arena, Consumer<MemorySegment> cleanup) {
+                return reinterpret(addr, 1, arena, cleanup);
+            }
+
+            /**
+             * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+             * The returned segment has size {@code elementCount * layout().byteSize()}
+             */
+            public static MemorySegment reinterpret(MemorySegment addr, long elementCount, Arena arena, Consumer<MemorySegment> cleanup) {
+                return addr.reinterpret(layout().byteSize() * elementCount, arena, cleanup);
+            }
+        }
+
+        private static final GroupLayout pkcs12$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("pkcs12"));
+
+        /**
+         * Layout for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const void *data;
+         *     size_t data_size;
+         *     const char *password;
+         * } pkcs12
+         * }
+         */
+        public static final GroupLayout pkcs12$layout() {
+            return pkcs12$LAYOUT;
+        }
+
+        private static final long pkcs12$OFFSET = $LAYOUT.byteOffset(groupElement("pkcs12"));
+
+        /**
+         * Offset for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const void *data;
+         *     size_t data_size;
+         *     const char *password;
+         * } pkcs12
+         * }
+         */
+        public static final long pkcs12$offset() {
+            return pkcs12$OFFSET;
+        }
+
+        /**
+         * Getter for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const void *data;
+         *     size_t data_size;
+         *     const char *password;
+         * } pkcs12
+         * }
+         */
+        public static MemorySegment pkcs12(MemorySegment union) {
+            return union.asSlice(pkcs12$OFFSET, pkcs12$LAYOUT.byteSize());
+        }
+
+        /**
+         * Setter for field:
+         * {@snippet lang=c :
+         * struct {
+         *     const void *data;
+         *     size_t data_size;
+         *     const char *password;
+         * } pkcs12
+         * }
+         */
+        public static void pkcs12(MemorySegment union, MemorySegment fieldValue) {
+            MemorySegment.copy(fieldValue, 0L, union, pkcs12$OFFSET, pkcs12$LAYOUT.byteSize());
+        }
+
+        private static final AddressLayout context$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("context"));
+
+        /**
+         * Layout for field:
+         * {@snippet lang=c :
+         * void *context
+         * }
+         */
+        public static final AddressLayout context$layout() {
+            return context$LAYOUT;
+        }
+
+        private static final long context$OFFSET = $LAYOUT.byteOffset(groupElement("context"));
+
+        /**
+         * Offset for field:
+         * {@snippet lang=c :
+         * void *context
+         * }
+         */
+        public static final long context$offset() {
+            return context$OFFSET;
+        }
+
+        /**
+         * Getter for field:
+         * {@snippet lang=c :
+         * void *context
+         * }
+         */
+        public static MemorySegment context(MemorySegment union) {
+            return union.get(context$LAYOUT, context$OFFSET);
+        }
+
+        /**
+         * Setter for field:
+         * {@snippet lang=c :
+         * void *context
+         * }
+         */
+        public static void context(MemorySegment union, MemorySegment fieldValue) {
+            union.set(context$LAYOUT, context$OFFSET, fieldValue);
+        }
+
+        /**
+         * Obtains a slice of {@code arrayParam} which selects the array element at {@code index}.
+         * The returned segment has address {@code arrayParam.address() + index * layout().byteSize()}
+         */
+        public static MemorySegment asSlice(MemorySegment array, long index) {
+            return array.asSlice(layout().byteSize() * index);
+        }
+
+        /**
+         * The size (in bytes) of this union
+         */
+        public static long sizeof() { return layout().byteSize(); }
+
+        /**
+         * Allocate a segment of size {@code layout().byteSize()} using {@code allocator}
+         */
+        public static MemorySegment allocate(SegmentAllocator allocator) {
+            return allocator.allocate(layout());
+        }
+
+        /**
+         * Allocate an array of size {@code elementCount} using {@code allocator}.
+         * The returned segment has size {@code elementCount * layout().byteSize()}.
+         */
+        public static MemorySegment allocateArray(long elementCount, SegmentAllocator allocator) {
+            return allocator.allocate(MemoryLayout.sequenceLayout(elementCount, layout()));
+        }
+
+        /**
+         * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+         * The returned segment has size {@code layout().byteSize()}
+         */
+        public static MemorySegment reinterpret(MemorySegment addr, Arena arena, Consumer<MemorySegment> cleanup) {
+            return reinterpret(addr, 1, arena, cleanup);
+        }
+
+        /**
+         * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+         * The returned segment has size {@code elementCount * layout().byteSize()}
+         */
+        public static MemorySegment reinterpret(MemorySegment addr, long elementCount, Arena arena, Consumer<MemorySegment> cleanup) {
+            return addr.reinterpret(layout().byteSize() * elementCount, arena, cleanup);
+        }
     }
 
-    public static MemorySegment cert_data$slice(MemorySegment seg) {
-        return seg.asSlice(8, 24);
+    private static final GroupLayout cert_data$LAYOUT = (GroupLayout)$LAYOUT.select(groupElement("cert_data"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * union {
+     *     struct {
+     *         const char *cert_path;
+     *         const char *key_path;
+     *     } file;
+     *     struct {
+     *         const char *cert_path;
+     *         const char *key_path;
+     *         const char *password;
+     *     } protected_file;
+     *     struct {
+     *         const char *thumbprint;
+     *     } hash;
+     *     struct {
+     *         const char *thumbprint;
+     *         const char *store_name;
+     *     } hash_store;
+     *     struct {
+     *         const void *data;
+     *         size_t data_size;
+     *         const char *password;
+     *     } pkcs12;
+     *     void *context;
+     * } cert_data
+     * }
+     */
+    public static final GroupLayout cert_data$layout() {
+        return cert_data$LAYOUT;
     }
-    public static VarHandle principal$VH() {
-        return constants$14.const$4;
+
+    private static final long cert_data$OFFSET = $LAYOUT.byteOffset(groupElement("cert_data"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * union {
+     *     struct {
+     *         const char *cert_path;
+     *         const char *key_path;
+     *     } file;
+     *     struct {
+     *         const char *cert_path;
+     *         const char *key_path;
+     *         const char *password;
+     *     } protected_file;
+     *     struct {
+     *         const char *thumbprint;
+     *     } hash;
+     *     struct {
+     *         const char *thumbprint;
+     *         const char *store_name;
+     *     } hash_store;
+     *     struct {
+     *         const void *data;
+     *         size_t data_size;
+     *         const char *password;
+     *     } pkcs12;
+     *     void *context;
+     * } cert_data
+     * }
+     */
+    public static final long cert_data$offset() {
+        return cert_data$OFFSET;
     }
+
     /**
      * Getter for field:
-     * {@snippet :
-     * char* principal;
+     * {@snippet lang=c :
+     * union {
+     *     struct {
+     *         const char *cert_path;
+     *         const char *key_path;
+     *     } file;
+     *     struct {
+     *         const char *cert_path;
+     *         const char *key_path;
+     *         const char *password;
+     *     } protected_file;
+     *     struct {
+     *         const char *thumbprint;
+     *     } hash;
+     *     struct {
+     *         const char *thumbprint;
+     *         const char *store_name;
+     *     } hash_store;
+     *     struct {
+     *         const void *data;
+     *         size_t data_size;
+     *         const char *password;
+     *     } pkcs12;
+     *     void *context;
+     * } cert_data
      * }
      */
-    public static MemorySegment principal$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$14.const$4.get(seg);
+    public static MemorySegment cert_data(MemorySegment struct) {
+        return struct.asSlice(cert_data$OFFSET, cert_data$LAYOUT.byteSize());
     }
+
     /**
      * Setter for field:
-     * {@snippet :
-     * char* principal;
+     * {@snippet lang=c :
+     * union {
+     *     struct {
+     *         const char *cert_path;
+     *         const char *key_path;
+     *     } file;
+     *     struct {
+     *         const char *cert_path;
+     *         const char *key_path;
+     *         const char *password;
+     *     } protected_file;
+     *     struct {
+     *         const char *thumbprint;
+     *     } hash;
+     *     struct {
+     *         const char *thumbprint;
+     *         const char *store_name;
+     *     } hash_store;
+     *     struct {
+     *         const void *data;
+     *         size_t data_size;
+     *         const char *password;
+     *     } pkcs12;
+     *     void *context;
+     * } cert_data
      * }
      */
-    public static void principal$set(MemorySegment seg, MemorySegment x) {
-        constants$14.const$4.set(seg, x);
+    public static void cert_data(MemorySegment struct, MemorySegment fieldValue) {
+        MemorySegment.copy(fieldValue, 0L, struct, cert_data$OFFSET, cert_data$LAYOUT.byteSize());
     }
-    public static MemorySegment principal$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$14.const$4.get(seg.asSlice(index*sizeof()));
+
+    private static final AddressLayout principal$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("principal"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * const char *principal
+     * }
+     */
+    public static final AddressLayout principal$layout() {
+        return principal$LAYOUT;
     }
-    public static void principal$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$14.const$4.set(seg.asSlice(index*sizeof()), x);
+
+    private static final long principal$OFFSET = $LAYOUT.byteOffset(groupElement("principal"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * const char *principal
+     * }
+     */
+    public static final long principal$offset() {
+        return principal$OFFSET;
     }
-    public static VarHandle ca_cert_file$VH() {
-        return constants$14.const$5;
-    }
+
     /**
      * Getter for field:
-     * {@snippet :
-     * char* ca_cert_file;
+     * {@snippet lang=c :
+     * const char *principal
      * }
      */
-    public static MemorySegment ca_cert_file$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$14.const$5.get(seg);
+    public static MemorySegment principal(MemorySegment struct) {
+        return struct.get(principal$LAYOUT, principal$OFFSET);
     }
+
     /**
      * Setter for field:
-     * {@snippet :
-     * char* ca_cert_file;
+     * {@snippet lang=c :
+     * const char *principal
      * }
      */
-    public static void ca_cert_file$set(MemorySegment seg, MemorySegment x) {
-        constants$14.const$5.set(seg, x);
+    public static void principal(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(principal$LAYOUT, principal$OFFSET, fieldValue);
     }
-    public static MemorySegment ca_cert_file$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$14.const$5.get(seg.asSlice(index*sizeof()));
+
+    private static final AddressLayout ca_cert_file$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("ca_cert_file"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * const char *ca_cert_file
+     * }
+     */
+    public static final AddressLayout ca_cert_file$layout() {
+        return ca_cert_file$LAYOUT;
     }
-    public static void ca_cert_file$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$14.const$5.set(seg.asSlice(index*sizeof()), x);
+
+    private static final long ca_cert_file$OFFSET = $LAYOUT.byteOffset(groupElement("ca_cert_file"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * const char *ca_cert_file
+     * }
+     */
+    public static final long ca_cert_file$offset() {
+        return ca_cert_file$OFFSET;
     }
-    public static long sizeof() { return $LAYOUT().byteSize(); }
-    public static MemorySegment allocate(SegmentAllocator allocator) { return allocator.allocate($LAYOUT()); }
-    public static MemorySegment allocateArray(long len, SegmentAllocator allocator) {
-        return allocator.allocate(MemoryLayout.sequenceLayout(len, $LAYOUT()));
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * const char *ca_cert_file
+     * }
+     */
+    public static MemorySegment ca_cert_file(MemorySegment struct) {
+        return struct.get(ca_cert_file$LAYOUT, ca_cert_file$OFFSET);
     }
-    public static MemorySegment ofAddress(MemorySegment addr, Arena arena) { return RuntimeHelper.asArray(addr, $LAYOUT(), 1, arena); }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * const char *ca_cert_file
+     * }
+     */
+    public static void ca_cert_file(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(ca_cert_file$LAYOUT, ca_cert_file$OFFSET, fieldValue);
+    }
+
+    /**
+     * Obtains a slice of {@code arrayParam} which selects the array element at {@code index}.
+     * The returned segment has address {@code arrayParam.address() + index * layout().byteSize()}
+     */
+    public static MemorySegment asSlice(MemorySegment array, long index) {
+        return array.asSlice(layout().byteSize() * index);
+    }
+
+    /**
+     * The size (in bytes) of this struct
+     */
+    public static long sizeof() { return layout().byteSize(); }
+
+    /**
+     * Allocate a segment of size {@code layout().byteSize()} using {@code allocator}
+     */
+    public static MemorySegment allocate(SegmentAllocator allocator) {
+        return allocator.allocate(layout());
+    }
+
+    /**
+     * Allocate an array of size {@code elementCount} using {@code allocator}.
+     * The returned segment has size {@code elementCount * layout().byteSize()}.
+     */
+    public static MemorySegment allocateArray(long elementCount, SegmentAllocator allocator) {
+        return allocator.allocate(MemoryLayout.sequenceLayout(elementCount, layout()));
+    }
+
+    /**
+     * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+     * The returned segment has size {@code layout().byteSize()}
+     */
+    public static MemorySegment reinterpret(MemorySegment addr, Arena arena, Consumer<MemorySegment> cleanup) {
+        return reinterpret(addr, 1, arena, cleanup);
+    }
+
+    /**
+     * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+     * The returned segment has size {@code elementCount * layout().byteSize()}
+     */
+    public static MemorySegment reinterpret(MemorySegment addr, long elementCount, Arena arena, Consumer<MemorySegment> cleanup) {
+        return addr.reinterpret(layout().byteSize() * elementCount, arena, cleanup);
+    }
 }
-
 

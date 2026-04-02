@@ -2,32 +2,70 @@
 
 package com.structmap.webtransportfast;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
+
 import static java.lang.foreign.ValueLayout.*;
+import static java.lang.foreign.MemoryLayout.PathElement.*;
+
 /**
- * {@snippet :
- * enum  (*wtf_connection_validator_t)(struct * request,void* user_context);
+ * {@snippet lang=c :
+ * typedef wtf_connection_decision_t (*wtf_connection_validator_t)(const wtf_connection_request_t *, void *)
  * }
  */
-public interface wtf_connection_validator_t {
+public final class wtf_connection_validator_t {
 
-    int apply(java.lang.foreign.MemorySegment request, java.lang.foreign.MemorySegment user_context);
-    static MemorySegment allocate(wtf_connection_validator_t fi, Arena scope) {
-        return RuntimeHelper.upcallStub(constants$10.const$0, fi, constants$9.const$5, scope);
+    private wtf_connection_validator_t() {
+        // Should not be called directly
     }
-    static wtf_connection_validator_t ofAddress(MemorySegment addr, Arena arena) {
-        MemorySegment symbol = addr.reinterpret(arena, null);
-        return (java.lang.foreign.MemorySegment _request, java.lang.foreign.MemorySegment _user_context) -> {
-            try {
-                return (int)constants$10.const$1.invokeExact(symbol, _request, _user_context);
-            } catch (Throwable ex$) {
-                throw new AssertionError("should not reach here", ex$);
-            }
-        };
+
+    /**
+     * The function pointer signature, expressed as a functional interface
+     */
+    public interface Function {
+        int apply(MemorySegment request, MemorySegment user_context);
+    }
+
+    private static final FunctionDescriptor $DESC = FunctionDescriptor.of(
+        wtf_h.C_INT,
+        wtf_h.C_POINTER,
+        wtf_h.C_POINTER
+    );
+
+    /**
+     * The descriptor of this function pointer
+     */
+    public static FunctionDescriptor descriptor() {
+        return $DESC;
+    }
+
+    private static final MethodHandle UP$MH = wtf_h.upcallHandle(wtf_connection_validator_t.Function.class, "apply", $DESC);
+
+    /**
+     * Allocates a new upcall stub, whose implementation is defined by {@code fi}.
+     * The lifetime of the returned segment is managed by {@code arena}
+     */
+    public static MemorySegment allocate(wtf_connection_validator_t.Function fi, Arena arena) {
+        return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, arena);
+    }
+
+    private static final MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
+
+    /**
+     * Invoke the upcall stub {@code funcPtr}, with given parameters
+     */
+    public static int invoke(MemorySegment funcPtr, MemorySegment request, MemorySegment user_context) {
+        try {
+            return (int) DOWN$MH.invokeExact(funcPtr, request, user_context);
+        } catch (Error | RuntimeException ex) {
+            throw ex;
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
     }
 }
-
 

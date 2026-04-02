@@ -2,398 +2,680 @@
 
 package com.structmap.webtransportfast;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.VarHandle;
-import java.nio.ByteOrder;
+import java.lang.invoke.*;
 import java.lang.foreign.*;
+import java.nio.ByteOrder;
+import java.util.*;
+import java.util.function.*;
+import java.util.stream.*;
+
 import static java.lang.foreign.ValueLayout.*;
+import static java.lang.foreign.MemoryLayout.PathElement.*;
+
 /**
- * {@snippet :
+ * {@snippet lang=c :
  * struct {
- *     char* host;
+ *     const char *host;
  *     uint16_t port;
- *     wtf_certificate_config_t* cert_config;
+ *     wtf_certificate_config_t *cert_config;
  *     uint32_t max_sessions_per_connection;
  *     uint32_t max_streams_per_session;
  *     uint64_t max_data_per_session;
  *     uint32_t idle_timeout_ms;
  *     uint32_t handshake_timeout_ms;
- *     _Bool enable_0rtt;
- *     _Bool enable_migration;
+ *     bool enable_0rtt;
+ *     bool enable_migration;
  *     wtf_connection_validator_t connection_validator;
  *     wtf_session_callback_t session_callback;
- *     void* user_context;
- * };
+ *     void *user_context;
+ * }
  * }
  */
 public class wtf_server_config_t {
 
-    public static MemoryLayout $LAYOUT() {
-        return constants$15.const$0;
+    wtf_server_config_t() {
+        // Should not be called directly
     }
-    public static VarHandle host$VH() {
-        return constants$15.const$1;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * char* host;
-     * }
-     */
-    public static MemorySegment host$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$15.const$1.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * char* host;
-     * }
-     */
-    public static void host$set(MemorySegment seg, MemorySegment x) {
-        constants$15.const$1.set(seg, x);
-    }
-    public static MemorySegment host$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$15.const$1.get(seg.asSlice(index*sizeof()));
-    }
-    public static void host$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$15.const$1.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle port$VH() {
-        return constants$15.const$2;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * uint16_t port;
-     * }
-     */
-    public static short port$get(MemorySegment seg) {
-        return (short)constants$15.const$2.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * uint16_t port;
-     * }
-     */
-    public static void port$set(MemorySegment seg, short x) {
-        constants$15.const$2.set(seg, x);
-    }
-    public static short port$get(MemorySegment seg, long index) {
-        return (short)constants$15.const$2.get(seg.asSlice(index*sizeof()));
-    }
-    public static void port$set(MemorySegment seg, long index, short x) {
-        constants$15.const$2.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle cert_config$VH() {
-        return constants$15.const$3;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * wtf_certificate_config_t* cert_config;
-     * }
-     */
-    public static MemorySegment cert_config$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$15.const$3.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * wtf_certificate_config_t* cert_config;
-     * }
-     */
-    public static void cert_config$set(MemorySegment seg, MemorySegment x) {
-        constants$15.const$3.set(seg, x);
-    }
-    public static MemorySegment cert_config$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$15.const$3.get(seg.asSlice(index*sizeof()));
-    }
-    public static void cert_config$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$15.const$3.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle max_sessions_per_connection$VH() {
-        return constants$15.const$4;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * uint32_t max_sessions_per_connection;
-     * }
-     */
-    public static int max_sessions_per_connection$get(MemorySegment seg) {
-        return (int)constants$15.const$4.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * uint32_t max_sessions_per_connection;
-     * }
-     */
-    public static void max_sessions_per_connection$set(MemorySegment seg, int x) {
-        constants$15.const$4.set(seg, x);
-    }
-    public static int max_sessions_per_connection$get(MemorySegment seg, long index) {
-        return (int)constants$15.const$4.get(seg.asSlice(index*sizeof()));
-    }
-    public static void max_sessions_per_connection$set(MemorySegment seg, long index, int x) {
-        constants$15.const$4.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle max_streams_per_session$VH() {
-        return constants$15.const$5;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * uint32_t max_streams_per_session;
-     * }
-     */
-    public static int max_streams_per_session$get(MemorySegment seg) {
-        return (int)constants$15.const$5.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * uint32_t max_streams_per_session;
-     * }
-     */
-    public static void max_streams_per_session$set(MemorySegment seg, int x) {
-        constants$15.const$5.set(seg, x);
-    }
-    public static int max_streams_per_session$get(MemorySegment seg, long index) {
-        return (int)constants$15.const$5.get(seg.asSlice(index*sizeof()));
-    }
-    public static void max_streams_per_session$set(MemorySegment seg, long index, int x) {
-        constants$15.const$5.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle max_data_per_session$VH() {
-        return constants$16.const$0;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * uint64_t max_data_per_session;
-     * }
-     */
-    public static long max_data_per_session$get(MemorySegment seg) {
-        return (long)constants$16.const$0.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * uint64_t max_data_per_session;
-     * }
-     */
-    public static void max_data_per_session$set(MemorySegment seg, long x) {
-        constants$16.const$0.set(seg, x);
-    }
-    public static long max_data_per_session$get(MemorySegment seg, long index) {
-        return (long)constants$16.const$0.get(seg.asSlice(index*sizeof()));
-    }
-    public static void max_data_per_session$set(MemorySegment seg, long index, long x) {
-        constants$16.const$0.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle idle_timeout_ms$VH() {
-        return constants$16.const$1;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * uint32_t idle_timeout_ms;
-     * }
-     */
-    public static int idle_timeout_ms$get(MemorySegment seg) {
-        return (int)constants$16.const$1.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * uint32_t idle_timeout_ms;
-     * }
-     */
-    public static void idle_timeout_ms$set(MemorySegment seg, int x) {
-        constants$16.const$1.set(seg, x);
-    }
-    public static int idle_timeout_ms$get(MemorySegment seg, long index) {
-        return (int)constants$16.const$1.get(seg.asSlice(index*sizeof()));
-    }
-    public static void idle_timeout_ms$set(MemorySegment seg, long index, int x) {
-        constants$16.const$1.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle handshake_timeout_ms$VH() {
-        return constants$16.const$2;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * uint32_t handshake_timeout_ms;
-     * }
-     */
-    public static int handshake_timeout_ms$get(MemorySegment seg) {
-        return (int)constants$16.const$2.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * uint32_t handshake_timeout_ms;
-     * }
-     */
-    public static void handshake_timeout_ms$set(MemorySegment seg, int x) {
-        constants$16.const$2.set(seg, x);
-    }
-    public static int handshake_timeout_ms$get(MemorySegment seg, long index) {
-        return (int)constants$16.const$2.get(seg.asSlice(index*sizeof()));
-    }
-    public static void handshake_timeout_ms$set(MemorySegment seg, long index, int x) {
-        constants$16.const$2.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle enable_0rtt$VH() {
-        return constants$16.const$3;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * _Bool enable_0rtt;
-     * }
-     */
-    public static boolean enable_0rtt$get(MemorySegment seg) {
-        return (boolean)constants$16.const$3.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * _Bool enable_0rtt;
-     * }
-     */
-    public static void enable_0rtt$set(MemorySegment seg, boolean x) {
-        constants$16.const$3.set(seg, x);
-    }
-    public static boolean enable_0rtt$get(MemorySegment seg, long index) {
-        return (boolean)constants$16.const$3.get(seg.asSlice(index*sizeof()));
-    }
-    public static void enable_0rtt$set(MemorySegment seg, long index, boolean x) {
-        constants$16.const$3.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle enable_migration$VH() {
-        return constants$16.const$4;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * _Bool enable_migration;
-     * }
-     */
-    public static boolean enable_migration$get(MemorySegment seg) {
-        return (boolean)constants$16.const$4.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * _Bool enable_migration;
-     * }
-     */
-    public static void enable_migration$set(MemorySegment seg, boolean x) {
-        constants$16.const$4.set(seg, x);
-    }
-    public static boolean enable_migration$get(MemorySegment seg, long index) {
-        return (boolean)constants$16.const$4.get(seg.asSlice(index*sizeof()));
-    }
-    public static void enable_migration$set(MemorySegment seg, long index, boolean x) {
-        constants$16.const$4.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static VarHandle connection_validator$VH() {
-        return constants$16.const$5;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * wtf_connection_validator_t connection_validator;
-     * }
-     */
-    public static MemorySegment connection_validator$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$16.const$5.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * wtf_connection_validator_t connection_validator;
-     * }
-     */
-    public static void connection_validator$set(MemorySegment seg, MemorySegment x) {
-        constants$16.const$5.set(seg, x);
-    }
-    public static MemorySegment connection_validator$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$16.const$5.get(seg.asSlice(index*sizeof()));
-    }
-    public static void connection_validator$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$16.const$5.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static wtf_connection_validator_t connection_validator(MemorySegment segment, Arena scope) {
-        return wtf_connection_validator_t.ofAddress(connection_validator$get(segment), scope);
-    }
-    public static VarHandle session_callback$VH() {
-        return constants$17.const$0;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * wtf_session_callback_t session_callback;
-     * }
-     */
-    public static MemorySegment session_callback$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$17.const$0.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * wtf_session_callback_t session_callback;
-     * }
-     */
-    public static void session_callback$set(MemorySegment seg, MemorySegment x) {
-        constants$17.const$0.set(seg, x);
-    }
-    public static MemorySegment session_callback$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$17.const$0.get(seg.asSlice(index*sizeof()));
-    }
-    public static void session_callback$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$17.const$0.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static wtf_session_callback_t session_callback(MemorySegment segment, Arena scope) {
-        return wtf_session_callback_t.ofAddress(session_callback$get(segment), scope);
-    }
-    public static VarHandle user_context$VH() {
-        return constants$17.const$1;
-    }
-    /**
-     * Getter for field:
-     * {@snippet :
-     * void* user_context;
-     * }
-     */
-    public static MemorySegment user_context$get(MemorySegment seg) {
-        return (java.lang.foreign.MemorySegment)constants$17.const$1.get(seg);
-    }
-    /**
-     * Setter for field:
-     * {@snippet :
-     * void* user_context;
-     * }
-     */
-    public static void user_context$set(MemorySegment seg, MemorySegment x) {
-        constants$17.const$1.set(seg, x);
-    }
-    public static MemorySegment user_context$get(MemorySegment seg, long index) {
-        return (java.lang.foreign.MemorySegment)constants$17.const$1.get(seg.asSlice(index*sizeof()));
-    }
-    public static void user_context$set(MemorySegment seg, long index, MemorySegment x) {
-        constants$17.const$1.set(seg.asSlice(index*sizeof()), x);
-    }
-    public static long sizeof() { return $LAYOUT().byteSize(); }
-    public static MemorySegment allocate(SegmentAllocator allocator) { return allocator.allocate($LAYOUT()); }
-    public static MemorySegment allocateArray(long len, SegmentAllocator allocator) {
-        return allocator.allocate(MemoryLayout.sequenceLayout(len, $LAYOUT()));
-    }
-    public static MemorySegment ofAddress(MemorySegment addr, Arena arena) { return RuntimeHelper.asArray(addr, $LAYOUT(), 1, arena); }
-}
 
+    private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
+        wtf_h.C_POINTER.withName("host"),
+        wtf_h.C_SHORT.withName("port"),
+        MemoryLayout.paddingLayout(6),
+        wtf_h.C_POINTER.withName("cert_config"),
+        wtf_h.C_INT.withName("max_sessions_per_connection"),
+        wtf_h.C_INT.withName("max_streams_per_session"),
+        wtf_h.C_LONG_LONG.withName("max_data_per_session"),
+        wtf_h.C_INT.withName("idle_timeout_ms"),
+        wtf_h.C_INT.withName("handshake_timeout_ms"),
+        wtf_h.C_BOOL.withName("enable_0rtt"),
+        wtf_h.C_BOOL.withName("enable_migration"),
+        MemoryLayout.paddingLayout(6),
+        wtf_h.C_POINTER.withName("connection_validator"),
+        wtf_h.C_POINTER.withName("session_callback"),
+        wtf_h.C_POINTER.withName("user_context")
+    ).withName("$anon$381:9");
+
+    /**
+     * The layout of this struct
+     */
+    public static final GroupLayout layout() {
+        return $LAYOUT;
+    }
+
+    private static final AddressLayout host$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("host"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * const char *host
+     * }
+     */
+    public static final AddressLayout host$layout() {
+        return host$LAYOUT;
+    }
+
+    private static final long host$OFFSET = $LAYOUT.byteOffset(groupElement("host"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * const char *host
+     * }
+     */
+    public static final long host$offset() {
+        return host$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * const char *host
+     * }
+     */
+    public static MemorySegment host(MemorySegment struct) {
+        return struct.get(host$LAYOUT, host$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * const char *host
+     * }
+     */
+    public static void host(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(host$LAYOUT, host$OFFSET, fieldValue);
+    }
+
+    private static final OfShort port$LAYOUT = (OfShort)$LAYOUT.select(groupElement("port"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * uint16_t port
+     * }
+     */
+    public static final OfShort port$layout() {
+        return port$LAYOUT;
+    }
+
+    private static final long port$OFFSET = $LAYOUT.byteOffset(groupElement("port"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * uint16_t port
+     * }
+     */
+    public static final long port$offset() {
+        return port$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * uint16_t port
+     * }
+     */
+    public static short port(MemorySegment struct) {
+        return struct.get(port$LAYOUT, port$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * uint16_t port
+     * }
+     */
+    public static void port(MemorySegment struct, short fieldValue) {
+        struct.set(port$LAYOUT, port$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout cert_config$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("cert_config"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * wtf_certificate_config_t *cert_config
+     * }
+     */
+    public static final AddressLayout cert_config$layout() {
+        return cert_config$LAYOUT;
+    }
+
+    private static final long cert_config$OFFSET = $LAYOUT.byteOffset(groupElement("cert_config"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * wtf_certificate_config_t *cert_config
+     * }
+     */
+    public static final long cert_config$offset() {
+        return cert_config$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * wtf_certificate_config_t *cert_config
+     * }
+     */
+    public static MemorySegment cert_config(MemorySegment struct) {
+        return struct.get(cert_config$LAYOUT, cert_config$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * wtf_certificate_config_t *cert_config
+     * }
+     */
+    public static void cert_config(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(cert_config$LAYOUT, cert_config$OFFSET, fieldValue);
+    }
+
+    private static final OfInt max_sessions_per_connection$LAYOUT = (OfInt)$LAYOUT.select(groupElement("max_sessions_per_connection"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * uint32_t max_sessions_per_connection
+     * }
+     */
+    public static final OfInt max_sessions_per_connection$layout() {
+        return max_sessions_per_connection$LAYOUT;
+    }
+
+    private static final long max_sessions_per_connection$OFFSET = $LAYOUT.byteOffset(groupElement("max_sessions_per_connection"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * uint32_t max_sessions_per_connection
+     * }
+     */
+    public static final long max_sessions_per_connection$offset() {
+        return max_sessions_per_connection$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * uint32_t max_sessions_per_connection
+     * }
+     */
+    public static int max_sessions_per_connection(MemorySegment struct) {
+        return struct.get(max_sessions_per_connection$LAYOUT, max_sessions_per_connection$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * uint32_t max_sessions_per_connection
+     * }
+     */
+    public static void max_sessions_per_connection(MemorySegment struct, int fieldValue) {
+        struct.set(max_sessions_per_connection$LAYOUT, max_sessions_per_connection$OFFSET, fieldValue);
+    }
+
+    private static final OfInt max_streams_per_session$LAYOUT = (OfInt)$LAYOUT.select(groupElement("max_streams_per_session"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * uint32_t max_streams_per_session
+     * }
+     */
+    public static final OfInt max_streams_per_session$layout() {
+        return max_streams_per_session$LAYOUT;
+    }
+
+    private static final long max_streams_per_session$OFFSET = $LAYOUT.byteOffset(groupElement("max_streams_per_session"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * uint32_t max_streams_per_session
+     * }
+     */
+    public static final long max_streams_per_session$offset() {
+        return max_streams_per_session$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * uint32_t max_streams_per_session
+     * }
+     */
+    public static int max_streams_per_session(MemorySegment struct) {
+        return struct.get(max_streams_per_session$LAYOUT, max_streams_per_session$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * uint32_t max_streams_per_session
+     * }
+     */
+    public static void max_streams_per_session(MemorySegment struct, int fieldValue) {
+        struct.set(max_streams_per_session$LAYOUT, max_streams_per_session$OFFSET, fieldValue);
+    }
+
+    private static final OfLong max_data_per_session$LAYOUT = (OfLong)$LAYOUT.select(groupElement("max_data_per_session"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * uint64_t max_data_per_session
+     * }
+     */
+    public static final OfLong max_data_per_session$layout() {
+        return max_data_per_session$LAYOUT;
+    }
+
+    private static final long max_data_per_session$OFFSET = $LAYOUT.byteOffset(groupElement("max_data_per_session"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * uint64_t max_data_per_session
+     * }
+     */
+    public static final long max_data_per_session$offset() {
+        return max_data_per_session$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * uint64_t max_data_per_session
+     * }
+     */
+    public static long max_data_per_session(MemorySegment struct) {
+        return struct.get(max_data_per_session$LAYOUT, max_data_per_session$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * uint64_t max_data_per_session
+     * }
+     */
+    public static void max_data_per_session(MemorySegment struct, long fieldValue) {
+        struct.set(max_data_per_session$LAYOUT, max_data_per_session$OFFSET, fieldValue);
+    }
+
+    private static final OfInt idle_timeout_ms$LAYOUT = (OfInt)$LAYOUT.select(groupElement("idle_timeout_ms"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * uint32_t idle_timeout_ms
+     * }
+     */
+    public static final OfInt idle_timeout_ms$layout() {
+        return idle_timeout_ms$LAYOUT;
+    }
+
+    private static final long idle_timeout_ms$OFFSET = $LAYOUT.byteOffset(groupElement("idle_timeout_ms"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * uint32_t idle_timeout_ms
+     * }
+     */
+    public static final long idle_timeout_ms$offset() {
+        return idle_timeout_ms$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * uint32_t idle_timeout_ms
+     * }
+     */
+    public static int idle_timeout_ms(MemorySegment struct) {
+        return struct.get(idle_timeout_ms$LAYOUT, idle_timeout_ms$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * uint32_t idle_timeout_ms
+     * }
+     */
+    public static void idle_timeout_ms(MemorySegment struct, int fieldValue) {
+        struct.set(idle_timeout_ms$LAYOUT, idle_timeout_ms$OFFSET, fieldValue);
+    }
+
+    private static final OfInt handshake_timeout_ms$LAYOUT = (OfInt)$LAYOUT.select(groupElement("handshake_timeout_ms"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * uint32_t handshake_timeout_ms
+     * }
+     */
+    public static final OfInt handshake_timeout_ms$layout() {
+        return handshake_timeout_ms$LAYOUT;
+    }
+
+    private static final long handshake_timeout_ms$OFFSET = $LAYOUT.byteOffset(groupElement("handshake_timeout_ms"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * uint32_t handshake_timeout_ms
+     * }
+     */
+    public static final long handshake_timeout_ms$offset() {
+        return handshake_timeout_ms$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * uint32_t handshake_timeout_ms
+     * }
+     */
+    public static int handshake_timeout_ms(MemorySegment struct) {
+        return struct.get(handshake_timeout_ms$LAYOUT, handshake_timeout_ms$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * uint32_t handshake_timeout_ms
+     * }
+     */
+    public static void handshake_timeout_ms(MemorySegment struct, int fieldValue) {
+        struct.set(handshake_timeout_ms$LAYOUT, handshake_timeout_ms$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean enable_0rtt$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("enable_0rtt"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * bool enable_0rtt
+     * }
+     */
+    public static final OfBoolean enable_0rtt$layout() {
+        return enable_0rtt$LAYOUT;
+    }
+
+    private static final long enable_0rtt$OFFSET = $LAYOUT.byteOffset(groupElement("enable_0rtt"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * bool enable_0rtt
+     * }
+     */
+    public static final long enable_0rtt$offset() {
+        return enable_0rtt$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * bool enable_0rtt
+     * }
+     */
+    public static boolean enable_0rtt(MemorySegment struct) {
+        return struct.get(enable_0rtt$LAYOUT, enable_0rtt$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * bool enable_0rtt
+     * }
+     */
+    public static void enable_0rtt(MemorySegment struct, boolean fieldValue) {
+        struct.set(enable_0rtt$LAYOUT, enable_0rtt$OFFSET, fieldValue);
+    }
+
+    private static final OfBoolean enable_migration$LAYOUT = (OfBoolean)$LAYOUT.select(groupElement("enable_migration"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * bool enable_migration
+     * }
+     */
+    public static final OfBoolean enable_migration$layout() {
+        return enable_migration$LAYOUT;
+    }
+
+    private static final long enable_migration$OFFSET = $LAYOUT.byteOffset(groupElement("enable_migration"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * bool enable_migration
+     * }
+     */
+    public static final long enable_migration$offset() {
+        return enable_migration$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * bool enable_migration
+     * }
+     */
+    public static boolean enable_migration(MemorySegment struct) {
+        return struct.get(enable_migration$LAYOUT, enable_migration$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * bool enable_migration
+     * }
+     */
+    public static void enable_migration(MemorySegment struct, boolean fieldValue) {
+        struct.set(enable_migration$LAYOUT, enable_migration$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout connection_validator$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("connection_validator"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * wtf_connection_validator_t connection_validator
+     * }
+     */
+    public static final AddressLayout connection_validator$layout() {
+        return connection_validator$LAYOUT;
+    }
+
+    private static final long connection_validator$OFFSET = $LAYOUT.byteOffset(groupElement("connection_validator"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * wtf_connection_validator_t connection_validator
+     * }
+     */
+    public static final long connection_validator$offset() {
+        return connection_validator$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * wtf_connection_validator_t connection_validator
+     * }
+     */
+    public static MemorySegment connection_validator(MemorySegment struct) {
+        return struct.get(connection_validator$LAYOUT, connection_validator$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * wtf_connection_validator_t connection_validator
+     * }
+     */
+    public static void connection_validator(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(connection_validator$LAYOUT, connection_validator$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout session_callback$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("session_callback"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * wtf_session_callback_t session_callback
+     * }
+     */
+    public static final AddressLayout session_callback$layout() {
+        return session_callback$LAYOUT;
+    }
+
+    private static final long session_callback$OFFSET = $LAYOUT.byteOffset(groupElement("session_callback"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * wtf_session_callback_t session_callback
+     * }
+     */
+    public static final long session_callback$offset() {
+        return session_callback$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * wtf_session_callback_t session_callback
+     * }
+     */
+    public static MemorySegment session_callback(MemorySegment struct) {
+        return struct.get(session_callback$LAYOUT, session_callback$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * wtf_session_callback_t session_callback
+     * }
+     */
+    public static void session_callback(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(session_callback$LAYOUT, session_callback$OFFSET, fieldValue);
+    }
+
+    private static final AddressLayout user_context$LAYOUT = (AddressLayout)$LAYOUT.select(groupElement("user_context"));
+
+    /**
+     * Layout for field:
+     * {@snippet lang=c :
+     * void *user_context
+     * }
+     */
+    public static final AddressLayout user_context$layout() {
+        return user_context$LAYOUT;
+    }
+
+    private static final long user_context$OFFSET = $LAYOUT.byteOffset(groupElement("user_context"));
+
+    /**
+     * Offset for field:
+     * {@snippet lang=c :
+     * void *user_context
+     * }
+     */
+    public static final long user_context$offset() {
+        return user_context$OFFSET;
+    }
+
+    /**
+     * Getter for field:
+     * {@snippet lang=c :
+     * void *user_context
+     * }
+     */
+    public static MemorySegment user_context(MemorySegment struct) {
+        return struct.get(user_context$LAYOUT, user_context$OFFSET);
+    }
+
+    /**
+     * Setter for field:
+     * {@snippet lang=c :
+     * void *user_context
+     * }
+     */
+    public static void user_context(MemorySegment struct, MemorySegment fieldValue) {
+        struct.set(user_context$LAYOUT, user_context$OFFSET, fieldValue);
+    }
+
+    /**
+     * Obtains a slice of {@code arrayParam} which selects the array element at {@code index}.
+     * The returned segment has address {@code arrayParam.address() + index * layout().byteSize()}
+     */
+    public static MemorySegment asSlice(MemorySegment array, long index) {
+        return array.asSlice(layout().byteSize() * index);
+    }
+
+    /**
+     * The size (in bytes) of this struct
+     */
+    public static long sizeof() { return layout().byteSize(); }
+
+    /**
+     * Allocate a segment of size {@code layout().byteSize()} using {@code allocator}
+     */
+    public static MemorySegment allocate(SegmentAllocator allocator) {
+        return allocator.allocate(layout());
+    }
+
+    /**
+     * Allocate an array of size {@code elementCount} using {@code allocator}.
+     * The returned segment has size {@code elementCount * layout().byteSize()}.
+     */
+    public static MemorySegment allocateArray(long elementCount, SegmentAllocator allocator) {
+        return allocator.allocate(MemoryLayout.sequenceLayout(elementCount, layout()));
+    }
+
+    /**
+     * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+     * The returned segment has size {@code layout().byteSize()}
+     */
+    public static MemorySegment reinterpret(MemorySegment addr, Arena arena, Consumer<MemorySegment> cleanup) {
+        return reinterpret(addr, 1, arena, cleanup);
+    }
+
+    /**
+     * Reinterprets {@code addr} using target {@code arena} and {@code cleanupAction} (if any).
+     * The returned segment has size {@code elementCount * layout().byteSize()}
+     */
+    public static MemorySegment reinterpret(MemorySegment addr, long elementCount, Arena arena, Consumer<MemorySegment> cleanup) {
+        return addr.reinterpret(layout().byteSize() * elementCount, arena, cleanup);
+    }
+}
 

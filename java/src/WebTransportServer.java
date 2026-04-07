@@ -1,9 +1,6 @@
 import com.structmap.webtransportfast.*;
 
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
+import java.io.*;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -213,7 +210,92 @@ class WebTransportServer {
     }
 
     void stream_callback(MemorySegment evt) {
-        // Stream event handling
+        var streamPointer = wtf_stream_event_t.stream(evt);
+        var eventType = wtf_stream_event_t.type(evt);
+
+        if (eventType == wtf_h.WTF_STREAM_EVENT_SEND_COMPLETE()) {
+            var pipes = this.streams.get(streamPointer);
+            if (pipes instanceof DuplexPipes pp) {
+                var sendComplete = wtf_stream_event_t.send_complete(evt);
+                var bufferCount = wtf_stream_event_t.send_complete.buffer_count(sendComplete);
+                var buffers = wtf_stream_event_t.send_complete.buffers(sendComplete);
+
+                for (int i = 0; i < bufferCount; i++) {
+                    var buffer = wtf_buffer_t.asSlice(buffers, i);
+                    var data = wtf_buffer_t.data(buffer);
+
+                    if (data != null && data.address() != 0) {
+                        var mh = pp.Sent.poll();
+                        if (mh != null) {
+                            if (data.address() != mh.address()) {
+                                System.err.printf("Buffer pointer mismatch for stream 0x%x\n",
+                                        streamPointer.address());
+                            }
+                            ((MemoryAllocator) arena).free(mh);
+                        }
+                    }
+                }
+            }
+            return;
+        }
+
+        if (eventType == wtf_h.WTF_STREAM_EVENT_DATA_RECEIVED()) {
+            var pipes = this.streams.get(streamPointer);
+            if (pipes instanceof DuplexPipes pp) {
+                var dataReceived = wtf_stream_event_t.data_received(evt);
+                var bufferCount = wtf_stream_event_t.data_received.buffer_count(dataReceived);
+                var buffers = wtf_stream_event_t.data_received.buffers(dataReceived);
+                var fin = wtf_stream_event_t.data_received.fin(dataReceived);
+
+                try {
+                    for (int i = 0; i < bufferCount; i++) {
+                        var buffer = wtf_buffer_t.asSlice(buffers, i);
+                        var length = wtf_buffer_t.length(buffer);
+                        var data = wtf_buffer_t.data(buffer);
+
+                        var bytes = new byte[(int) length];
+                        MemorySegment.copy(data, ValueLayout.JAVA_BYTE, 0, bytes, 0, (int) length);
+                        // TODO: in backpressure scenario won't this block event handler loop?
+                        // need to fix. possibly with wtf_stream_set_receive_enabled ?
+                        pp.IncomingWriter.write(bytes);
+                    }
+                    if (fin) {
+                        pp.IncomingWriter.close();
+                    }
+                } catch (IOException e) {
+                    System.err.printf("Error writing to stream 0x%x: %s\n",
+                            streamPointer.address(), e.getMessage());
+                    e.printStackTrace();
+                }
+            } else {
+                System.err.printf("Failed to cast pipes for stream 0x%x\n", streamPointer.address());
+            }
+            return;
+        }
+
+        if (eventType == wtf_h.WTF_STREAM_EVENT_PEER_CLOSED()) {
+            System.out.printf("[STREAM] Stream 0x%x closed by peer\n", streamPointer.address());
+            return;
+        }
+
+        if (eventType == wtf_h.WTF_STREAM_EVENT_CLOSED()) {
+            System.out.printf("[STREAM] Stream 0x%x fully closed\n", streamPointer.address());
+            if (this.streams.remove(streamPointer) == null) {
+                System.err.printf("Warning: no stream found 0x%x\n", streamPointer.address());
+            }
+            return;
+        }
+
+        if (eventType == wtf_h.WTF_STREAM_EVENT_ABORTED()) {
+            var aborted = wtf_stream_event_t.aborted(evt);
+            var errorCode = wtf_stream_event_t.aborted.error_code(aborted);
+            System.out.printf("[STREAM] Stream 0x%x aborted with error %d\n",
+                    streamPointer.address(), errorCode);
+            // if (this.streams.remove(streamPointer) == null) {
+            //     System.err.printf("Failed to remove stream 0x%x\n", streamPointer.address());
+            // }
+            return;
+        }
     }
 
     void sendLoop(DuplexPipes pipes, MemorySegment streamPointer) {

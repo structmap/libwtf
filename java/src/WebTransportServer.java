@@ -80,12 +80,9 @@ class WebTransportServer {
             var d = new Datagram(new Session(this, sessionPointer), new byte[(int) n]);
             var dataPtr = wtf_session_event_t.datagram_received.data(dr);
             MemorySegment.copy(dataPtr, ValueLayout.JAVA_BYTE, 0, d.Payload, 0, (int) n);
-            if (this.sessions.containsKey(sessionPointer)) {
-                try {
-                    this.sessions.get(sessionPointer).put(d);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            var ch = this.sessions.get(sessionPointer);
+            if (ch != null) {
+                ch.offer(d); // TODO: warn on dropped datagram (even better would be to nack at protocol level)
             } else {
                 System.err.printf("No channel for session 0x%x\n", sessionPointer.address());
             }

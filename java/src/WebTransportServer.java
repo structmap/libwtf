@@ -4,6 +4,9 @@ import java.io.*;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.Pipe;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -79,9 +82,7 @@ class WebTransportServer {
     public record Stream(Session Context, Object Identifier, InputStream Incoming, OutputStream Outgoing) {
     }
 
-    public record DuplexPipes(PipedInputStream IncomingReader, PipedOutputStream IncomingWriter,
-                              PipedInputStream OutgoingReader, PipedOutputStream OutgoingWriter,
-                              BlockingQueue<MemorySegment> Sent) {
+    public record DuplexPipes(Pipe Incoming, Pipe Outgoing, BlockingQueue<MemorySegment> Sent) {
     }
 
     void session_callback(MemorySegment evt) {
@@ -107,20 +108,14 @@ class WebTransportServer {
                         wtf_h.WTF_STREAM_BIDIRECTIONAL();
 
                 try {
-                    var incomingReader = new PipedInputStream();
-                    var incomingWriter = new PipedOutputStream(incomingReader);
-                    var outgoingReader = new PipedInputStream();
-                    var outgoingWriter = new PipedOutputStream(outgoingReader);
+                    var incoming = Pipe.open();
+                    var outgoing = Pipe.open();
 
-                    var pipes = new DuplexPipes(
-                            incomingReader, incomingWriter,
-                            outgoingReader, outgoingWriter,
-                            new LinkedBlockingQueue<>(2)
-                    );
+                    var pipes = new DuplexPipes(incoming, outgoing, new LinkedBlockingQueue<>(2));
 
                     if (!bidi) {
                         try {
-                            outgoingWriter.close();
+                            outgoing.sink().close();
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -131,8 +126,8 @@ class WebTransportServer {
                     var stream = new Stream(
                             new Session(this, sessionPointer),
                             streamPointer,
-                            incomingReader,
-                            bidi ? outgoingWriter : OutputStream.nullOutputStream()
+                            Channels.newInputStream(incoming.source()),
+                            bidi ? Channels.newOutputStream(outgoing.sink()) : OutputStream.nullOutputStream()
                     );
 
                     ch.offer(stream); // TODO: warn on dropped stream or reject it
@@ -266,10 +261,10 @@ class WebTransportServer {
                         MemorySegment.copy(data, ValueLayout.JAVA_BYTE, 0, bytes, 0, (int) length);
                         // TODO: in backpressure scenario won't this block event handler loop?
                         // need to fix. possibly with wtf_stream_set_receive_enabled ?
-                        pp.IncomingWriter.write(bytes);
+                        pp.Incoming.sink().write(ByteBuffer.wrap(bytes));
                     }
                     if (fin) {
-                        pp.IncomingWriter.close();
+                        pp.Incoming.sink().close();
                     }
                 } catch (IOException e) {
                     System.err.printf("Error writing to stream 0x%x: %s\n",
@@ -308,30 +303,23 @@ class WebTransportServer {
     }
 
     void sendLoop(DuplexPipes pipes, MemorySegment streamPointer) {
-        var outgoingReader = pipes.OutgoingReader;
+        var outgoingReader = pipes.Outgoing.source();
         var sent = pipes.Sent;
 
         while (true) {
-            byte[] buffer = new byte[4096]; // TODO: make this configurable
-            int bytesRead = -1;
-            MemorySegment dataSegment = MemorySegment.NULL;
+            var dataSegment = arena.allocate(4096);
+            var buffer = dataSegment.asByteBuffer();
+            long bytesRead = -1;
 
             try {
                 bytesRead = outgoingReader.read(buffer);
-                if (bytesRead != -1) {
-                    dataSegment = arena.allocate(bytesRead);
-                    MemorySegment.copy(buffer, 0, dataSegment, ValueLayout.JAVA_BYTE, 0, bytesRead);
-                } else {
+                if (bytesRead == -1) {
                     break;
                 }
             } catch (IOException e) {
-                var msg = e.getMessage();
-                if (msg != null && msg.equals("Write end dead")) {
-                    break;
-                } else {
-                    System.err.printf("[STREAM] Failed processing stream 0x%x: %s\n",  streamPointer.address());
-                    e.printStackTrace();
-                }
+                System.err.printf("[STREAM] Failed processing stream 0x%x: %s\n",  streamPointer.address(), e.getMessage());
+                e.printStackTrace();
+                break;
             }
 
             try {
@@ -345,7 +333,7 @@ class WebTransportServer {
             // use the fact that an array of one item is just pointer to the first
             var wtfBuffer = wtf_buffer_t.allocate(arena);
             wtf_buffer_t.data(wtfBuffer, dataSegment);
-            wtf_buffer_t.length(wtfBuffer, bytesRead);
+            wtf_buffer_t.length(wtfBuffer, (int)bytesRead);
 
             // Send data through the stream
             int result = wtf_h.wtf_stream_send(streamPointer, wtfBuffer, 1, false);

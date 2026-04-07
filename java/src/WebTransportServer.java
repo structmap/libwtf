@@ -6,6 +6,7 @@ import java.lang.foreign.ValueLayout;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 class WebTransportServer {
@@ -28,11 +29,23 @@ class WebTransportServer {
         this.sessions = new ConcurrentHashMap<>();
         this.sessionCallback = this::session_callback;
         this.channelFactory = () -> new LinkedBlockingQueue<>(10);
+        this.handler = (ch) -> {
+            // TODO handle channel closure
+            while (true) {
+                try {
+                    var msg = ch.take();
+                    System.out.printf("[SERVER] Received message: %s\n", msg);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        };
     }
 
     public ConcurrentHashMap<Object, BlockingQueue<Object>> sessions;
 
     public Supplier<BlockingQueue<Object>> channelFactory;
+    public Consumer<BlockingQueue<Object>> handler;
 
     public wtf_log_callback_t.Function logCallback;
     public wtf_connection_validator_t.Function connectionValidator;
@@ -45,6 +58,28 @@ class WebTransportServer {
             System.out.printf("[SESSION] New session connected 0x%x\n", sessionPointer.address());
             var ch = this.channelFactory.get();
             this.sessions.put(sessionPointer, ch);
+            Thread.startVirtualThread(() -> this.handler.accept(ch));
+            return;
+        }
+        if (wtf_session_event_t.type(evt) == wtf_h.WTF_SESSION_EVENT_DATAGRAM_RECEIVED()) {
+            var sessionPointer = wtf_session_event_t.session(evt);
+            var dr = wtf_session_event_t.datagram_received(evt);
+            var n = wtf_session_event_t.datagram_received.length(dr);
+            System.out.printf("[DATAGRAM] Received on session 0x%x (%d bytes)\n", sessionPointer.address(), n);
+            var bs = new byte[(int) n];
+            var dataPtr = wtf_session_event_t.datagram_received.data(dr);
+            MemorySegment.copy(dataPtr, ValueLayout.JAVA_BYTE, 0, bs, 0, (int) n);
+            var message = new String(bs, java.nio.charset.StandardCharsets.UTF_8);
+            if (this.sessions.containsKey(sessionPointer)) {
+                try {
+                    this.sessions.get(sessionPointer).put(message);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.err.printf("No channel for session 0x%x\n", sessionPointer.address());
+            }
+            return;
         }
     }
 

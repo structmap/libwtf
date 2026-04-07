@@ -4,11 +4,6 @@ import java.io.IOException;
 import java.lang.foreign.*;
 
 class EchoServer {
-    static {
-        // this needs VM option -Djava.library.path to directory
-        System.loadLibrary("msquic");
-        System.loadLibrary("wtf");
-    }
     static void log_callback(int level, MemorySegment component, MemorySegment file, int line,
                              MemorySegment message, MemorySegment user_context) {
         String[] logLevels = {

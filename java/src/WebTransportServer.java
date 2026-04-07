@@ -3,6 +3,10 @@ import com.structmap.webtransportfast.*;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.function.Supplier;
 
 class WebTransportServer {
     static {
@@ -21,10 +25,45 @@ class WebTransportServer {
         this.port = port;
         this.cert = cert;
         this.key = key;
+        this.sessions = new ConcurrentHashMap<>();
+        this.sessionCallback = this::session_callback;
+        this.channelFactory = () -> new LinkedBlockingQueue<>(10);
     }
+
+    public ConcurrentHashMap<Object, BlockingQueue<Object>> sessions;
+
+    public Supplier<BlockingQueue<Object>> channelFactory;
 
     public wtf_log_callback_t.Function logCallback;
     public wtf_connection_validator_t.Function connectionValidator;
+    public wtf_session_callback_t.Function sessionCallback;
+    public wtf_stream_callback_t.Function streamCallback;
+
+//    void session_callback(wtf_session_event_t* evt) {
+//        if (evt -> user_context == null) {
+//            evt -> user_context = ( void*)new IntPtr(1);
+//        }
+//
+//        switch (evt -> type) {
+//            case wtf_session_event_type_t.WTF_SESSION_EVENT_CONNECTED: {
+//                var sessionPointer = new IntPtr(evt -> session);
+//                Console.Out.WriteLine("[SESSION] New session connected 0x{0:x}", sessionPointer);
+//                var ch = ChannelFactory();
+//                Sessions.TryAdd(sessionPointer, ch);
+//                Task.Run(() = > Handler(ch));
+//                break;
+//            }
+//        }
+//    }
+
+    void session_callback(MemorySegment evt) {
+        if (wtf_session_event_t.type(evt) == wtf_h.WTF_SESSION_EVENT_CONNECTED()) {
+            var sessionPointer = wtf_session_event_t.session(evt);
+            System.out.printf("[SESSION] New session connected 0x%x\n", sessionPointer.address());
+            var ch = this.channelFactory.get();
+            this.sessions.put(sessionPointer, ch);
+        }
+    }
 
     boolean Start() {
         var arena = Arena.global();
@@ -55,6 +94,10 @@ class WebTransportServer {
                 cert_data
         );
 
+        var sessionCallback = wtf_session_callback_t.allocate(
+                this.sessionCallback,
+                arena
+        );
         var connectionValidator = wtf_connection_validator_t.allocate(
                 this.connectionValidator,
                 arena
@@ -63,7 +106,7 @@ class WebTransportServer {
         var server_config = wtf_server_config_t.allocate(arena);
         wtf_server_config_t.port(server_config, (short)this.port);
         wtf_server_config_t.cert_config(server_config, cert_config);
-        wtf_server_config_t.session_callback(server_config, MemorySegment.NULL);
+        wtf_server_config_t.session_callback(server_config, sessionCallback);
         wtf_server_config_t.connection_validator(server_config, connectionValidator);
         wtf_server_config_t.max_sessions_per_connection(server_config, 32);
         wtf_server_config_t.max_streams_per_session(server_config, 256);

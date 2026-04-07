@@ -161,11 +161,5 @@ class WebTransportServer {
         wtf_h.wtf_server_stop(g_server.get(ValueLayout.ADDRESS, 0));
         wtf_h.wtf_server_destroy(g_server.get(ValueLayout.ADDRESS, 0));
         wtf_h.wtf_context_destroy(g_context.get(ValueLayout.ADDRESS, 0));
-
-//        Linker nativeLinker = Linker.nativeLinker();
-//        SymbolLookup stdlib = nativeLinker.defaultLookup();
-//        MemorySegment malloc = stdlib.find("malloc").orElseThrow();
-//        System.out.printf("%x\n", malloc.address());
-
     }
 }

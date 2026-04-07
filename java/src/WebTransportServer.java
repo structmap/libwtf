@@ -34,7 +34,10 @@ class WebTransportServer {
             while (true) {
                 try {
                     var msg = ch.take();
-                    System.out.printf("[SERVER] Received message: %s\n", msg);
+                    if (msg instanceof Datagram dg) {
+                        System.out.printf("[SERVER] Received message: %s\n", msg);
+                        this.Send(dg.Context.Identifier, dg.Payload);
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

@@ -72,6 +72,31 @@ class WebTransportServer {
             Thread.startVirtualThread(() -> this.handler.accept(ch));
             return;
         }
+
+        if (wtf_session_event_t.type(evt) == wtf_h.WTF_SESSION_EVENT_DISCONNECTED()) {
+            var sessionPointer = wtf_session_event_t.session(evt);
+            var disconnected = wtf_session_event_t.disconnected(evt);
+            var reasonPtr = wtf_session_event_t.disconnected.reason(disconnected);
+            var msg = "none";
+            if (reasonPtr != null && reasonPtr.address() != 0) {
+                var reasonStr = reasonPtr.getString(0);
+                if (reasonStr != null && !reasonStr.isEmpty()) {
+                    msg = reasonStr;
+                }
+            }
+            var errorCode = wtf_session_event_t.disconnected.error_code(disconnected);
+
+            System.out.printf("[SESSION] Session 0x%x disconnected (error: %d, reason: %s)\n",
+                    sessionPointer.address(), errorCode, msg);
+
+            var ch = this.sessions.remove(sessionPointer);
+            if (ch != null) {
+                // Note: BlockingQueue doesn't have a Writer.TryComplete() equivalent
+                // The channel will be garbage collected when no longer referenced
+            }
+            return;
+        }
+
         if (wtf_session_event_t.type(evt) == wtf_h.WTF_SESSION_EVENT_DATAGRAM_RECEIVED()) {
             var sessionPointer = wtf_session_event_t.session(evt);
             var dr = wtf_session_event_t.datagram_received(evt);
@@ -107,6 +132,10 @@ class WebTransportServer {
                 }
             }
             return;
+        }
+        if (wtf_session_event_t.type(evt) == wtf_h.WTF_SESSION_EVENT_DRAINING()) {
+            var sessionPointer = wtf_session_event_t.session(evt);
+            System.out.printf("[SESSION] Session 0x%x is draining\n", sessionPointer.address());
         }
     }
 

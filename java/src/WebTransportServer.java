@@ -1,5 +1,9 @@
 import com.structmap.webtransportfast.*;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.lang.foreign.Arena;
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
@@ -29,6 +33,8 @@ class WebTransportServer {
         this.key = key;
         this.sessions = new ConcurrentHashMap<>();
         this.sessionCallback = this::session_callback;
+        this.streams = new ConcurrentHashMap<>();
+        this.streamCallback = this::stream_callback;
         this.channelFactory = () -> new LinkedBlockingQueue<>(10);
         this.handler = (ch) -> {
             // TODO handle channel closure
@@ -48,6 +54,7 @@ class WebTransportServer {
     }
 
     public ConcurrentHashMap<Object, BlockingQueue<Object>> sessions;
+    public ConcurrentHashMap<Object,Object> streams;
 
     public Supplier<BlockingQueue<Object>> channelFactory;
     public Consumer<BlockingQueue<Object>> handler;
@@ -63,6 +70,14 @@ class WebTransportServer {
     public record Datagram(Session Context, byte[] Payload) {
     }
 
+    public record Stream(Session Context, Object Identifier, InputStream Incoming, OutputStream Outgoing) {
+    }
+
+    public record DuplexPipes(PipedInputStream IncomingReader, PipedOutputStream IncomingWriter,
+                              PipedInputStream OutgoingReader, PipedOutputStream OutgoingWriter,
+                              BlockingQueue<MemorySegment> Sent) {
+    }
+
     void session_callback(MemorySegment evt) {
         if (wtf_session_event_t.type(evt) == wtf_h.WTF_SESSION_EVENT_CONNECTED()) {
             var sessionPointer = wtf_session_event_t.session(evt);
@@ -70,6 +85,64 @@ class WebTransportServer {
             var ch = this.channelFactory.get();
             this.sessions.put(sessionPointer, ch);
             Thread.startVirtualThread(() -> this.handler.accept(ch));
+            return;
+        }
+
+        if (wtf_session_event_t.type(evt) == wtf_h.WTF_SESSION_EVENT_STREAM_OPENED()) {
+            var sessionPointer = wtf_session_event_t.session(evt);
+            var streamOpened = wtf_session_event_t.stream_opened(evt);
+            var streamPointer = wtf_session_event_t.stream_opened.stream(streamOpened);
+            System.out.printf("[SESSION] New stream 0x%x opened on session 0x%x\n",
+                    streamPointer.address(), sessionPointer.address());
+
+            var ch = this.sessions.get(sessionPointer);
+            if (ch != null) {
+                boolean bidi = wtf_session_event_t.stream_opened.stream_type(streamOpened) ==
+                        wtf_h.WTF_STREAM_BIDIRECTIONAL();
+
+                try {
+                    var incomingReader = new PipedInputStream();
+                    var incomingWriter = new PipedOutputStream(incomingReader);
+                    var outgoingReader = new PipedInputStream();
+                    var outgoingWriter = new PipedOutputStream(outgoingReader);
+
+                    var pipes = new DuplexPipes(
+                            incomingReader, incomingWriter,
+                            outgoingReader, outgoingWriter,
+                            new LinkedBlockingQueue<>(2)
+                    );
+
+                    if (!bidi) {
+                        try {
+                            outgoingWriter.close();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    this.streams.put(streamPointer, pipes);
+
+                    var stream = new Stream(
+                            new Session(this, sessionPointer),
+                            streamPointer,
+                            incomingReader,
+                            bidi ? outgoingWriter : OutputStream.nullOutputStream()
+                    );
+
+                    ch.offer(stream); // TODO: warn on dropped stream or reject it
+
+                    if (bidi) {
+                        Thread.startVirtualThread(() -> sendLoop(pipes, streamPointer));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            wtf_h.wtf_stream_set_callback(streamPointer,
+                    wtf_stream_callback_t.allocate(this.streamCallback, arena));
+
+            System.out.printf("[SESSION] Stream 0x%x configured\n", streamPointer.address());
             return;
         }
 
@@ -137,6 +210,14 @@ class WebTransportServer {
             var sessionPointer = wtf_session_event_t.session(evt);
             System.out.printf("[SESSION] Session 0x%x is draining\n", sessionPointer.address());
         }
+    }
+
+    void stream_callback(MemorySegment evt) {
+        // Stream event handling
+    }
+
+    void sendLoop(DuplexPipes pipes, MemorySegment streamPointer) {
+        // TODO: Implement send loop for bidirectional streams
     }
 
     public boolean Send(Object session, byte[] data) {

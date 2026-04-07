@@ -283,6 +283,7 @@ class WebTransportServer {
     }
 
     boolean Start() {
+        var arena = Arena.global();
         var logCallback = wtf_log_callback_t.allocate(
                 this.logCallback,
                 arena

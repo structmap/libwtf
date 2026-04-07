@@ -52,6 +52,12 @@ class WebTransportServer {
     public wtf_session_callback_t.Function sessionCallback;
     public wtf_stream_callback_t.Function streamCallback;
 
+    public record Session(WebTransportServer Server, Object Identifier) {
+    }
+
+    public record Datagram(Session Context, byte[] Payload) {
+    }
+
     void session_callback(MemorySegment evt) {
         if (wtf_session_event_t.type(evt) == wtf_h.WTF_SESSION_EVENT_CONNECTED()) {
             var sessionPointer = wtf_session_event_t.session(evt);
@@ -66,13 +72,12 @@ class WebTransportServer {
             var dr = wtf_session_event_t.datagram_received(evt);
             var n = wtf_session_event_t.datagram_received.length(dr);
             System.out.printf("[DATAGRAM] Received on session 0x%x (%d bytes)\n", sessionPointer.address(), n);
-            var bs = new byte[(int) n];
+            var d = new Datagram(new Session(this, sessionPointer.address()), new byte[(int) n]);
             var dataPtr = wtf_session_event_t.datagram_received.data(dr);
-            MemorySegment.copy(dataPtr, ValueLayout.JAVA_BYTE, 0, bs, 0, (int) n);
-            var message = new String(bs, java.nio.charset.StandardCharsets.UTF_8);
+            MemorySegment.copy(dataPtr, ValueLayout.JAVA_BYTE, 0, d.Payload, 0, (int) n);
             if (this.sessions.containsKey(sessionPointer)) {
                 try {
-                    this.sessions.get(sessionPointer).put(message);
+                    this.sessions.get(sessionPointer).put(d);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

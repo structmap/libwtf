@@ -1037,7 +1037,7 @@ public class wtf_certificate_config_t {
 
             private static final GroupLayout $LAYOUT = MemoryLayout.structLayout(
                 wtf_h.C_POINTER.withName("data"),
-                wtf_h.C_LONG_LONG.withName("data_size"),
+                wtf_h.C_LONG.withName("data_size"),
                 wtf_h.C_POINTER.withName("password")
             ).withName("$anon$366:9");
 

@@ -39,23 +39,6 @@ class WebTransportServer {
     public wtf_session_callback_t.Function sessionCallback;
     public wtf_stream_callback_t.Function streamCallback;
 
-//    void session_callback(wtf_session_event_t* evt) {
-//        if (evt -> user_context == null) {
-//            evt -> user_context = ( void*)new IntPtr(1);
-//        }
-//
-//        switch (evt -> type) {
-//            case wtf_session_event_type_t.WTF_SESSION_EVENT_CONNECTED: {
-//                var sessionPointer = new IntPtr(evt -> session);
-//                Console.Out.WriteLine("[SESSION] New session connected 0x{0:x}", sessionPointer);
-//                var ch = ChannelFactory();
-//                Sessions.TryAdd(sessionPointer, ch);
-//                Task.Run(() = > Handler(ch));
-//                break;
-//            }
-//        }
-//    }
-
     void session_callback(MemorySegment evt) {
         if (wtf_session_event_t.type(evt) == wtf_h.WTF_SESSION_EVENT_CONNECTED()) {
             var sessionPointer = wtf_session_event_t.session(evt);

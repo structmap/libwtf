@@ -50,293 +50,149 @@ public class wtf_h extends wtf_h$shared {
     public static int __bool_true_false_are_defined() {
         return __bool_true_false_are_defined;
     }
-    private static final int __WORDSIZE = (int)64L;
+    private static final int _VCRT_COMPILER_PREPROCESSOR = (int)1L;
     /**
      * {@snippet lang=c :
-     * #define __WORDSIZE 64
+     * #define _VCRT_COMPILER_PREPROCESSOR 1
      * }
      */
-    public static int __WORDSIZE() {
-        return __WORDSIZE;
+    public static int _VCRT_COMPILER_PREPROCESSOR() {
+        return _VCRT_COMPILER_PREPROCESSOR;
     }
-    private static final int __has_safe_buffers = (int)0L;
+    private static final int _SAL_VERSION = (int)20L;
     /**
      * {@snippet lang=c :
-     * #define __has_safe_buffers 0
+     * #define _SAL_VERSION 20
      * }
      */
-    public static int __has_safe_buffers() {
-        return __has_safe_buffers;
+    public static int _SAL_VERSION() {
+        return _SAL_VERSION;
     }
-    private static final int __DARWIN_ONLY_64_BIT_INO_T = (int)1L;
+    private static final int __SAL_H_VERSION = (int)180000000L;
     /**
      * {@snippet lang=c :
-     * #define __DARWIN_ONLY_64_BIT_INO_T 1
+     * #define __SAL_H_VERSION 180000000
      * }
      */
-    public static int __DARWIN_ONLY_64_BIT_INO_T() {
-        return __DARWIN_ONLY_64_BIT_INO_T;
+    public static int __SAL_H_VERSION() {
+        return __SAL_H_VERSION;
     }
-    private static final int __DARWIN_ONLY_UNIX_CONFORMANCE = (int)1L;
+    private static final int _USE_DECLSPECS_FOR_SAL = (int)0L;
     /**
      * {@snippet lang=c :
-     * #define __DARWIN_ONLY_UNIX_CONFORMANCE 1
+     * #define _USE_DECLSPECS_FOR_SAL 0
      * }
      */
-    public static int __DARWIN_ONLY_UNIX_CONFORMANCE() {
-        return __DARWIN_ONLY_UNIX_CONFORMANCE;
+    public static int _USE_DECLSPECS_FOR_SAL() {
+        return _USE_DECLSPECS_FOR_SAL;
     }
-    private static final int __DARWIN_ONLY_VERS_1050 = (int)1L;
+    private static final int _USE_ATTRIBUTES_FOR_SAL = (int)0L;
     /**
      * {@snippet lang=c :
-     * #define __DARWIN_ONLY_VERS_1050 1
+     * #define _USE_ATTRIBUTES_FOR_SAL 0
      * }
      */
-    public static int __DARWIN_ONLY_VERS_1050() {
-        return __DARWIN_ONLY_VERS_1050;
+    public static int _USE_ATTRIBUTES_FOR_SAL() {
+        return _USE_ATTRIBUTES_FOR_SAL;
     }
-    private static final int __DARWIN_UNIX03 = (int)1L;
+    private static final int _CRT_PACKING = (int)8L;
     /**
      * {@snippet lang=c :
-     * #define __DARWIN_UNIX03 1
+     * #define _CRT_PACKING 8
      * }
      */
-    public static int __DARWIN_UNIX03() {
-        return __DARWIN_UNIX03;
+    public static int _CRT_PACKING() {
+        return _CRT_PACKING;
     }
-    private static final int __DARWIN_64_BIT_INO_T = (int)1L;
+    private static final int _HAS_EXCEPTIONS = (int)1L;
     /**
      * {@snippet lang=c :
-     * #define __DARWIN_64_BIT_INO_T 1
+     * #define _HAS_EXCEPTIONS 1
      * }
      */
-    public static int __DARWIN_64_BIT_INO_T() {
-        return __DARWIN_64_BIT_INO_T;
+    public static int _HAS_EXCEPTIONS() {
+        return _HAS_EXCEPTIONS;
     }
-    private static final int __DARWIN_VERS_1050 = (int)1L;
+    private static final int _HAS_CXX17 = (int)0L;
     /**
      * {@snippet lang=c :
-     * #define __DARWIN_VERS_1050 1
+     * #define _HAS_CXX17 0
      * }
      */
-    public static int __DARWIN_VERS_1050() {
-        return __DARWIN_VERS_1050;
+    public static int _HAS_CXX17() {
+        return _HAS_CXX17;
     }
-    private static final int __DARWIN_NON_CANCELABLE = (int)0L;
+    private static final int _HAS_CXX20 = (int)0L;
     /**
      * {@snippet lang=c :
-     * #define __DARWIN_NON_CANCELABLE 0
+     * #define _HAS_CXX20 0
      * }
      */
-    public static int __DARWIN_NON_CANCELABLE() {
-        return __DARWIN_NON_CANCELABLE;
+    public static int _HAS_CXX20() {
+        return _HAS_CXX20;
     }
-    private static final int __STDC_WANT_LIB_EXT1__ = (int)1L;
+    private static final int _HAS_CXX23 = (int)0L;
     /**
      * {@snippet lang=c :
-     * #define __STDC_WANT_LIB_EXT1__ 1
+     * #define _HAS_CXX23 0
      * }
      */
-    public static int __STDC_WANT_LIB_EXT1__() {
-        return __STDC_WANT_LIB_EXT1__;
+    public static int _HAS_CXX23() {
+        return _HAS_CXX23;
     }
-    private static final int __DARWIN_NO_LONG_LONG = (int)0L;
+    private static final int _HAS_CXX26 = (int)0L;
     /**
      * {@snippet lang=c :
-     * #define __DARWIN_NO_LONG_LONG 0
+     * #define _HAS_CXX26 0
      * }
      */
-    public static int __DARWIN_NO_LONG_LONG() {
-        return __DARWIN_NO_LONG_LONG;
+    public static int _HAS_CXX26() {
+        return _HAS_CXX26;
     }
-    private static final int _DARWIN_FEATURE_64_BIT_INODE = (int)1L;
+    private static final int _HAS_NODISCARD = (int)0L;
     /**
      * {@snippet lang=c :
-     * #define _DARWIN_FEATURE_64_BIT_INODE 1
+     * #define _HAS_NODISCARD 0
      * }
      */
-    public static int _DARWIN_FEATURE_64_BIT_INODE() {
-        return _DARWIN_FEATURE_64_BIT_INODE;
+    public static int _HAS_NODISCARD() {
+        return _HAS_NODISCARD;
     }
-    private static final int _DARWIN_FEATURE_ONLY_64_BIT_INODE = (int)1L;
+    private static final int WCHAR_MIN = (int)0L;
     /**
      * {@snippet lang=c :
-     * #define _DARWIN_FEATURE_ONLY_64_BIT_INODE 1
+     * #define WCHAR_MIN 0
      * }
      */
-    public static int _DARWIN_FEATURE_ONLY_64_BIT_INODE() {
-        return _DARWIN_FEATURE_ONLY_64_BIT_INODE;
+    public static int WCHAR_MIN() {
+        return WCHAR_MIN;
     }
-    private static final int _DARWIN_FEATURE_ONLY_VERS_1050 = (int)1L;
+    private static final int WCHAR_MAX = (int)65535L;
     /**
      * {@snippet lang=c :
-     * #define _DARWIN_FEATURE_ONLY_VERS_1050 1
+     * #define WCHAR_MAX 65535
      * }
      */
-    public static int _DARWIN_FEATURE_ONLY_VERS_1050() {
-        return _DARWIN_FEATURE_ONLY_VERS_1050;
+    public static int WCHAR_MAX() {
+        return WCHAR_MAX;
     }
-    private static final int _DARWIN_FEATURE_ONLY_UNIX_CONFORMANCE = (int)1L;
+    private static final int WINT_MIN = (int)0L;
     /**
      * {@snippet lang=c :
-     * #define _DARWIN_FEATURE_ONLY_UNIX_CONFORMANCE 1
+     * #define WINT_MIN 0
      * }
      */
-    public static int _DARWIN_FEATURE_ONLY_UNIX_CONFORMANCE() {
-        return _DARWIN_FEATURE_ONLY_UNIX_CONFORMANCE;
+    public static int WINT_MIN() {
+        return WINT_MIN;
     }
-    private static final int _DARWIN_FEATURE_UNIX_CONFORMANCE = (int)3L;
+    private static final int WINT_MAX = (int)65535L;
     /**
      * {@snippet lang=c :
-     * #define _DARWIN_FEATURE_UNIX_CONFORMANCE 3
+     * #define WINT_MAX 65535
      * }
      */
-    public static int _DARWIN_FEATURE_UNIX_CONFORMANCE() {
-        return _DARWIN_FEATURE_UNIX_CONFORMANCE;
-    }
-    private static final int __has_ptrcheck = (int)0L;
-    /**
-     * {@snippet lang=c :
-     * #define __has_ptrcheck 0
-     * }
-     */
-    public static int __has_ptrcheck() {
-        return __has_ptrcheck;
-    }
-    private static final int USE_CLANG_TYPES = (int)0L;
-    /**
-     * {@snippet lang=c :
-     * #define USE_CLANG_TYPES 0
-     * }
-     */
-    public static int USE_CLANG_TYPES() {
-        return USE_CLANG_TYPES;
-    }
-    private static final int __PTHREAD_SIZE__ = (int)8176L;
-    /**
-     * {@snippet lang=c :
-     * #define __PTHREAD_SIZE__ 8176
-     * }
-     */
-    public static int __PTHREAD_SIZE__() {
-        return __PTHREAD_SIZE__;
-    }
-    private static final int __PTHREAD_ATTR_SIZE__ = (int)56L;
-    /**
-     * {@snippet lang=c :
-     * #define __PTHREAD_ATTR_SIZE__ 56
-     * }
-     */
-    public static int __PTHREAD_ATTR_SIZE__() {
-        return __PTHREAD_ATTR_SIZE__;
-    }
-    private static final int __PTHREAD_MUTEXATTR_SIZE__ = (int)8L;
-    /**
-     * {@snippet lang=c :
-     * #define __PTHREAD_MUTEXATTR_SIZE__ 8
-     * }
-     */
-    public static int __PTHREAD_MUTEXATTR_SIZE__() {
-        return __PTHREAD_MUTEXATTR_SIZE__;
-    }
-    private static final int __PTHREAD_MUTEX_SIZE__ = (int)56L;
-    /**
-     * {@snippet lang=c :
-     * #define __PTHREAD_MUTEX_SIZE__ 56
-     * }
-     */
-    public static int __PTHREAD_MUTEX_SIZE__() {
-        return __PTHREAD_MUTEX_SIZE__;
-    }
-    private static final int __PTHREAD_CONDATTR_SIZE__ = (int)8L;
-    /**
-     * {@snippet lang=c :
-     * #define __PTHREAD_CONDATTR_SIZE__ 8
-     * }
-     */
-    public static int __PTHREAD_CONDATTR_SIZE__() {
-        return __PTHREAD_CONDATTR_SIZE__;
-    }
-    private static final int __PTHREAD_COND_SIZE__ = (int)40L;
-    /**
-     * {@snippet lang=c :
-     * #define __PTHREAD_COND_SIZE__ 40
-     * }
-     */
-    public static int __PTHREAD_COND_SIZE__() {
-        return __PTHREAD_COND_SIZE__;
-    }
-    private static final int __PTHREAD_ONCE_SIZE__ = (int)8L;
-    /**
-     * {@snippet lang=c :
-     * #define __PTHREAD_ONCE_SIZE__ 8
-     * }
-     */
-    public static int __PTHREAD_ONCE_SIZE__() {
-        return __PTHREAD_ONCE_SIZE__;
-    }
-    private static final int __PTHREAD_RWLOCK_SIZE__ = (int)192L;
-    /**
-     * {@snippet lang=c :
-     * #define __PTHREAD_RWLOCK_SIZE__ 192
-     * }
-     */
-    public static int __PTHREAD_RWLOCK_SIZE__() {
-        return __PTHREAD_RWLOCK_SIZE__;
-    }
-    private static final int __PTHREAD_RWLOCKATTR_SIZE__ = (int)16L;
-    /**
-     * {@snippet lang=c :
-     * #define __PTHREAD_RWLOCKATTR_SIZE__ 16
-     * }
-     */
-    public static int __PTHREAD_RWLOCKATTR_SIZE__() {
-        return __PTHREAD_RWLOCKATTR_SIZE__;
-    }
-    private static final int INT8_MAX = (int)127L;
-    /**
-     * {@snippet lang=c :
-     * #define INT8_MAX 127
-     * }
-     */
-    public static int INT8_MAX() {
-        return INT8_MAX;
-    }
-    private static final int INT16_MAX = (int)32767L;
-    /**
-     * {@snippet lang=c :
-     * #define INT16_MAX 32767
-     * }
-     */
-    public static int INT16_MAX() {
-        return INT16_MAX;
-    }
-    private static final int INT32_MAX = (int)2147483647L;
-    /**
-     * {@snippet lang=c :
-     * #define INT32_MAX 2147483647
-     * }
-     */
-    public static int INT32_MAX() {
-        return INT32_MAX;
-    }
-    private static final int UINT8_MAX = (int)255L;
-    /**
-     * {@snippet lang=c :
-     * #define UINT8_MAX 255
-     * }
-     */
-    public static int UINT8_MAX() {
-        return UINT8_MAX;
-    }
-    private static final int UINT16_MAX = (int)65535L;
-    /**
-     * {@snippet lang=c :
-     * #define UINT16_MAX 65535
-     * }
-     */
-    public static int UINT16_MAX() {
-        return UINT16_MAX;
+    public static int WINT_MAX() {
+        return WINT_MAX;
     }
     private static final int WTF_WEBTRANSPORT_BUFFERED_STREAM_REJECTED = (int)966049156L;
     /**
@@ -358,22 +214,343 @@ public class wtf_h extends wtf_h$shared {
     }
     /**
      * {@snippet lang=c :
-     * typedef long ptrdiff_t
+     * typedef long long ptrdiff_t
      * }
      */
-    public static final OfLong ptrdiff_t = wtf_h.C_LONG;
+    public static final OfLong ptrdiff_t = wtf_h.C_LONG_LONG;
     /**
      * {@snippet lang=c :
-     * typedef unsigned long size_t
+     * typedef unsigned long long size_t
      * }
      */
-    public static final OfLong size_t = wtf_h.C_LONG;
+    public static final OfLong size_t = wtf_h.C_LONG_LONG;
     /**
      * {@snippet lang=c :
-     * typedef int wchar_t
+     * typedef unsigned short wchar_t
      * }
      */
-    public static final OfInt wchar_t = wtf_h.C_INT;
+    public static final OfShort wchar_t = wtf_h.C_SHORT;
+    /**
+     * {@snippet lang=c :
+     * typedef double max_align_t
+     * }
+     */
+    public static final OfDouble max_align_t = wtf_h.C_DOUBLE;
+    /**
+     * {@snippet lang=c :
+     * typedef unsigned long long uintptr_t
+     * }
+     */
+    public static final OfLong uintptr_t = wtf_h.C_LONG_LONG;
+    /**
+     * {@snippet lang=c :
+     * typedef char *va_list
+     * }
+     */
+    public static final AddressLayout va_list = wtf_h.C_POINTER;
+
+    /**
+     * Variadic invoker class for:
+     * {@snippet lang=c :
+     * void __va_start(va_list *, ...)
+     * }
+     */
+    public static class __va_start {
+        private static final FunctionDescriptor BASE_DESC = FunctionDescriptor.ofVoid(
+                wtf_h.C_POINTER
+            );
+        private static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__va_start");
+
+        private final MethodHandle handle;
+        private final FunctionDescriptor descriptor;
+        private final MethodHandle spreader;
+
+        private __va_start(MethodHandle handle, FunctionDescriptor descriptor, MethodHandle spreader) {
+            this.handle = handle;
+            this.descriptor = descriptor;
+            this.spreader = spreader;
+        }
+
+        /**
+         * Variadic invoker factory for:
+         * {@snippet lang=c :
+         * void __va_start(va_list *, ...)
+         * }
+         */
+        public static __va_start makeInvoker(MemoryLayout... layouts) {
+            FunctionDescriptor desc$ = BASE_DESC.appendArgumentLayouts(layouts);
+            Linker.Option fva$ = Linker.Option.firstVariadicArg(BASE_DESC.argumentLayouts().size());
+            var mh$ = Linker.nativeLinker().downcallHandle(ADDR, desc$, fva$);
+            var spreader$ = mh$.asSpreader(Object[].class, layouts.length);
+            return new __va_start(mh$, desc$, spreader$);
+        }
+
+        /**
+         * {@return the address}
+         */
+        public static MemorySegment address() {
+            return ADDR;
+        }
+
+        /**
+         * {@return the specialized method handle}
+         */
+        public MethodHandle handle() {
+            return handle;
+        }
+
+        /**
+         * {@return the specialized descriptor}
+         */
+        public FunctionDescriptor descriptor() {
+            return descriptor;
+        }
+
+        public void apply(MemorySegment x0, Object... x1) {
+            try {
+                if (TRACE_DOWNCALLS) {
+                    traceDowncall("__va_start", x0, x1);
+                }
+                 spreader.invokeExact(x0, x1);
+            } catch(IllegalArgumentException | ClassCastException ex$)  {
+                throw ex$; // rethrow IAE from passing wrong number/type of args
+            } catch (Throwable ex$) {
+               throw new AssertionError("should not reach here", ex$);
+            }
+        }
+    }
+    /**
+     * {@snippet lang=c :
+     * typedef long long intptr_t
+     * }
+     */
+    public static final OfLong intptr_t = wtf_h.C_LONG_LONG;
+    /**
+     * {@snippet lang=c :
+     * typedef bool __vcrt_bool
+     * }
+     */
+    public static final OfBoolean __vcrt_bool = wtf_h.C_BOOL;
+
+    private static class __security_init_cookie {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(    );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__security_init_cookie");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void __security_init_cookie()
+     * }
+     */
+    public static FunctionDescriptor __security_init_cookie$descriptor() {
+        return __security_init_cookie.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void __security_init_cookie()
+     * }
+     */
+    public static MethodHandle __security_init_cookie$handle() {
+        return __security_init_cookie.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void __security_init_cookie()
+     * }
+     */
+    public static MemorySegment __security_init_cookie$address() {
+        return __security_init_cookie.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void __security_init_cookie()
+     * }
+     */
+    public static void __security_init_cookie() {
+        var mh$ = __security_init_cookie.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("__security_init_cookie");
+            }
+            mh$.invokeExact();
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class __security_check_cookie {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            wtf_h.C_LONG_LONG
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__security_check_cookie");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void __security_check_cookie(uintptr_t _StackCookie)
+     * }
+     */
+    public static FunctionDescriptor __security_check_cookie$descriptor() {
+        return __security_check_cookie.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void __security_check_cookie(uintptr_t _StackCookie)
+     * }
+     */
+    public static MethodHandle __security_check_cookie$handle() {
+        return __security_check_cookie.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void __security_check_cookie(uintptr_t _StackCookie)
+     * }
+     */
+    public static MemorySegment __security_check_cookie$address() {
+        return __security_check_cookie.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void __security_check_cookie(uintptr_t _StackCookie)
+     * }
+     */
+    public static void __security_check_cookie(long _StackCookie) {
+        var mh$ = __security_check_cookie.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("__security_check_cookie", _StackCookie);
+            }
+            mh$.invokeExact(_StackCookie);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class __report_gsfailure {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
+            wtf_h.C_LONG_LONG
+        );
+
+        public static final MemorySegment ADDR = SYMBOL_LOOKUP.findOrThrow("__report_gsfailure");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * Function descriptor for:
+     * {@snippet lang=c :
+     * void __report_gsfailure(uintptr_t _StackCookie)
+     * }
+     */
+    public static FunctionDescriptor __report_gsfailure$descriptor() {
+        return __report_gsfailure.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang=c :
+     * void __report_gsfailure(uintptr_t _StackCookie)
+     * }
+     */
+    public static MethodHandle __report_gsfailure$handle() {
+        return __report_gsfailure.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang=c :
+     * void __report_gsfailure(uintptr_t _StackCookie)
+     * }
+     */
+    public static MemorySegment __report_gsfailure$address() {
+        return __report_gsfailure.ADDR;
+    }
+
+    /**
+     * {@snippet lang=c :
+     * void __report_gsfailure(uintptr_t _StackCookie)
+     * }
+     */
+    public static void __report_gsfailure(long _StackCookie) {
+        var mh$ = __report_gsfailure.HANDLE;
+        try {
+            if (TRACE_DOWNCALLS) {
+                traceDowncall("__report_gsfailure", _StackCookie);
+            }
+            mh$.invokeExact(_StackCookie);
+        } catch (Error | RuntimeException ex) {
+           throw ex;
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static class __security_cookie$constants {
+        public static final OfLong LAYOUT = wtf_h.C_LONG_LONG;
+        public static final MemorySegment SEGMENT = SYMBOL_LOOKUP.findOrThrow("__security_cookie").reinterpret(LAYOUT.byteSize());
+    }
+
+    /**
+     * Layout for variable:
+     * {@snippet lang=c :
+     * extern uintptr_t __security_cookie
+     * }
+     */
+    public static OfLong __security_cookie$layout() {
+        return __security_cookie$constants.LAYOUT;
+    }
+
+    /**
+     * Segment for variable:
+     * {@snippet lang=c :
+     * extern uintptr_t __security_cookie
+     * }
+     */
+    public static MemorySegment __security_cookie$segment() {
+        return __security_cookie$constants.SEGMENT;
+    }
+
+    /**
+     * Getter for variable:
+     * {@snippet lang=c :
+     * extern uintptr_t __security_cookie
+     * }
+     */
+    public static long __security_cookie() {
+        return __security_cookie$constants.SEGMENT.get(__security_cookie$constants.LAYOUT, 0L);
+    }
+
+    /**
+     * Setter for variable:
+     * {@snippet lang=c :
+     * extern uintptr_t __security_cookie
+     * }
+     */
+    public static void __security_cookie(long varValue) {
+        __security_cookie$constants.SEGMENT.set(__security_cookie$constants.LAYOUT, 0L, varValue);
+    }
     /**
      * {@snippet lang=c :
      * typedef signed char int8_t
@@ -424,374 +601,112 @@ public class wtf_h extends wtf_h$shared {
     public static final OfLong uint64_t = wtf_h.C_LONG_LONG;
     /**
      * {@snippet lang=c :
-     * typedef int8_t int_least8_t
+     * typedef signed char int_least8_t
      * }
      */
     public static final OfByte int_least8_t = wtf_h.C_CHAR;
     /**
      * {@snippet lang=c :
-     * typedef int16_t int_least16_t
+     * typedef short int_least16_t
      * }
      */
     public static final OfShort int_least16_t = wtf_h.C_SHORT;
     /**
      * {@snippet lang=c :
-     * typedef int32_t int_least32_t
+     * typedef int int_least32_t
      * }
      */
     public static final OfInt int_least32_t = wtf_h.C_INT;
     /**
      * {@snippet lang=c :
-     * typedef int64_t int_least64_t
+     * typedef long long int_least64_t
      * }
      */
     public static final OfLong int_least64_t = wtf_h.C_LONG_LONG;
     /**
      * {@snippet lang=c :
-     * typedef uint8_t uint_least8_t
+     * typedef unsigned char uint_least8_t
      * }
      */
     public static final OfByte uint_least8_t = wtf_h.C_CHAR;
     /**
      * {@snippet lang=c :
-     * typedef uint16_t uint_least16_t
+     * typedef unsigned short uint_least16_t
      * }
      */
     public static final OfShort uint_least16_t = wtf_h.C_SHORT;
     /**
      * {@snippet lang=c :
-     * typedef uint32_t uint_least32_t
+     * typedef unsigned int uint_least32_t
      * }
      */
     public static final OfInt uint_least32_t = wtf_h.C_INT;
     /**
      * {@snippet lang=c :
-     * typedef uint64_t uint_least64_t
+     * typedef unsigned long long uint_least64_t
      * }
      */
     public static final OfLong uint_least64_t = wtf_h.C_LONG_LONG;
     /**
      * {@snippet lang=c :
-     * typedef int8_t int_fast8_t
+     * typedef signed char int_fast8_t
      * }
      */
     public static final OfByte int_fast8_t = wtf_h.C_CHAR;
     /**
      * {@snippet lang=c :
-     * typedef int16_t int_fast16_t
+     * typedef int int_fast16_t
      * }
      */
-    public static final OfShort int_fast16_t = wtf_h.C_SHORT;
+    public static final OfInt int_fast16_t = wtf_h.C_INT;
     /**
      * {@snippet lang=c :
-     * typedef int32_t int_fast32_t
+     * typedef int int_fast32_t
      * }
      */
     public static final OfInt int_fast32_t = wtf_h.C_INT;
     /**
      * {@snippet lang=c :
-     * typedef int64_t int_fast64_t
+     * typedef long long int_fast64_t
      * }
      */
     public static final OfLong int_fast64_t = wtf_h.C_LONG_LONG;
     /**
      * {@snippet lang=c :
-     * typedef uint8_t uint_fast8_t
+     * typedef unsigned char uint_fast8_t
      * }
      */
     public static final OfByte uint_fast8_t = wtf_h.C_CHAR;
     /**
      * {@snippet lang=c :
-     * typedef uint16_t uint_fast16_t
+     * typedef unsigned int uint_fast16_t
      * }
      */
-    public static final OfShort uint_fast16_t = wtf_h.C_SHORT;
+    public static final OfInt uint_fast16_t = wtf_h.C_INT;
     /**
      * {@snippet lang=c :
-     * typedef uint32_t uint_fast32_t
+     * typedef unsigned int uint_fast32_t
      * }
      */
     public static final OfInt uint_fast32_t = wtf_h.C_INT;
     /**
      * {@snippet lang=c :
-     * typedef uint64_t uint_fast64_t
+     * typedef unsigned long long uint_fast64_t
      * }
      */
     public static final OfLong uint_fast64_t = wtf_h.C_LONG_LONG;
     /**
      * {@snippet lang=c :
-     * typedef signed char __int8_t
+     * typedef long long intmax_t
      * }
      */
-    public static final OfByte __int8_t = wtf_h.C_CHAR;
+    public static final OfLong intmax_t = wtf_h.C_LONG_LONG;
     /**
      * {@snippet lang=c :
-     * typedef unsigned char __uint8_t
+     * typedef unsigned long long uintmax_t
      * }
      */
-    public static final OfByte __uint8_t = wtf_h.C_CHAR;
-    /**
-     * {@snippet lang=c :
-     * typedef short __int16_t
-     * }
-     */
-    public static final OfShort __int16_t = wtf_h.C_SHORT;
-    /**
-     * {@snippet lang=c :
-     * typedef unsigned short __uint16_t
-     * }
-     */
-    public static final OfShort __uint16_t = wtf_h.C_SHORT;
-    /**
-     * {@snippet lang=c :
-     * typedef int __int32_t
-     * }
-     */
-    public static final OfInt __int32_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef unsigned int __uint32_t
-     * }
-     */
-    public static final OfInt __uint32_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef long long __int64_t
-     * }
-     */
-    public static final OfLong __int64_t = wtf_h.C_LONG_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef unsigned long long __uint64_t
-     * }
-     */
-    public static final OfLong __uint64_t = wtf_h.C_LONG_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef long __darwin_intptr_t
-     * }
-     */
-    public static final OfLong __darwin_intptr_t = wtf_h.C_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef unsigned int __darwin_natural_t
-     * }
-     */
-    public static final OfInt __darwin_natural_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef int __darwin_ct_rune_t
-     * }
-     */
-    public static final OfInt __darwin_ct_rune_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef long __darwin_ptrdiff_t
-     * }
-     */
-    public static final OfLong __darwin_ptrdiff_t = wtf_h.C_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef unsigned long __darwin_size_t
-     * }
-     */
-    public static final OfLong __darwin_size_t = wtf_h.C_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef __builtin_va_list __darwin_va_list
-     * }
-     */
-    public static final AddressLayout __darwin_va_list = wtf_h.C_POINTER;
-    /**
-     * {@snippet lang=c :
-     * typedef int __darwin_wchar_t
-     * }
-     */
-    public static final OfInt __darwin_wchar_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef __darwin_wchar_t __darwin_rune_t
-     * }
-     */
-    public static final OfInt __darwin_rune_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef int __darwin_wint_t
-     * }
-     */
-    public static final OfInt __darwin_wint_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef unsigned long __darwin_clock_t
-     * }
-     */
-    public static final OfLong __darwin_clock_t = wtf_h.C_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef __uint32_t __darwin_socklen_t
-     * }
-     */
-    public static final OfInt __darwin_socklen_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef long __darwin_ssize_t
-     * }
-     */
-    public static final OfLong __darwin_ssize_t = wtf_h.C_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef long __darwin_time_t
-     * }
-     */
-    public static final OfLong __darwin_time_t = wtf_h.C_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef __int64_t __darwin_blkcnt_t
-     * }
-     */
-    public static final OfLong __darwin_blkcnt_t = wtf_h.C_LONG_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef __int32_t __darwin_blksize_t
-     * }
-     */
-    public static final OfInt __darwin_blksize_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef __int32_t __darwin_dev_t
-     * }
-     */
-    public static final OfInt __darwin_dev_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef unsigned int __darwin_fsblkcnt_t
-     * }
-     */
-    public static final OfInt __darwin_fsblkcnt_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef unsigned int __darwin_fsfilcnt_t
-     * }
-     */
-    public static final OfInt __darwin_fsfilcnt_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef __uint32_t __darwin_gid_t
-     * }
-     */
-    public static final OfInt __darwin_gid_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef __uint32_t __darwin_id_t
-     * }
-     */
-    public static final OfInt __darwin_id_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef __uint64_t __darwin_ino64_t
-     * }
-     */
-    public static final OfLong __darwin_ino64_t = wtf_h.C_LONG_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef __darwin_ino64_t __darwin_ino_t
-     * }
-     */
-    public static final OfLong __darwin_ino_t = wtf_h.C_LONG_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef __darwin_natural_t __darwin_mach_port_name_t
-     * }
-     */
-    public static final OfInt __darwin_mach_port_name_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef __darwin_mach_port_name_t __darwin_mach_port_t
-     * }
-     */
-    public static final OfInt __darwin_mach_port_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef __uint16_t __darwin_mode_t
-     * }
-     */
-    public static final OfShort __darwin_mode_t = wtf_h.C_SHORT;
-    /**
-     * {@snippet lang=c :
-     * typedef __int64_t __darwin_off_t
-     * }
-     */
-    public static final OfLong __darwin_off_t = wtf_h.C_LONG_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef __int32_t __darwin_pid_t
-     * }
-     */
-    public static final OfInt __darwin_pid_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef __uint32_t __darwin_sigset_t
-     * }
-     */
-    public static final OfInt __darwin_sigset_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef __int32_t __darwin_suseconds_t
-     * }
-     */
-    public static final OfInt __darwin_suseconds_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef __uint32_t __darwin_uid_t
-     * }
-     */
-    public static final OfInt __darwin_uid_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef __uint32_t __darwin_useconds_t
-     * }
-     */
-    public static final OfInt __darwin_useconds_t = wtf_h.C_INT;
-    /**
-     * {@snippet lang=c :
-     * typedef unsigned long __darwin_pthread_key_t
-     * }
-     */
-    public static final OfLong __darwin_pthread_key_t = wtf_h.C_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef struct _opaque_pthread_t {
-     *     long __sig;
-     *     struct __darwin_pthread_handler_rec *__cleanup_stack;
-     *     char __opaque[8176];
-     * } *__darwin_pthread_t
-     * }
-     */
-    public static final AddressLayout __darwin_pthread_t = wtf_h.C_POINTER;
-    /**
-     * {@snippet lang=c :
-     * typedef __darwin_intptr_t intptr_t
-     * }
-     */
-    public static final OfLong intptr_t = wtf_h.C_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef unsigned long uintptr_t
-     * }
-     */
-    public static final OfLong uintptr_t = wtf_h.C_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef long intmax_t
-     * }
-     */
-    public static final OfLong intmax_t = wtf_h.C_LONG;
-    /**
-     * {@snippet lang=c :
-     * typedef unsigned long uintmax_t
-     * }
-     */
-    public static final OfLong uintmax_t = wtf_h.C_LONG;
+    public static final OfLong uintmax_t = wtf_h.C_LONG_LONG;
     private static final int WTF_EXECUTION_PROFILE_LOW_LATENCY = (int)0L;
     /**
      * {@snippet lang=c :
@@ -3671,62 +3586,14 @@ public class wtf_h extends wtf_h$shared {
     public static MemorySegment NULL() {
         return NULL;
     }
+    private static final int _VCRUNTIME_DISABLED_WARNINGS = (int)4514L;
     /**
      * {@snippet lang=c :
-     * #define __DARWIN_SUF_EXTSN "$DARWIN_EXTSN"
+     * #define _VCRUNTIME_DISABLED_WARNINGS 4514
      * }
      */
-    public static MemorySegment __DARWIN_SUF_EXTSN() {
-        class Holder {
-            static final MemorySegment __DARWIN_SUF_EXTSN
-                = wtf_h.LIBRARY_ARENA.allocateFrom("$DARWIN_EXTSN");
-        }
-        return Holder.__DARWIN_SUF_EXTSN;
-    }
-    private static final long __DARWIN_C_ANSI = 4096L;
-    /**
-     * {@snippet lang=c :
-     * #define __DARWIN_C_ANSI 4096
-     * }
-     */
-    public static long __DARWIN_C_ANSI() {
-        return __DARWIN_C_ANSI;
-    }
-    private static final long __DARWIN_C_FULL = 900000L;
-    /**
-     * {@snippet lang=c :
-     * #define __DARWIN_C_FULL 900000
-     * }
-     */
-    public static long __DARWIN_C_FULL() {
-        return __DARWIN_C_FULL;
-    }
-    private static final long __DARWIN_C_LEVEL = 900000L;
-    /**
-     * {@snippet lang=c :
-     * #define __DARWIN_C_LEVEL 900000
-     * }
-     */
-    public static long __DARWIN_C_LEVEL() {
-        return __DARWIN_C_LEVEL;
-    }
-    private static final MemorySegment __DARWIN_NULL = MemorySegment.ofAddress(0L);
-    /**
-     * {@snippet lang=c :
-     * #define __DARWIN_NULL (void*) 0
-     * }
-     */
-    public static MemorySegment __DARWIN_NULL() {
-        return __DARWIN_NULL;
-    }
-    private static final long INT64_MAX = 9223372036854775807L;
-    /**
-     * {@snippet lang=c :
-     * #define INT64_MAX 9223372036854775807
-     * }
-     */
-    public static long INT64_MAX() {
-        return INT64_MAX;
+    public static int _VCRUNTIME_DISABLED_WARNINGS() {
+        return _VCRUNTIME_DISABLED_WARNINGS;
     }
     private static final int INT8_MIN = (int)-128L;
     /**
@@ -3763,6 +3630,60 @@ public class wtf_h extends wtf_h$shared {
      */
     public static long INT64_MIN() {
         return INT64_MIN;
+    }
+    private static final byte INT8_MAX = (byte)127L;
+    /**
+     * {@snippet lang=c :
+     * #define INT8_MAX 127
+     * }
+     */
+    public static byte INT8_MAX() {
+        return INT8_MAX;
+    }
+    private static final short INT16_MAX = (short)32767L;
+    /**
+     * {@snippet lang=c :
+     * #define INT16_MAX 32767
+     * }
+     */
+    public static short INT16_MAX() {
+        return INT16_MAX;
+    }
+    private static final int INT32_MAX = (int)2147483647L;
+    /**
+     * {@snippet lang=c :
+     * #define INT32_MAX 2147483647
+     * }
+     */
+    public static int INT32_MAX() {
+        return INT32_MAX;
+    }
+    private static final long INT64_MAX = 9223372036854775807L;
+    /**
+     * {@snippet lang=c :
+     * #define INT64_MAX 9223372036854775807
+     * }
+     */
+    public static long INT64_MAX() {
+        return INT64_MAX;
+    }
+    private static final byte UINT8_MAX = (byte)255L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT8_MAX 255
+     * }
+     */
+    public static byte UINT8_MAX() {
+        return UINT8_MAX;
+    }
+    private static final short UINT16_MAX = (short)65535L;
+    /**
+     * {@snippet lang=c :
+     * #define UINT16_MAX 65535
+     * }
+     */
+    public static short UINT16_MAX() {
+        return UINT16_MAX;
     }
     private static final int UINT32_MAX = (int)4294967295L;
     /**
@@ -3818,22 +3739,22 @@ public class wtf_h extends wtf_h$shared {
     public static long INT_LEAST64_MIN() {
         return INT_LEAST64_MIN;
     }
-    private static final int INT_LEAST8_MAX = (int)127L;
+    private static final byte INT_LEAST8_MAX = (byte)127L;
     /**
      * {@snippet lang=c :
      * #define INT_LEAST8_MAX 127
      * }
      */
-    public static int INT_LEAST8_MAX() {
+    public static byte INT_LEAST8_MAX() {
         return INT_LEAST8_MAX;
     }
-    private static final int INT_LEAST16_MAX = (int)32767L;
+    private static final short INT_LEAST16_MAX = (short)32767L;
     /**
      * {@snippet lang=c :
      * #define INT_LEAST16_MAX 32767
      * }
      */
-    public static int INT_LEAST16_MAX() {
+    public static short INT_LEAST16_MAX() {
         return INT_LEAST16_MAX;
     }
     private static final int INT_LEAST32_MAX = (int)2147483647L;
@@ -3854,22 +3775,22 @@ public class wtf_h extends wtf_h$shared {
     public static long INT_LEAST64_MAX() {
         return INT_LEAST64_MAX;
     }
-    private static final int UINT_LEAST8_MAX = (int)255L;
+    private static final byte UINT_LEAST8_MAX = (byte)255L;
     /**
      * {@snippet lang=c :
      * #define UINT_LEAST8_MAX 255
      * }
      */
-    public static int UINT_LEAST8_MAX() {
+    public static byte UINT_LEAST8_MAX() {
         return UINT_LEAST8_MAX;
     }
-    private static final int UINT_LEAST16_MAX = (int)65535L;
+    private static final short UINT_LEAST16_MAX = (short)65535L;
     /**
      * {@snippet lang=c :
      * #define UINT_LEAST16_MAX 65535
      * }
      */
-    public static int UINT_LEAST16_MAX() {
+    public static short UINT_LEAST16_MAX() {
         return UINT_LEAST16_MAX;
     }
     private static final int UINT_LEAST32_MAX = (int)4294967295L;
@@ -3899,10 +3820,10 @@ public class wtf_h extends wtf_h$shared {
     public static int INT_FAST8_MIN() {
         return INT_FAST8_MIN;
     }
-    private static final int INT_FAST16_MIN = (int)-32768L;
+    private static final int INT_FAST16_MIN = (int)-2147483648L;
     /**
      * {@snippet lang=c :
-     * #define INT_FAST16_MIN -32768
+     * #define INT_FAST16_MIN -2147483648
      * }
      */
     public static int INT_FAST16_MIN() {
@@ -3926,19 +3847,19 @@ public class wtf_h extends wtf_h$shared {
     public static long INT_FAST64_MIN() {
         return INT_FAST64_MIN;
     }
-    private static final int INT_FAST8_MAX = (int)127L;
+    private static final byte INT_FAST8_MAX = (byte)127L;
     /**
      * {@snippet lang=c :
      * #define INT_FAST8_MAX 127
      * }
      */
-    public static int INT_FAST8_MAX() {
+    public static byte INT_FAST8_MAX() {
         return INT_FAST8_MAX;
     }
-    private static final int INT_FAST16_MAX = (int)32767L;
+    private static final int INT_FAST16_MAX = (int)2147483647L;
     /**
      * {@snippet lang=c :
-     * #define INT_FAST16_MAX 32767
+     * #define INT_FAST16_MAX 2147483647
      * }
      */
     public static int INT_FAST16_MAX() {
@@ -3962,19 +3883,19 @@ public class wtf_h extends wtf_h$shared {
     public static long INT_FAST64_MAX() {
         return INT_FAST64_MAX;
     }
-    private static final int UINT_FAST8_MAX = (int)255L;
+    private static final byte UINT_FAST8_MAX = (byte)255L;
     /**
      * {@snippet lang=c :
      * #define UINT_FAST8_MAX 255
      * }
      */
-    public static int UINT_FAST8_MAX() {
+    public static byte UINT_FAST8_MAX() {
         return UINT_FAST8_MAX;
     }
-    private static final int UINT_FAST16_MAX = (int)65535L;
+    private static final int UINT_FAST16_MAX = (int)4294967295L;
     /**
      * {@snippet lang=c :
-     * #define UINT_FAST16_MAX 65535
+     * #define UINT_FAST16_MAX 4294967295
      * }
      */
     public static int UINT_FAST16_MAX() {
@@ -3998,15 +3919,6 @@ public class wtf_h extends wtf_h$shared {
     public static long UINT_FAST64_MAX() {
         return UINT_FAST64_MAX;
     }
-    private static final long INTPTR_MAX = 9223372036854775807L;
-    /**
-     * {@snippet lang=c :
-     * #define INTPTR_MAX 9223372036854775807
-     * }
-     */
-    public static long INTPTR_MAX() {
-        return INTPTR_MAX;
-    }
     private static final long INTPTR_MIN = -9223372036854775808L;
     /**
      * {@snippet lang=c :
@@ -4016,6 +3928,15 @@ public class wtf_h extends wtf_h$shared {
     public static long INTPTR_MIN() {
         return INTPTR_MIN;
     }
+    private static final long INTPTR_MAX = 9223372036854775807L;
+    /**
+     * {@snippet lang=c :
+     * #define INTPTR_MAX 9223372036854775807
+     * }
+     */
+    public static long INTPTR_MAX() {
+        return INTPTR_MAX;
+    }
     private static final long UINTPTR_MAX = -1L;
     /**
      * {@snippet lang=c :
@@ -4024,6 +3945,15 @@ public class wtf_h extends wtf_h$shared {
      */
     public static long UINTPTR_MAX() {
         return UINTPTR_MAX;
+    }
+    private static final long INTMAX_MIN = -9223372036854775808L;
+    /**
+     * {@snippet lang=c :
+     * #define INTMAX_MIN -9223372036854775808
+     * }
+     */
+    public static long INTMAX_MIN() {
+        return INTMAX_MIN;
     }
     private static final long INTMAX_MAX = 9223372036854775807L;
     /**
@@ -4042,15 +3972,6 @@ public class wtf_h extends wtf_h$shared {
      */
     public static long UINTMAX_MAX() {
         return UINTMAX_MAX;
-    }
-    private static final long INTMAX_MIN = -9223372036854775808L;
-    /**
-     * {@snippet lang=c :
-     * #define INTMAX_MIN -9223372036854775808
-     * }
-     */
-    public static long INTMAX_MIN() {
-        return INTMAX_MIN;
     }
     private static final long PTRDIFF_MIN = -9223372036854775808L;
     /**
@@ -4078,51 +3999,6 @@ public class wtf_h extends wtf_h$shared {
      */
     public static long SIZE_MAX() {
         return SIZE_MAX;
-    }
-    private static final long RSIZE_MAX = 9223372036854775807L;
-    /**
-     * {@snippet lang=c :
-     * #define RSIZE_MAX 9223372036854775807
-     * }
-     */
-    public static long RSIZE_MAX() {
-        return RSIZE_MAX;
-    }
-    private static final int WCHAR_MAX = (int)2147483647L;
-    /**
-     * {@snippet lang=c :
-     * #define WCHAR_MAX 2147483647
-     * }
-     */
-    public static int WCHAR_MAX() {
-        return WCHAR_MAX;
-    }
-    private static final int WCHAR_MIN = (int)-2147483648L;
-    /**
-     * {@snippet lang=c :
-     * #define WCHAR_MIN -2147483648
-     * }
-     */
-    public static int WCHAR_MIN() {
-        return WCHAR_MIN;
-    }
-    private static final int WINT_MIN = (int)-2147483648L;
-    /**
-     * {@snippet lang=c :
-     * #define WINT_MIN -2147483648
-     * }
-     */
-    public static int WINT_MIN() {
-        return WINT_MIN;
-    }
-    private static final int WINT_MAX = (int)2147483647L;
-    /**
-     * {@snippet lang=c :
-     * #define WINT_MAX 2147483647
-     * }
-     */
-    public static int WINT_MAX() {
-        return WINT_MAX;
     }
     private static final int SIG_ATOMIC_MIN = (int)-2147483648L;
     /**

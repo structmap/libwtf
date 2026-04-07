@@ -36,9 +36,9 @@ public class wtf_connection_request_t {
         wtf_h.C_POINTER.withName("path"),
         wtf_h.C_POINTER.withName("authority"),
         wtf_h.C_POINTER.withName("headers"),
-        wtf_h.C_LONG.withName("header_count"),
+        wtf_h.C_LONG_LONG.withName("header_count"),
         wtf_h.C_POINTER.withName("peer_address"),
-        wtf_h.C_LONG.withName("address_length")
+        wtf_h.C_LONG_LONG.withName("address_length")
     ).withName("$anon$219:9");
 
     /**

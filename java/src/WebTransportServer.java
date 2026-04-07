@@ -21,6 +21,7 @@ class WebTransportServer {
     public int port;
     public String cert;
     public String key;
+    public Arena arena;
 
     public WebTransportServer(int port, String cert, String key) {
         this.port = port;
@@ -43,6 +44,7 @@ class WebTransportServer {
                 }
             }
         };
+        this.arena = new MemoryAllocator();
     }
 
     public ConcurrentHashMap<Object, BlockingQueue<Object>> sessions;
@@ -75,7 +77,7 @@ class WebTransportServer {
             var dr = wtf_session_event_t.datagram_received(evt);
             var n = wtf_session_event_t.datagram_received.length(dr);
             System.out.printf("[DATAGRAM] Received on session 0x%x (%d bytes)\n", sessionPointer.address(), n);
-            var d = new Datagram(new Session(this, sessionPointer.address()), new byte[(int) n]);
+            var d = new Datagram(new Session(this, sessionPointer), new byte[(int) n]);
             var dataPtr = wtf_session_event_t.datagram_received.data(dr);
             MemorySegment.copy(dataPtr, ValueLayout.JAVA_BYTE, 0, d.Payload, 0, (int) n);
             if (this.sessions.containsKey(sessionPointer)) {
@@ -89,6 +91,49 @@ class WebTransportServer {
             }
             return;
         }
+        if (wtf_session_event_t.type(evt) == wtf_h.WTF_SESSION_EVENT_DATAGRAM_SEND_STATE_CHANGE()) {
+            var dsc = wtf_session_event_t.datagram_send_state_changed(evt);
+            var sendState = wtf_session_event_t.datagram_send_state_changed.state(dsc);
+            var mightResend = sendState < wtf_h.WTF_DATAGRAM_SEND_LOST_DISCARDED();
+
+            if (!mightResend) {
+                var bufferCount = wtf_session_event_t.datagram_send_state_changed.buffer_count(dsc);
+                var buffers = wtf_session_event_t.datagram_send_state_changed.buffers(dsc);
+
+                for (int i = 0; i < bufferCount; i++) {
+                    var buffer = wtf_buffer_t.asSlice(buffers, i);
+                    var data = wtf_buffer_t.data(buffer);
+
+                    if (data != null && data.address() != 0) {
+                        ((MemoryAllocator) arena).free(data);
+                    }
+                }
+            }
+            return;
+        }
+    }
+
+    public boolean Send(Object session, byte[] data) {
+        var n = data.length;
+        var dst = arena.allocate(n);
+        MemorySegment.copy(data, 0, dst, ValueLayout.JAVA_BYTE, 0, n);
+
+        var buffer = wtf_buffer_t.allocate(arena);
+        wtf_buffer_t.data(buffer, dst);
+        wtf_buffer_t.length(buffer, n);
+
+        if (session instanceof MemorySegment sessionPtr) {
+            int result = wtf_h.wtf_session_send_datagram(sessionPtr, buffer, 1);
+            if (result != wtf_h.WTF_SUCCESS()) {
+                var msg = wtf_h.wtf_result_to_string(result);
+                System.out.printf("[DATAGRAM] Failed to echo: %s\n", msg.getString(0));
+                return false;
+            }
+            System.out.printf("[DATAGRAM] Echoed %d bytes\n", n);
+            return true;
+        }
+
+        return false;
     }
 
     boolean Start() {

@@ -24,6 +24,7 @@ class WebTransportServer {
     }
 
     public wtf_log_callback_t.Function logCallback;
+    public wtf_connection_validator_t.Function connectionValidator;
 
     boolean Start() {
         var arena = Arena.global();
@@ -54,11 +55,16 @@ class WebTransportServer {
                 cert_data
         );
 
+        var connectionValidator = wtf_connection_validator_t.allocate(
+                this.connectionValidator,
+                arena
+        );
+
         var server_config = wtf_server_config_t.allocate(arena);
         wtf_server_config_t.port(server_config, (short)this.port);
         wtf_server_config_t.cert_config(server_config, cert_config);
         wtf_server_config_t.session_callback(server_config, MemorySegment.NULL);
-        wtf_server_config_t.connection_validator(server_config, MemorySegment.NULL);
+        wtf_server_config_t.connection_validator(server_config, connectionValidator);
         wtf_server_config_t.max_sessions_per_connection(server_config, 32);
         wtf_server_config_t.max_streams_per_session(server_config, 256);
         wtf_server_config_t.idle_timeout_ms(server_config, 60000);

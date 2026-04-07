@@ -42,6 +42,15 @@ class WebTransportServer {
                         System.out.printf("[SERVER] Received message: %s\n", msg);
                         this.Send(dg.Context.Identifier, dg.Payload);
                     }
+                    if (msg instanceof Stream s) {
+                        Thread.startVirtualThread(() -> {
+                            try {
+                                s.Incoming.transferTo(s.Outgoing);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        });
+                    }
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

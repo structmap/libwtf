@@ -311,42 +311,57 @@ class WebTransportServer {
         var outgoingReader = pipes.OutgoingReader;
         var sent = pipes.Sent;
 
-        try {
+        while (true) {
             byte[] buffer = new byte[4096]; // TODO: make this configurable
-            int bytesRead;
+            int bytesRead = -1;
+            MemorySegment dataSegment = MemorySegment.NULL;
 
-            while ((bytesRead = outgoingReader.read(buffer)) != -1) {
-                var dataSegment = arena.allocate(bytesRead);
-                MemorySegment.copy(buffer, 0, dataSegment, ValueLayout.JAVA_BYTE, 0, bytesRead);
-
-                // Add to sent queue for clean up
-                sent.put(dataSegment); // TODO: find a less icky way
-
-                // use the fact that an array of one item is just pointer to the first
-                var wtfBuffer = wtf_buffer_t.allocate(arena);
-                wtf_buffer_t.data(wtfBuffer, dataSegment);
-                wtf_buffer_t.length(wtfBuffer, bytesRead);
-
-                // Send data through the stream
-                int sendResult = wtf_h.wtf_stream_send(streamPointer, wtfBuffer, 1, false);
-
-                if (sendResult != wtf_h.WTF_SUCCESS()) {
-                    var msg = wtf_h.wtf_result_to_string(sendResult);
-                    System.err.printf("[STREAM] Failed to write to stream 0x%x: %s\n",
-                            streamPointer.address(), msg.getString(0));
+            try {
+                bytesRead = outgoingReader.read(buffer);
+                if (bytesRead != -1) {
+                    dataSegment = arena.allocate(bytesRead);
+                    MemorySegment.copy(buffer, 0, dataSegment, ValueLayout.JAVA_BYTE, 0, bytesRead);
+                } else {
                     break;
                 }
+            } catch (IOException e) {
+                var msg = e.getMessage();
+                if (msg != null && msg.equals("Write end dead")) {
+                    break;
+                } else {
+                    System.err.printf("[STREAM] Failed processing stream 0x%x: %s\n",  streamPointer.address());
+                    e.printStackTrace();
+                }
             }
-        } catch (Exception e) {
-            System.err.printf("[STREAM] Error in send loop for stream 0x%x: %s\n",
-                    streamPointer.address(), e.getMessage());
-            e.printStackTrace();
-        } finally {
+
             try {
-                outgoingReader.close();
-            } catch (Exception e) {
+                sent.put(dataSegment);
+            } catch (InterruptedException e) {
+                System.out.printf("[STREAM] Error adding buffer to sent queue: %s\n", e.getMessage());
                 e.printStackTrace();
+                break;
             }
+
+            // use the fact that an array of one item is just pointer to the first
+            var wtfBuffer = wtf_buffer_t.allocate(arena);
+            wtf_buffer_t.data(wtfBuffer, dataSegment);
+            wtf_buffer_t.length(wtfBuffer, bytesRead);
+
+            // Send data through the stream
+            int result = wtf_h.wtf_stream_send(streamPointer, wtfBuffer, 1, false);
+            if (result != wtf_h.WTF_SUCCESS()) {
+                var msg = wtf_h.wtf_result_to_string(result);
+                System.err.printf("[STREAM] Failed to write to stream 0x%x: %s\n",
+                        streamPointer.address(), msg.getString(0));
+                break;
+            }
+        }
+
+        try {
+            outgoingReader.close();
+        } catch (IOException e) {
+            System.err.printf("[STREAM] Failed at outgoingReader.close() processing stream 0x%x: %s\n", streamPointer.address());
+            e.printStackTrace();
         }
     }
 

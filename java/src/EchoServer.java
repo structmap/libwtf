@@ -26,6 +26,7 @@ class EchoServer {
 
         System.out.println("Starting echo server...");
         var server = new WebTransportServer(8443, "cert.pem", "key.pem");
+        server.logCallback = EchoServer::log_callback;
         if (!server.Start()) {
             return;
         }

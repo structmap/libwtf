@@ -10,19 +10,7 @@ class WebTransportServer {
         System.loadLibrary("msquic");
         System.loadLibrary("wtf");
     }
-    static void log_callback(int level, MemorySegment component, MemorySegment file, int line,
-                             MemorySegment message, MemorySegment user_context) {
-        String[] logLevels = {
-          "WTF_LOG_LEVEL_TRACE", // 0
-          "WTF_LOG_LEVEL_DEBUG", // 1
-          "WTF_LOG_LEVEL_INFO", // 2
-          "WTF_LOG_LEVEL_WARN", // 3
-          "WTF_LOG_LEVEL_ERROR", // 4
-          "WTF_LOG_LEVEL_CRITICAL", // 5
-          "WTF_LOG_LEVEL_NONE" // 6
-        };
-        System.out.println(logLevels[level] + "\t" + message.getString(0));
-    }
+
     public MemorySegment g_context;
     public MemorySegment g_server;
     public int port;
@@ -35,10 +23,12 @@ class WebTransportServer {
         this.key = key;
     }
 
+    public wtf_log_callback_t.Function logCallback;
+
     boolean Start() {
         var arena = Arena.global();
         var logCallback = wtf_log_callback_t.allocate(
-                WebTransportServer::log_callback,
+                this.logCallback,
                 arena
         );
         var context_config = wtf_context_config_t.allocate(arena);

@@ -217,7 +217,46 @@ class WebTransportServer {
     }
 
     void sendLoop(DuplexPipes pipes, MemorySegment streamPointer) {
-        // TODO: Implement send loop for bidirectional streams
+        var outgoingReader = pipes.OutgoingReader;
+        var sent = pipes.Sent;
+
+        try {
+            byte[] buffer = new byte[4096]; // TODO: make this configurable
+            int bytesRead;
+
+            while ((bytesRead = outgoingReader.read(buffer)) != -1) {
+                var dataSegment = arena.allocate(bytesRead);
+                MemorySegment.copy(buffer, 0, dataSegment, ValueLayout.JAVA_BYTE, 0, bytesRead);
+
+                // Add to sent queue for clean up
+                sent.put(dataSegment); // TODO: find a less icky way
+
+                // use the fact that an array of one item is just pointer to the first
+                var wtfBuffer = wtf_buffer_t.allocate(arena);
+                wtf_buffer_t.data(wtfBuffer, dataSegment);
+                wtf_buffer_t.length(wtfBuffer, bytesRead);
+
+                // Send data through the stream
+                int sendResult = wtf_h.wtf_stream_send(streamPointer, wtfBuffer, 1, false);
+
+                if (sendResult != wtf_h.WTF_SUCCESS()) {
+                    var msg = wtf_h.wtf_result_to_string(sendResult);
+                    System.err.printf("[STREAM] Failed to write to stream 0x%x: %s\n",
+                            streamPointer.address(), msg.getString(0));
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            System.err.printf("[STREAM] Error in send loop for stream 0x%x: %s\n",
+                    streamPointer.address(), e.getMessage());
+            e.printStackTrace();
+        } finally {
+            try {
+                outgoingReader.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public boolean Send(Object session, byte[] data) {

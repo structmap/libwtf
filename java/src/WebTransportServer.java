@@ -111,7 +111,7 @@ class WebTransportServer {
                     var incoming = Pipe.open();
                     var outgoing = Pipe.open();
 
-                    var pipes = new DuplexPipes(incoming, outgoing, new LinkedBlockingQueue<>(2));
+                    var pipes = new DuplexPipes(incoming, outgoing, new LinkedBlockingQueue<>(2)); // TODO: consider making configurable
 
                     if (!bidi) {
                         try {

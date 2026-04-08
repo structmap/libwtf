@@ -2,10 +2,10 @@
 
 clojure -M \
 	--main cljs.main \
-	--output-dir public/js \
-	--compile-opts '{:asset-path "js"}' \
+	--compile-opts compile.edn \
+	--repl-opts repl.edn \
 	--verbose \
 	--watch src \
-	--repl-opts '{:static-dir "public"}'\
 	--compile libwtf.experimental \
-	--repl
+	--repl \
+	--serve 127.0.0.1:8080

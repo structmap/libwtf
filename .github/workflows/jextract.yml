@@ -1,0 +1,139 @@
+---
+name: jextract
+
+on:
+  workflow_dispatch:
+    inputs: {}
+  push:
+    commits:
+      - '*'
+
+jobs:
+  build-native:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            runtime: osx-arm64
+            classifier: macosx-arm64
+            jextract: https://download.java.net/java/early_access/jextract/25/2/openjdk-25-jextract+2-4_macos-aarch64_bin.tar.gz
+#          - os: macos-15-intel
+#            runtime: osx-x64
+#            classifier: macosx-x86_64
+#          - os: windows-2022
+#            runtime: win-x64
+#            classifier: windows-x86_64
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 25
+          distribution: temurin
+          cache: maven
+
+# thanks to Nathan for sharing these on GitHub
+# jextract steps from https://github.com/pot/boba/blob/main/.github/workflows/jextract.yml
+
+      - name: Curl jextract
+        shell: bash
+        run: |
+          curl -L ${{ matrix.jextract }} -o jextract.tar.gz
+
+      - name: Extract jextract
+        shell: bash
+        run: tar -xzf jextract.tar.gz
+
+      - name: Find jextract binary path
+        id: jextract_bin
+        shell: bash
+        run: |
+          JEXTRACT_BIN=$(find . -name jextract -type f -path "*/bin/*" | head -n 1)
+          echo "path=$JEXTRACT_BIN" >> $GITHUB_OUTPUT
+
+      - name: Chmod jextract
+        shell: bash
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        run: chmod +x ${{ steps.jextract_bin.outputs.path }}
+
+      - name: Run jextract generator
+        run: |
+          cd java
+          ${{ steps.jextract_bin.outputs.path }} --output src --target-package com.structmap.webtransportfast include/wtf.h
+
+      - name: Parse tag from build context
+        uses: olegtarasov/get-tag@v2.1.4
+        id: tagVersion
+        with:
+          tagRegex: "v(.*)"
+
+      - name: Compile Java to class files
+        run: |
+          cd java
+          javac -d target src/com/structmap/webtransportfast/*
+          cd target
+          jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-{{ matrix.classifier }}.jar com/structmap/webtransportfast/*
+
+      - name: Install dependencies
+        run: |
+          ${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'dotnet restore csharp --use-current-runtime' }}
+      - name: Get location of libmsquic
+        id: strings
+        run: |
+          echo -n "libmsquic=" >> $GITHUB_OUTPUT
+          brew --prefix libmsquic >> $GITHUB_OUTPUT
+        if: runner.os == 'macOS'
+      - name: Configure project on macOS # cmake 4.1.3
+        run: >
+          cmake -S . -B build
+          -DWTF_USE_EXTERNAL_MSQUIC=on
+          -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.libmsquic }}
+        if: runner.os == 'macOS'
+      - name: Configure project on Windows # cmake version 3.31.6-msvc6
+        run: >
+          cmake -S . -B build
+          -DWTF_USE_EXTERNAL_MSQUIC=on
+          -DMSQUIC_LIBRARIES="c:\\users\\runneradmin\\.nuget\\packages\\microsoft.native.quic.msquic.openssl\\2.5.6\\build\\native\\Microsoft.Native.Quic.MsQuic.quictls.targets"
+        if: runner.os == 'Windows'
+      - name: Build project
+        run: cmake --build build --config Release
+
+      - name: Create JAR file from class files and native bits
+        run: |
+          cd java/target
+          mkdir native/{{ matrix.classifier }}
+          cp ../../build/output/* native/{{ matrix.classifier }}
+Release
+          jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-{{ matrix.classifier }}.jar com/structmap/webtransportfast/* native/{{ matrix.classifier }}/*
+
+
+      - name: Add native dependencies to the JAR file
+        run: |
+          cd build/output
+          
+        run: >
+          cd
+        <None Include="../build/output/libwtf.*" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
+          dotnet pack csharp
+          -p:RuntimeTarget=${{ matrix.os.runtime }}
+          -p:PublishVersion=${{ steps.tagVersion.outputs.tag }}
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: csharp/bin/Release/Structmap.WebTransportFast.${{ matrix.os.runtime }}.${{ steps.tagVersion.outputs.tag }}.nupkg
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: ""
+
+
+
+

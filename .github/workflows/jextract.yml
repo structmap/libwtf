@@ -32,8 +32,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: 25
-          distribution: temurin
-          cache: maven
+          distribution: corretto
 
 # thanks to Nathan for sharing these on GitHub
 # jextract steps from https://github.com/pot/boba/blob/main/.github/workflows/jextract.yml

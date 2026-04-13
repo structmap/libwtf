@@ -15,9 +15,11 @@ import java.util.function.Supplier;
 
 class WebTransportServer {
     static {
-        // this needs VM option -Djava.library.path to directory
-        System.loadLibrary("msquic");
-        System.loadLibrary("wtf");
+        // try to load from jar classpath but fall back to -Djava.library.path VM option in development
+        if (!WebTransportFast.load()) {
+            System.loadLibrary("msquic");
+            System.loadLibrary("wtf");
+        }
     }
 
     public MemorySegment g_context;

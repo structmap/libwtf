@@ -1,3 +1,5 @@
+package com.structmap.webtransportfast;
+
 import java.lang.foreign.*;
 import java.lang.invoke.MethodHandle;
 import java.util.ArrayList;

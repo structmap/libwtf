@@ -15,6 +15,7 @@ public class WebTransportFast {
                 var plat = System.getProperty("os.name").toLowerCase();
                 var arch = System.getProperty("os.arch").toLowerCase();
                 var jarFolder = String.format("/native/%s-%s/", plat, arch);
+                var tempDir = Files.createTempDirectory("native");
                 String[] libraryNames = {"msquic", "wtf"};
                 for (String libName : libraryNames) {
                     var mappedLibName = System.mapLibraryName(libName);

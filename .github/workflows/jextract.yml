@@ -40,7 +40,7 @@ jobs:
       - name: Curl jextract
         shell: bash
         run: |
-          curl -L ${{ matrix.jextract }} -o jextract.tar.gz
+          curl --silent --fail -L ${{ matrix.jextract }} -o jextract.tar.gz
 
       - name: Extract jextract
         shell: bash
@@ -60,8 +60,7 @@ jobs:
 
       - name: Run jextract generator
         run: |
-          cd java
-          ${{ steps.jextract_bin.outputs.path }} --output src --target-package com.structmap.webtransportfast include/wtf.h
+          ${{ steps.jextract_bin.outputs.path }} --output java/src --target-package com.structmap.webtransportfast include/wtf.h
 
       - name: Parse tag from build context
         uses: olegtarasov/get-tag@v2.1.4

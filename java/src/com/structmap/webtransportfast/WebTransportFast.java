@@ -16,10 +16,12 @@ public class WebTransportFast {
                 var arch = System.getProperty("os.arch").toLowerCase();
                 var jarFolder = String.format("/native/%s-%s/", plat, arch);
                 var tempDir = Files.createTempDirectory("native");
+                System.out.println(tempDir.toAbsolutePath());
                 String[] libraryNames = {"msquic", "wtf"};
                 for (String libName : libraryNames) {
                     var mappedLibName = System.mapLibraryName(libName);
                     var in = WebTransportFast.class.getResourceAsStream(jarFolder + mappedLibName);
+                    System.out.println(jarFolder + mappedLibName);
                     if (in == null) {
                         return false;
                     }

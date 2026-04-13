@@ -22,17 +22,16 @@ public class WebTransportFast {
                 }
                 var jarFolder = String.format("/native/%s-%s/", plat, arch);
                 var tempDir = Files.createTempDirectory("native");
-                String[] libraryNames = {"msquic", "wtf"};
-                for (String libName : libraryNames) {
-                    var mappedLibName = System.mapLibraryName(libName);
-                    var in = WebTransportFast.class.getResourceAsStream(jarFolder + mappedLibName);
-                    if (in == null) {
-                        return false;
+                var libmsquic = System.mapLibraryName("msquic");
+                var libwtf = System.mapLibraryName("wtf");
+                for (String lib : new String[] { libmsquic, libwtf }) {
+                    var in = WebTransportFast.class.getResourceAsStream(jarFolder + lib);
+                    if (in != null) {
+                        var tempPath = tempDir.resolve(lib);
+                        Files.copy(in, tempPath);
                     }
-                    var tempPath = tempDir.resolve(mappedLibName).toAbsolutePath();
-                    Files.copy(in, tempPath);
-                    System.load(tempPath.toString());
                 }
+                System.load(tempDir.resolve(libwtf).toAbsolutePath().toString());
             } catch (IOException | UnsatisfiedLinkError | NullPointerException e) {
                 System.err.println("Failed to load library: " + e.getMessage());
                 return false;

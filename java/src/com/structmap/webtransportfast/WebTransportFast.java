@@ -17,8 +17,14 @@ public class WebTransportFast {
                 if (plat.equals("windows 11")) {
                     plat = "windows";
                 }
+                if (plat.equals("mac os x")) {
+                    plat = "macosx";
+                }
                 if (arch.equals("amd64")) {
                     arch = "x86_64";
+                }
+                if (arch.equals("aarch64")) {
+                    arch = "arm64";
                 }
                 var jarFolder = String.format("/native/%s-%s/", plat, arch);
                 var tempDir = Files.createTempDirectory("native");

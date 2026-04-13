@@ -28,11 +28,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 10.0.x
-
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -84,7 +79,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          ${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'dotnet restore csharp --use-current-runtime' }}
+          ${{ runner.os == 'macOS' && 'brew update && brew install libmsquic' || 'nuget install microsoft.native.quic.msquic.openssl -Version 2.5.6' }}
       - name: Get location of libmsquic
         id: strings
         run: |
@@ -106,34 +101,15 @@ jobs:
       - name: Build project
         run: cmake --build build --config Release
 
-      - name: Create JAR file from class files and native bits
+      - name: Create JAR file
         run: |
           cd java/target
           mkdir native/{{ matrix.classifier }}
-          cp ../../build/output/* native/{{ matrix.classifier }}
-Release
-          jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-{{ matrix.classifier }}.jar com/structmap/webtransportfast/* native/{{ matrix.classifier }}/*
+          cp ../../build/output${{ runner.os == 'Windows' && '/Release' || '' }}/* native/${{ matrix.classifier }}
+          jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar com/structmap/webtransportfast/* native/${{ matrix.classifier }}/*
 
-
-      - name: Add native dependencies to the JAR file
-        run: |
-          cd build/output
-          
-        run: >
-          cd
-        <None Include="../build/output/libwtf.*" Pack="true" PackagePath="runtimes/$(RuntimeTarget)/native/" />
-          dotnet pack csharp
-          -p:RuntimeTarget=${{ matrix.os.runtime }}
-          -p:PublishVersion=${{ steps.tagVersion.outputs.tag }}
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
+      - name: Save artifact for checking
+        uses: actions/upload-artifact@v7
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: csharp/bin/Release/Structmap.WebTransportFast.${{ matrix.os.runtime }}.${{ steps.tagVersion.outputs.tag }}.nupkg
-          tag: ${{ github.ref }}
-          overwrite: true
-          body: ""
-
-
-
-
+          path: java/target/webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar
+          archive: false

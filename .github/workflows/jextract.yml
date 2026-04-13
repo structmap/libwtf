@@ -73,7 +73,7 @@ jobs:
           cd java
           javac -d target src/com/structmap/webtransportfast/*
           cd target
-          jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-{{ matrix.classifier }}.jar com/structmap/webtransportfast/*
+          jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar com/structmap/webtransportfast/*
 
       - name: Install dependencies
         run: |
@@ -102,7 +102,7 @@ jobs:
       - name: Create JAR file
         run: |
           cd java/target
-          mkdir native/{{ matrix.classifier }}
+          mkdir native/${{ matrix.classifier }}
           cp ../../build/output${{ runner.os == 'Windows' && '/Release' || '' }}/* native/${{ matrix.classifier }}
           jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar com/structmap/webtransportfast/* native/${{ matrix.classifier }}/*
 

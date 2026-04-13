@@ -23,8 +23,7 @@ public class WebTransportFast {
                     if (in == null) {
                         return false;
                     }
-                    var tempDir = Files.createTempDirectory("native");
-                    var tempPath = tempDir.resolve(mappedLibName);
+                    var tempPath = tempDir.resolve(mappedLibName).toAbsolutePath();
                     Files.copy(in, tempPath);
                     System.load(tempPath.toString());
                 }

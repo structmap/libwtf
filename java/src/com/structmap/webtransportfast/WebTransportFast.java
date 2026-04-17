@@ -2,6 +2,7 @@ package com.structmap.webtransportfast;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class WebTransportFast {
 
@@ -28,6 +29,9 @@ public class WebTransportFast {
                 }
                 var jarFolder = String.format("/native/%s-%s/", plat, arch);
                 var tempDir = Files.createTempDirectory("native");
+                if (plat.equals("windows")) {
+                    tempDir = Paths.get(".").toAbsolutePath();
+                }
                 var libmsquic = System.mapLibraryName("msquic");
                 var libwtf = System.mapLibraryName("wtf");
                 for (String lib : new String[] { libmsquic, libwtf }) {

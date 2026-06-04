@@ -106,8 +106,11 @@ jobs:
           cp ../../build/output${{ runner.os == 'Windows' && '/Release' || '' }}/* native/${{ matrix.classifier }}
           jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar com/structmap/webtransportfast/* native/${{ matrix.classifier }}/*
 
-      - name: Save artifact for checking
-        uses: actions/upload-artifact@v7
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          path: java/target/webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar
-          archive: false
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: java/target/webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: ""

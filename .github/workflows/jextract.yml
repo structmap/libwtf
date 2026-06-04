@@ -2,10 +2,8 @@
 name: jextract
 
 on:
-  workflow_dispatch:
-    inputs: {}
   push:
-    commits:
+    tags:
       - '*'
 
 jobs:

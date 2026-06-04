@@ -17,13 +17,13 @@ public class WebTransportFast {
                 var plat = System.getProperty("os.name").toLowerCase();
                 var arch = System.getProperty("os.arch").toLowerCase();
                 if (plat.equals("windows 11")) {
-                    plat = "windows";
+                    plat = "win";
                 }
                 if (plat.equals("mac os x")) {
-                    plat = "macosx";
+                    plat = "osx";
                 }
                 if (arch.equals("amd64")) {
-                    arch = "x86_64";
+                    arch = "x64";
                 }
                 if (arch.equals("aarch64")) {
                     arch = "arm64";

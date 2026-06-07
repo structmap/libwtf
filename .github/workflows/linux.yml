@@ -75,8 +75,8 @@ jobs:
 
       - name: Install dependencies, configure project and build
         run: |
-          apt -y update
-          apt -y install libmsquic
+          sudo apt -y update
+          sudo apt -y install libmsquic
           cmake -S . -B build -DWTF_USE_EXTERNAL_MSQUIC=on
           cmake --build build --config Release
 

@@ -1,0 +1,134 @@
+---
+name: package
+on:
+  workflow_dispatch:
+    inputs: {}
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-native:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            runtime: osx-arm64
+            jextract: https://download.java.net/java/early_access/jextract/25/2/openjdk-25-jextract+2-4_macos-aarch64_bin.tar.gz
+          - os: macos-15-intel
+            runtime: osx-x64
+            jextract: https://download.java.net/java/early_access/jextract/25/2/openjdk-25-jextract+2-4_macos-x64_bin.tar.gz
+          - os: windows-2022
+            runtime: win-x64
+            jextract: https://download.java.net/java/early_access/jextract/25/2/openjdk-25-jextract+2-4_windows-x64_bin.tar.gz
+          - os: ubuntu-24.04
+            runtime: linux-x64
+            jextract: https://download.java.net/java/early_access/jextract/25/2/openjdk-25-jextract+2-4_linux-x64_bin.tar.gz
+          - os: ubuntu-24.04-arm
+            runtime: linux-arm64
+            jextract: https://download.java.net/java/early_access/jextract/25/2/openjdk-25-jextract+2-4_linux-aarch64_bin.tar.gz
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: 25
+          distribution: corretto
+      # thanks to Nathan for sharing these on GitHub
+      # jextract steps from https://github.com/pot/boba/blob/main/.github/workflows/jextract.yml
+      - name: Curl jextract
+        shell: bash
+        run: |
+          curl --silent --fail -L ${{ matrix.jextract }} -o jextract.tar.gz
+      - name: Extract jextract
+        shell: bash
+        run: tar -xzf jextract.tar.gz
+      - name: Find jextract binary path
+        id: jextract_bin
+        shell: bash
+        run: |
+          JEXTRACT_BIN=$(find . -name jextract -type f -path "*/bin/*" | head -n 1)
+          echo "path=$JEXTRACT_BIN" >> $GITHUB_OUTPUT
+      - name: Chmod jextract
+        shell: bash
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        run: chmod +x ${{ steps.jextract_bin.outputs.path }}
+      - if: runner.os == 'Linux'
+        name: Install Homebrew and add to PATH
+        run: |
+          cd `mktemp -d`
+          curl -fsSL -O https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+          chmod +x ./install.sh
+          ./install.sh
+          test -d /home/linuxbrew/.linuxbrew/bin
+          echo /home/linuxbrew/.linuxbrew/bin >> $GITHUB_PATH
+      - if: runner.os == 'macOS' || runner.os == 'Linux'
+        run: brew install libmsquic
+      - if: runner.os == 'Windows'
+        run: dotnet restore csharp --use-current-runtime
+      - if: runner.os == 'macOS' || runner.os == 'Linux'
+        id: strings
+        run: |
+          echo -n "libmsquic=" >> $GITHUB_OUTPUT
+          brew --prefix libmsquic >> $GITHUB_OUTPUT
+      - if: runner.os == 'macOS' || runner.os == 'Linux'
+        name: Configure project on macOS / Linux
+        run: >
+          cmake -S . -B build
+          -DWTF_USE_EXTERNAL_MSQUIC=on
+          -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.libmsquic }}
+      - if: runner.os == 'Windows'
+        name: Configure project on Windows # cmake version 3.31.6-msvc6
+        run: >
+          cmake -S . -B build
+          -DWTF_USE_EXTERNAL_MSQUIC=on
+          -DMSQUIC_LIBRARIES="c:\\users\\runneradmin\\.nuget\\packages\\microsoft.native.quic.msquic.openssl\\2.5.6\\build\\native\\Microsoft.Native.Quic.MsQuic.quictls.targets"
+      - name: Build project
+        run: cmake --build build --config Release
+      - name: Parse tag from build context
+        uses: olegtarasov/get-tag@v2.1.4
+        id: tagVersion
+        with:
+          tagRegex: "v(.*)"
+      - name: Build project and create NuGet package
+        run: >
+          dotnet pack csharp
+          -p:RuntimeTarget=${{ matrix.os.runtime }}
+          -p:PublishVersion=${{ steps.tagVersion.outputs.tag }}
+      - name: Upload .NET package to release
+        if: steps.tagVersion.outputs.tag != ''
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: csharp/bin/Release/Structmap.WebTransportFast.${{ matrix.os.runtime }}.${{ steps.tagVersion.outputs.tag }}.nupkg
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: ""
+      - name: Run jextract generator
+        run: |
+          ${{ steps.jextract_bin.outputs.path }} --output java/src --target-package com.structmap.webtransportfast include/wtf.h
+      - name: Compile Java to class files
+        run: |
+          cd java
+          javac -d target src/com/structmap/webtransportfast/*
+          cd target
+          jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.runtime }}.jar com/structmap/webtransportfast/*
+      - name: Create JAR file
+        run: |
+          cd java/target
+          mkdir -p native/${{ matrix.runtime }}
+          cp ../../build/output/* native/${{ matrix.runtime }}
+          jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.runtime }}.jar com/structmap/webtransportfast/* native/${{ matrix.runtime }}/*
+      - name: Upload JAR artifact to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: java/target/webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: ""

@@ -96,12 +96,7 @@ jobs:
           overwrite: true
           body: ""
       - name: Run jextract generator
-        shell: bash
-        run: >
-          jextract
-            --output java/src
-            --target-package com.structmap.webtransportfast
-            include/wtf.h
+        run: jextract --output java/src --target-package com.structmap.webtransportfast include/wtf.h
       - name: Compile Java to class files
         run: |
           cd java

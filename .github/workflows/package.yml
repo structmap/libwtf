@@ -37,12 +37,25 @@ jobs:
         with:
           java-version: 25
           distribution: corretto
-      - name: Unpack jextract and add to PATH
+      # thanks to Nathan for sharing these on GitHub
+      # jextract steps from https://github.com/pot/boba/blob/main/.github/workflows/jextract.yml
+      - name: Curl jextract
         shell: bash
         run: |
-          curl -fsSL ${{ matrix.jextract }} -o jextract.tar.gz
-          tar -xzf jextract.tar.gz
-          realpath jextract-25/bin >> $GITHUB_PATH
+          curl --silent --fail -L ${{ matrix.jextract }} -o jextract.tar.gz
+      - name: Extract jextract
+        shell: bash
+        run: tar -xzf jextract.tar.gz
+      - name: Find jextract binary path
+        id: jextract_bin
+        shell: bash
+        run: |
+          JEXTRACT_BIN=$(find . -name jextract -type f -path "*/bin/*" | head -n 1)
+          echo "path=$JEXTRACT_BIN" >> $GITHUB_OUTPUT
+      - name: Chmod jextract
+        shell: bash
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        run: chmod +x ${{ steps.jextract_bin.outputs.path }}          
       - if: runner.os == 'Linux'
         name: Install Homebrew and add to PATH
         run: |
@@ -96,7 +109,8 @@ jobs:
           overwrite: true
           body: ""
       - name: Run jextract generator
-        run: jextract --output java/src --target-package com.structmap.webtransportfast include/wtf.h
+        run: |
+          ${{ steps.jextract_bin.outputs.path }} --output java/src --target-package com.structmap.webtransportfast include/wtf.h
       - name: Compile Java to class files
         run: |
           cd java

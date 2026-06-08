@@ -1,8 +1,6 @@
 ---
 name: nupkg
 on:
-  workflow_dispatch:
-    inputs: {}
   push:
     tags:
       - '*'
@@ -18,8 +16,8 @@ jobs:
             runtime: osx-x64
           - runner: windows-2022
             runtime: win-x64
-          - runner: ubuntu-24.04-arm
-            runtime: linux-arm64
+          - runner: ubuntu-24.04
+            runtime: linux-x64
           - runner: ubuntu-24.04-arm
             runtime: linux-arm64
     runs-on: ${{ matrix.os.runner }}

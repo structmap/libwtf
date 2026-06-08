@@ -16,6 +16,10 @@ jobs:
             runtime: osx-x64
           - runner: windows-2022
             runtime: win-x64
+          - runner: ubuntu-24.04-arm
+            runtime: linux-arm64
+          - runner: ubuntu-24.04-arm
+            runtime: linux-arm64
     runs-on: ${{ matrix.os.runner }}
     steps:
       - uses: actions/checkout@v4
@@ -23,17 +27,17 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-      - if: runner.os == 'macOS'
+      - if: runner.os == 'macOS' || runner.os == 'Linux'
         run: brew install libmsquic
       - if: runner.os == 'Windows'
         run: dotnet restore csharp --use-current-runtime
-      - if: runner.os == 'macOS'
+      - if: runner.os == 'macOS' || runner.os == 'Linux'
         id: strings
         run: |
           echo -n "libmsquic=" >> $GITHUB_OUTPUT
           brew --prefix libmsquic >> $GITHUB_OUTPUT
-      - if: runner.os == 'macOS'
-        name: Configure project on macOS
+      - if: runner.os == 'macOS' || runner.os == 'Linux'
+        name: Configure project on macOS / Linux
         run: >
           cmake -S . -B build
           -DWTF_USE_EXTERNAL_MSQUIC=on

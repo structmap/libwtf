@@ -26,20 +26,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set up Homebrew on Linux
+        shell: bash
+        run: |
+          cd `mktemp -d`
+          curl -fsSL -O https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+          chmod +x ./install.sh
+          ./install.sh
+          test -d /home/linuxbrew/.linuxbrew/bin
+
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
           java-version: 25
           distribution: corretto
-
-      - name: Install MsQuic from Microsoft packages
-        run: |
-          cd `mktemp -d`
-          curl -sSL -O https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb
-          sudo dpkg -i packages-microsoft-prod.deb
-          rm -fv packages-microsoft-prod.deb
-          sudo apt -y -qq update
-          sudo apt -y -qq install libmsquic
 
 # thanks to Nathan for sharing these on GitHub
 # jextract steps from https://github.com/pot/boba/blob/main/.github/workflows/jextract.yml
@@ -82,10 +82,24 @@ jobs:
           cd target
           jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar com/structmap/webtransportfast/*
 
-      - name: Configure and build
+      - name: Install MsQuic with headers
+        run: /home/linuxbrew/.linuxbrew/bin/brew install libmsquic
+
+      - name: Get location of libmsquic
+        id: strings
         run: |
-          cmake -S . -B build -DWTF_USE_EXTERNAL_MSQUIC=on
-          cmake --build build --config Release
+          echo -n "libmsquic=" >> $GITHUB_OUTPUT
+          /home/linuxbrew/.linuxbrew/bin/brew --prefix libmsquic >> $GITHUB_OUTPUT
+        if: runner.os == 'macOS' || runner.os == 'Linux'
+
+      - name: Configure project on Linux
+        run: >
+          cmake -S . -B build
+          -DWTF_USE_EXTERNAL_MSQUIC=on
+          -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.libmsquic }}
+
+      - name: Build project
+        run: cmake --build build --config Release
 
       - name: Create JAR file
         run: |

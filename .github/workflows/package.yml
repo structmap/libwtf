@@ -42,8 +42,7 @@ jobs:
         run: |
           curl -fsSL ${{ matrix.jextract }} -o jextract.tar.gz
           tar -xzf jextract.tar.gz
-          JEXTRACT_BIN=$(find . -name jextract -type d -name bin | head -n 1)
-          echo $JEXTRACT_BIN >> $GITHUB_PATH
+          realpath jextract-25/bin >> $GITHUB_PATH
       - if: runner.os == 'Linux'
         name: Install Homebrew and add to PATH
         run: |

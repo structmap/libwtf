@@ -32,6 +32,15 @@ jobs:
           java-version: 25
           distribution: corretto
 
+      - name: Install MsQuic from Microsoft packages
+        run: |
+          cd `mktemp -d`
+          curl -sSL -O https://packages.microsoft.com/config/ubuntu/26.04/packages-microsoft-prod.deb
+          sudo dpkg -i packages-microsoft-prod.deb
+          rm -fv packages-microsoft-prod.deb
+          sudo apt -y -qq update
+          sudo apt -y -qq install libmsquic
+
 # thanks to Nathan for sharing these on GitHub
 # jextract steps from https://github.com/pot/boba/blob/main/.github/workflows/jextract.yml
 
@@ -73,10 +82,8 @@ jobs:
           cd target
           jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar com/structmap/webtransportfast/*
 
-      - name: Install dependencies, configure project and build
+      - name: Configure and build
         run: |
-          sudo apt -y update
-          sudo apt -y install libmsquic
           cmake -S . -B build -DWTF_USE_EXTERNAL_MSQUIC=on
           cmake --build build --config Release
 

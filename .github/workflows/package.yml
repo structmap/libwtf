@@ -55,7 +55,7 @@ jobs:
       - name: Chmod jextract
         shell: bash
         if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
-        run: chmod +x ${{ steps.jextract_bin.outputs.path }}          
+        run: chmod +x ${{ steps.jextract_bin.outputs.path }}
       - if: runner.os == 'Linux'
         name: Install Homebrew and add to PATH
         run: |

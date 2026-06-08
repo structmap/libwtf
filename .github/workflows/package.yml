@@ -1,8 +1,10 @@
 ---
 name: package
 on:
+  workflow_dispatch:
+    inputs: {}
   push:
-    commits:
+    tags:
       - '*'
 
 jobs:
@@ -94,12 +96,11 @@ jobs:
         with:
           tagRegex: "v(.*)"
       - name: Build project and create NuGet package
-        if: steps.tagVersion.outputs.tag != ''
         run: >
           dotnet pack csharp
           -p:RuntimeTarget=${{ matrix.os.runtime }}
           -p:PublishVersion=${{ steps.tagVersion.outputs.tag }}
-      - name: Upload binaries to release
+      - name: Upload .NET package to release
         if: steps.tagVersion.outputs.tag != ''
         uses: svenstaro/upload-release-action@v2
         with:
@@ -123,8 +124,11 @@ jobs:
           mkdir -p native/${{ matrix.runtime }}
           cp ../../build/output/* native/${{ matrix.runtime }}
           jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.runtime }}.jar com/structmap/webtransportfast/* native/${{ matrix.runtime }}/*
-      - name: Save artifact for checking
-        uses: actions/upload-artifact@v7
+      - name: Upload JAR artifact to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          path: java/target/webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.runtime }}.jar
-          archive: false
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: java/target/webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar
+          tag: ${{ github.ref }}
+          overwrite: true
+          body: ""

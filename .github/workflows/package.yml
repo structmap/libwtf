@@ -98,14 +98,14 @@ jobs:
       - name: Build project and create NuGet package
         run: >
           dotnet pack csharp
-          -p:RuntimeTarget=${{ matrix.os.runtime }}
+          -p:RuntimeTarget=${{ matrix.runtime }}
           -p:PublishVersion=${{ steps.tagVersion.outputs.tag }}
       - name: Upload .NET package to release
         if: steps.tagVersion.outputs.tag != ''
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: csharp/bin/Release/Structmap.WebTransportFast.${{ matrix.os.runtime }}.${{ steps.tagVersion.outputs.tag }}.nupkg
+          file: csharp/bin/Release/Structmap.WebTransportFast.${{ matrix.runtime }}.${{ steps.tagVersion.outputs.tag }}.nupkg
           tag: ${{ github.ref }}
           overwrite: true
           body: ""
@@ -128,7 +128,7 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: java/target/webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.classifier }}.jar
+          file: java/target/webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.runtime }}.jar
           tag: ${{ github.ref }}
           overwrite: true
           body: ""

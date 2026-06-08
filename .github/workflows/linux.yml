@@ -47,7 +47,7 @@ jobs:
       - name: Curl jextract
         shell: bash
         run: |
-          curl --silent --fail -L ${{ matrix.jextract }} -o jextract.tar.gz
+          curl -fsSL ${{ matrix.jextract }} -o jextract.tar.gz
 
       - name: Extract jextract
         shell: bash
@@ -62,8 +62,8 @@ jobs:
 
       - name: Chmod jextract
         shell: bash
-        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
         run: chmod +x ${{ steps.jextract_bin.outputs.path }}
+        if: runner.os == 'macOS' || runner.os == 'Linux'
 
       - name: Run jextract generator
         run: |

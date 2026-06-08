@@ -82,6 +82,7 @@ jobs:
         with:
           tagRegex: "v(.*)"
       - name: Build project and create NuGet package
+        if: steps.tagVersion.outputs.tag != ''
         run: >
           dotnet pack csharp
           -p:RuntimeTarget=${{ matrix.os.runtime }}

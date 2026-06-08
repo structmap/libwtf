@@ -44,6 +44,15 @@ jobs:
           tar -xzf jextract.tar.gz
           JEXTRACT_BIN=$(find . -name jextract -type d -name bin | head -n 1)
           echo $JEXTRACT_BIN >> $GITHUB_PATH
+      - if: runner.os == 'Linux'
+        name: Install Homebrew and add to PATH
+        run: |
+          cd `mktemp -d`
+          curl -fsSL -O https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
+          chmod +x ./install.sh
+          ./install.sh
+          test -d /home/linuxbrew/.linuxbrew/bin
+          echo /home/linuxbrew/.linuxbrew/bin >> $GITHUB_PATH
       - if: runner.os == 'macOS' || runner.os == 'Linux'
         run: brew install libmsquic
       - if: runner.os == 'Windows'

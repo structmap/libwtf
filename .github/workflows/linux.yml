@@ -13,11 +13,11 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-latest-arm
+          - os: ubuntu-24.04-arm
             runtime: linux-arm64
             classifier: linux-arm64
             jextract: https://download.java.net/java/early_access/jextract/25/2/openjdk-25-jextract+2-4_linux-aarch64_bin.tar.gz
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             runtime: linux-x64
             classifier: linux-x64
             jextract: https://download.java.net/java/early_access/jextract/25/2/openjdk-25-jextract+2-4_linux-x64_bin.tar.gz
@@ -35,7 +35,7 @@ jobs:
       - name: Install MsQuic from Microsoft packages
         run: |
           cd `mktemp -d`
-          curl -sSL -O https://packages.microsoft.com/config/ubuntu/26.04/packages-microsoft-prod.deb
+          curl -sSL -O https://packages.microsoft.com/config/ubuntu/24.04/packages-microsoft-prod.deb
           sudo dpkg -i packages-microsoft-prod.deb
           rm -fv packages-microsoft-prod.deb
           sudo apt -y -qq update

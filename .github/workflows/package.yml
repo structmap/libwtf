@@ -122,7 +122,7 @@ jobs:
         run: |
           cd java/target
           mkdir -p native/${{ matrix.runtime }}
-          cp ../../build/output/* native/${{ matrix.runtime }}
+          cp ../../build/output${{ runner.os == 'Windows' && '/Release' || '' }}/* native/${{ matrix.runtime }}
           jar --create --file webtransportfast-${{ steps.tagVersion.outputs.tag }}-${{ matrix.runtime }}.jar com/structmap/webtransportfast/* native/${{ matrix.runtime }}/*
       - name: Upload JAR artifact to release
         uses: svenstaro/upload-release-action@v2

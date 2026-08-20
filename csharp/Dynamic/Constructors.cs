@@ -36,6 +36,6 @@ public partial struct wtf_certificate_config_t
         public partial struct _pkcs12_e__Struct;
     }
 };
-[QuickConstructor(Fields=IncludeFields.AllFields)] public partial struct wtf_server_config_t;
-[QuickConstructor(Fields=IncludeFields.AllFields)] public partial struct wtf_context_config_t;
+// [QuickConstructor(Fields=IncludeFields.AllFields)] public partial struct wtf_server_config_t;
+// [QuickConstructor(Fields=IncludeFields.AllFields)] public partial struct wtf_context_config_t;
 [QuickConstructor(Fields = IncludeFields.AllFields)] public partial struct wtf_version_info_t;

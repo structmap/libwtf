@@ -30,6 +30,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          show-progress: false
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
@@ -58,38 +61,10 @@ jobs:
         shell: bash
         if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
         run: chmod +x ${{ steps.jextract_bin.outputs.path }}
-      - if: runner.os == 'Linux'
-        name: Install Homebrew and add to PATH
+      - name: Configure and build project
         run: |
-          cd `mktemp -d`
-          curl -fsSL -O https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh
-          chmod +x ./install.sh
-          ./install.sh
-          test -d /home/linuxbrew/.linuxbrew/bin
-          echo /home/linuxbrew/.linuxbrew/bin >> $GITHUB_PATH
-      - if: runner.os == 'macOS' || runner.os == 'Linux'
-        run: brew install libmsquic
-      - if: runner.os == 'Windows'
-        run: dotnet restore csharp --use-current-runtime
-      - if: runner.os == 'macOS' || runner.os == 'Linux'
-        id: strings
-        run: |
-          echo -n "libmsquic=" >> $GITHUB_OUTPUT
-          brew --prefix libmsquic >> $GITHUB_OUTPUT
-      - if: runner.os == 'macOS' || runner.os == 'Linux'
-        name: Configure project on macOS / Linux
-        run: >
           cmake -S . -B build
-          -DWTF_USE_EXTERNAL_MSQUIC=on
-          -DCMAKE_PREFIX_PATH=${{ steps.strings.outputs.libmsquic }}
-      - if: runner.os == 'Windows'
-        name: Configure project on Windows # cmake version 3.31.6-msvc6
-        run: >
-          cmake -S . -B build
-          -DWTF_USE_EXTERNAL_MSQUIC=on
-          -DMSQUIC_LIBRARIES="c:\\users\\runneradmin\\.nuget\\packages\\microsoft.native.quic.msquic.openssl\\2.5.6\\build\\native\\Microsoft.Native.Quic.MsQuic.quictls.targets"
-      - name: Build project
-        run: cmake --build build --config Release
+          cmake --build build --config Release
       - name: Parse tag from build context
         uses: olegtarasov/get-tag@v2.1.4
         id: tagVersion

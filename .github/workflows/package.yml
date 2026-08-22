@@ -33,6 +33,10 @@ jobs:
         with:
           submodules: recursive
           show-progress: false
+      - if: runner.os == 'Windows'
+        uses: ilammy/setup-nasm@v1
+        with:
+          from-source: false
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:

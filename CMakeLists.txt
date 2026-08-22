@@ -169,7 +169,7 @@ else()
     set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
     
     if(WIN32)
-        set(QUIC_TLS_LIB "schannel" CACHE STRING "Use Schannel on Windows")
+        set(QUIC_TLS_LIB "openssl" CACHE STRING "Use OpenSSL on Windows")
     else()
         set(QUIC_TLS_LIB "openssl" CACHE STRING "Use OpenSSL on non-Windows")
     endif()

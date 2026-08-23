@@ -1,0 +1,12 @@
+--language
+c
+--file
+msquic/src/inc/msquic.h
+--output
+csharp/MsQuic.cs
+--namespace
+Structmap.WebTransportFast.MsQuic
+--libraryPath
+msquic
+--remap
+QUIC_ADDR*=IntPtr
